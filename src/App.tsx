@@ -11,6 +11,7 @@ import { LoginModal } from './components/auth/LoginModal';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { SellModule } from './components/pos/SellModule';
 import { ExchangeModule } from './components/exchange/ExchangeModule';
+import { BuyModule } from './components/exchange/BuyModule';
 import { EcommerceModule } from './components/ecommerce/EcommerceModule';
 import { CreditModule } from './components/credit/CreditModule';
 import { SettingsModule } from './components/settings/SettingsModule';
@@ -39,7 +40,7 @@ function MainLayout() {
           {activeTab === 'dashboard' && <DashboardOverview />}
           {activeTab === 'catalog' && <CatalogModule />}
           {activeTab === 'sell' && <SellModule />}
-          {activeTab === 'buy' && <ExchangeModule />}
+          {activeTab === 'buy' && <BuyModule />}
           {activeTab === 'valuation' && <ExchangeModule />}
           {activeTab === 'credits' && <CreditModule />}
           {(activeTab === 'repairs' || activeTab === 'jobcard') && <RepairsModule />}

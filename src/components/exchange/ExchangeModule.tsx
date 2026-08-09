@@ -1,98 +1,322 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { TradeInExchange, ConditionChecklist, ExchangeGrade } from '../../types';
+import { TradeInExchange, ConditionChecklist, ExchangeGrade, DamageItem } from '../../types';
 import {
   RefreshCw,
   Smartphone,
-  ShieldAlert,
   CheckCircle2,
   XCircle,
-  Award,
-  DollarSign,
   Tag,
-  User,
-  Phone,
   FileCheck,
-  Zap,
+  Plus,
+  Trash2,
+  Wrench,
   Sparkles,
-  Plus
+  ChevronRight,
+  ShieldCheck,
+  Layers,
+  DollarSign,
+  Info,
+  Sliders,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 
-export const ExchangeModule: React.FC = () => {
-  const { createExchange, exchanges, updateExchangeStatus, settings } = useApp();
+// Step 1: Brands Catalog
+const BRANDS = [
+  { name: 'Apple', icon: '🍎' },
+  { name: 'Samsung', icon: '📱' },
+  { name: 'OnePlus', icon: '⚡' },
+  { name: 'Xiaomi', icon: '🟧' },
+  { name: 'Vivo', icon: '💙' },
+  { name: 'Oppo', icon: '🟢' },
+  { name: 'Realme', icon: '🟡' },
+  { name: 'Google Pixel', icon: '🔍' },
+  { name: 'Motorola', icon: 'Ⓜ️' },
+  { name: 'Nothing', icon: '⚪' },
+  { name: 'Other', icon: '✨' }
+];
 
-  // Form State for new trade-in valuation
+// Step 2: Brand -> Model Database with Default Market Benchmark Values
+const BRANDS_AND_MODELS: Record<string, { name: string; baseValue: number }[]> = {
+  'Apple': [
+    { name: 'iPhone 15 Pro Max', baseValue: 88000 },
+    { name: 'iPhone 15 Pro', baseValue: 76000 },
+    { name: 'iPhone 15 Plus', baseValue: 58000 },
+    { name: 'iPhone 15', baseValue: 52000 },
+    { name: 'iPhone 14 Pro Max', baseValue: 68000 },
+    { name: 'iPhone 14 Pro', baseValue: 59000 },
+    { name: 'iPhone 14 Plus', baseValue: 46000 },
+    { name: 'iPhone 14', baseValue: 42000 },
+    { name: 'iPhone 13 Pro Max', baseValue: 52000 },
+    { name: 'iPhone 13 Pro', baseValue: 45000 },
+    { name: 'iPhone 13', baseValue: 34000 },
+    { name: 'iPhone 13 mini', baseValue: 28000 },
+    { name: 'iPhone 12 Pro Max', baseValue: 38000 },
+    { name: 'iPhone 12', baseValue: 26000 },
+    { name: 'iPhone 11', baseValue: 18000 },
+    { name: 'iPhone SE (3rd Gen)', baseValue: 16000 }
+  ],
+  'Samsung': [
+    { name: 'Galaxy S24 Ultra', baseValue: 82000 },
+    { name: 'Galaxy S24+', baseValue: 62000 },
+    { name: 'Galaxy S24', baseValue: 48000 },
+    { name: 'Galaxy S23 Ultra', baseValue: 58000 },
+    { name: 'Galaxy S23', baseValue: 38000 },
+    { name: 'Galaxy S22 Ultra', baseValue: 42000 },
+    { name: 'Galaxy Z Fold5', baseValue: 72000 },
+    { name: 'Galaxy Z Flip5', baseValue: 42000 },
+    { name: 'Galaxy A55 5G', baseValue: 22000 },
+    { name: 'Galaxy A35 5G', baseValue: 17000 },
+    { name: 'Galaxy M34 5G', baseValue: 11000 }
+  ],
+  'OnePlus': [
+    { name: 'OnePlus 12', baseValue: 48000 },
+    { name: 'OnePlus 12R', baseValue: 32000 },
+    { name: 'OnePlus 11 5G', baseValue: 34000 },
+    { name: 'OnePlus 11R 5G', baseValue: 24000 },
+    { name: 'OnePlus 10 Pro', baseValue: 26000 },
+    { name: 'OnePlus 10', baseValue: 22000 },
+    { name: 'OnePlus Nord 3 5G', baseValue: 18000 },
+    { name: 'OnePlus Nord CE 3', baseValue: 14000 }
+  ],
+  'Xiaomi': [
+    { name: 'Xiaomi 14 Ultra', baseValue: 72000 },
+    { name: 'Xiaomi 14', baseValue: 48000 },
+    { name: 'Xiaomi 13 Pro', baseValue: 38000 },
+    { name: 'Redmi Note 13 Pro+ 5G', baseValue: 19000 },
+    { name: 'Redmi Note 13 Pro', baseValue: 15000 },
+    { name: 'Redmi Note 12 5G', baseValue: 10000 },
+    { name: 'POCO X6 Pro 5G', baseValue: 18000 },
+    { name: 'POCO F5 5G', baseValue: 16000 }
+  ],
+  'Vivo': [
+    { name: 'Vivo X100 Pro', baseValue: 62000 },
+    { name: 'Vivo X90 Pro', baseValue: 42000 },
+    { name: 'Vivo V30 Pro', baseValue: 28000 },
+    { name: 'Vivo V29 5G', baseValue: 20000 },
+    { name: 'Vivo T2 Pro 5G', baseValue: 15000 },
+    { name: 'Vivo Y200 5G', baseValue: 12000 }
+  ],
+  'Oppo': [
+    { name: 'Oppo Find N3 Flip', baseValue: 54000 },
+    { name: 'Oppo Reno 11 Pro 5G', baseValue: 27000 },
+    { name: 'Oppo Reno 10 Pro+ 5G', baseValue: 29000 },
+    { name: 'Oppo F25 Pro 5G', baseValue: 17000 },
+    { name: 'Oppo A79 5G', baseValue: 11000 }
+  ],
+  'Realme': [
+    { name: 'Realme 12 Pro+ 5G', baseValue: 22000 },
+    { name: 'Realme 12+ 5G', baseValue: 15000 },
+    { name: 'Realme GT 2 Pro', baseValue: 21000 },
+    { name: 'Realme 11 Pro+ 5G', baseValue: 16000 },
+    { name: 'Realme Narzo 60 Pro', baseValue: 13000 }
+  ],
+  'Google Pixel': [
+    { name: 'Google Pixel 8 Pro', baseValue: 58000 },
+    { name: 'Google Pixel 8', baseValue: 42000 },
+    { name: 'Google Pixel 7a', baseValue: 22000 },
+    { name: 'Google Pixel 7 Pro', baseValue: 34000 },
+    { name: 'Google Pixel 6a', baseValue: 15000 }
+  ],
+  'Motorola': [
+    { name: 'Motorola Razr 40 Ultra', baseValue: 46000 },
+    { name: 'Motorola Edge 50 Pro', baseValue: 26000 },
+    { name: 'Motorola Edge 40 Neo', baseValue: 16000 },
+    { name: 'Motorola Moto G84 5G', baseValue: 11000 }
+  ],
+  'Nothing': [
+    { name: 'Nothing Phone (2)', baseValue: 28000 },
+    { name: 'Nothing Phone (2a)', baseValue: 18000 },
+    { name: 'Nothing Phone (1)', baseValue: 16000 }
+  ],
+  'Other': [
+    { name: 'Generic Smartphone Model', baseValue: 15000 }
+  ]
+};
+
+// Step 3: All 18 Exact Predefined Damage Types & Deductions
+export interface DamageCatalogItem {
+  id: string;
+  category: 'Display & Screen' | 'Body & Frame' | 'Battery & Charging' | 'Camera & Biometrics' | 'Audio & Network' | 'Hardware & Liquid';
+  type: string;
+  defaultDeduction: number;
+}
+
+const PRESET_DAMAGE_CATALOG: DamageCatalogItem[] = [
+  // Display & Screen
+  { id: 'screen_cracked', category: 'Display & Screen', type: 'Screen Outer Glass Cracked / Shattered', defaultDeduction: 4500 },
+  { id: 'screen_touch', category: 'Display & Screen', type: 'Touch Screen Unresponsive / Ghost Touch', defaultDeduction: 6000 },
+  { id: 'screen_bleed', category: 'Display & Screen', type: 'Display Lines / Black Spots / Bleed / OLED Burn', defaultDeduction: 8500 },
+
+  // Body & Frame
+  { id: 'back_glass', category: 'Body & Frame', type: 'Back Glass / Rear Housing Broken', defaultDeduction: 3500 },
+  { id: 'frame_dented', category: 'Body & Frame', type: 'Metal Frame Dented / Bent Corners', defaultDeduction: 2500 },
+  { id: 'heavy_scratches', category: 'Body & Frame', type: 'Heavy Scratches / Paint Peeling', defaultDeduction: 1500 },
+
+  // Battery & Charging
+  { id: 'battery_degraded', category: 'Battery & Charging', type: 'Battery Health Degraded (<80%) / Rapid Drain', defaultDeduction: 2500 },
+  { id: 'battery_swollen', category: 'Battery & Charging', type: 'Battery Swollen / Bulging Back Panel', defaultDeduction: 3500 },
+  { id: 'charging_port', category: 'Battery & Charging', type: 'Charging Port Loose / Defective / No Power', defaultDeduction: 1800 },
+
+  // Camera & Biometrics
+  { id: 'camera_blur', category: 'Camera & Biometrics', type: 'Rear Camera Blur / OIS Shaking / Dust Inside Lens', defaultDeduction: 3500 },
+  { id: 'camera_lens', category: 'Camera & Biometrics', type: 'Camera Outer Glass Lens Cracked', defaultDeduction: 1200 },
+  { id: 'front_cam_faceid', category: 'Camera & Biometrics', type: 'Front Camera / Face ID / Touch ID Defect', defaultDeduction: 3000 },
+
+  // Audio & Network
+  { id: 'speaker_mic', category: 'Audio & Network', type: 'Speaker Crackling / Mic Distorted / Ear Piece Low', defaultDeduction: 1500 },
+  { id: 'sim_network', category: 'Audio & Network', type: 'SIM Reader / No Network Signal / Baseband Defect', defaultDeduction: 4000 },
+  { id: 'wifi_bt', category: 'Audio & Network', type: 'Wi-Fi / Bluetooth / GPS Hardware Fault', defaultDeduction: 2200 },
+
+  // Hardware & Liquid
+  { id: 'liquid_damage', category: 'Hardware & Liquid', type: 'Water / Moisture Contact Exposure', defaultDeduction: 6500 },
+  { id: 'power_volume_keys', category: 'Hardware & Liquid', type: 'Power Button / Volume Keys Sticking or Faulty', defaultDeduction: 1200 },
+  { id: 'motherboard_ic', category: 'Hardware & Liquid', type: 'Motherboard IC Fault / Random Restarts', defaultDeduction: 9000 }
+];
+
+export const ExchangeModule: React.FC = () => {
+  const { createExchange, exchanges, settings } = useApp();
+
+  // Workflow State: Step 1 -> Step 2 -> Step 3 -> Step 4
+  const [activeStep, setActiveStep] = useState<number>(1);
+
+  // Customer Details
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [govtId, setGovtId] = useState('');
 
-  const [brand, setBrand] = useState('Apple');
-  const [model, setModel] = useState('iPhone 13');
-  const [storageColor, setStorageColor] = useState('128GB Midnight');
-  const [imei, setImei] = useState('');
+  // Step 1: Selected Brand
+  const [brand, setBrand] = useState<string>('Apple');
 
-  // Checklist
-  const [condition, setCondition] = useState<ConditionChecklist>({
-    screenOk: true,
-    screenCondition: 'No Scratch',
-    bodyCondition: 'Flawless',
-    batteryHealth: 88,
-    cameraOk: true,
-    biometricsOk: true,
-    callingOk: true,
-    wifiOk: true,
-    boxAvailable: true,
-    originalChargerAvailable: true,
-    billAvailable: true
-  });
+  // Step 2: Selected Model & Config
+  const [model, setModel] = useState<string>('iPhone 13 Pro');
+  const [customModelInput, setCustomModelInput] = useState<string>('');
+  const [isCustomModel, setIsCustomModel] = useState<boolean>(false);
+  const [storageColor, setStorageColor] = useState<string>('128GB Sierra Blue');
+  const [imei, setImei] = useState<string>('358921048291048');
+  const [baseMarketValue, setBaseMarketValue] = useState<number>(45000);
 
-  const [baseMarketValue, setBaseMarketValue] = useState<number>(32000);
+  // Accessories Checklist Bonuses
+  const [boxAvailable, setBoxAvailable] = useState<boolean>(true);
+  const [chargerAvailable, setChargerAvailable] = useState<boolean>(true);
+  const [billAvailable, setBillAvailable] = useState<boolean>(true);
+
+  // Step 3: Selected Damages List (starts with 1 item for immediate calculation preview)
+  const [selectedDamages, setSelectedDamages] = useState<DamageItem[]>([
+    {
+      id: 'damage-screen_cracked',
+      category: 'Display & Screen',
+      damageType: 'Screen Outer Glass Cracked / Shattered',
+      deductionValue: 4500
+    }
+  ]);
+
+  // Custom Damage Form State
+  const [customDamageName, setCustomDamageName] = useState<string>('');
+  const [customDamageValue, setCustomDamageValue] = useState<string>('');
+  const [customDamageCategory, setCustomDamageCategory] = useState<DamageItem['category']>('Display & Screen');
+
+  // Step 4: Final Payout Options & Override
   const [customValueOverride, setCustomValueOverride] = useState<string>('');
   const [actionChoice, setActionChoice] = useState<TradeInExchange['actionTaken']>('Store Credit Voucher');
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState<string>('');
 
-  // Calculate Valuation & Grade
-  const calculateValuation = () => {
-    let penalty = 0;
-
-    // Screen
-    if (condition.screenCondition === 'Minor Scratch') penalty += 2000;
-    if (condition.screenCondition === 'Cracked') penalty += 7000;
-    if (condition.screenCondition === 'Display Bleed') penalty += 10000;
-
-    // Body
-    if (condition.bodyCondition === 'Light Scratches') penalty += 1500;
-    if (condition.bodyCondition === 'Dented / Bent') penalty += 4000;
-    if (condition.bodyCondition === 'Broken Back') penalty += 6000;
-
-    // Battery
-    if (condition.batteryHealth < 80) penalty += 3000;
-
-    // Functions
-    if (!condition.cameraOk) penalty += 3000;
-    if (!condition.biometricsOk) penalty += 2500;
-    if (!condition.callingOk) penalty += 4000;
-    if (!condition.wifiOk) penalty += 2000;
-
-    // Box/Accessories bonus
-    let bonus = 0;
-    if (condition.boxAvailable) bonus += 500;
-    if (condition.originalChargerAvailable) bonus += 500;
-    if (condition.billAvailable) bonus += 1000;
-
-    const netVal = Math.max(1000, baseMarketValue - penalty + bonus);
-    return Math.round(netVal / 100) * 100; // round to hundreds
+  // Handle Step 1 Brand Selection
+  const handleSelectBrand = (selectedBrand: string) => {
+    setBrand(selectedBrand);
+    const brandModels = BRANDS_AND_MODELS[selectedBrand] || BRANDS_AND_MODELS['Other'];
+    if (brandModels && brandModels.length > 0) {
+      setModel(brandModels[0].name);
+      setBaseMarketValue(brandModels[0].baseValue);
+      setIsCustomModel(false);
+    } else {
+      setModel('Custom Model');
+      setIsCustomModel(true);
+      setBaseMarketValue(15000);
+    }
   };
 
-  const calculatedVal = calculateValuation();
-  const finalAgreedVal = customValueOverride !== '' ? parseFloat(customValueOverride) : calculatedVal;
+  // Handle Step 2 Model Selection
+  const handleSelectModel = (selectedModelName: string, value?: number) => {
+    if (selectedModelName === 'CUSTOM') {
+      setIsCustomModel(true);
+      setModel(customModelInput || 'Custom Model');
+    } else {
+      setIsCustomModel(false);
+      setModel(selectedModelName);
+      if (value !== undefined) {
+        setBaseMarketValue(value);
+      }
+    }
+  };
 
+  // Toggle Damage Type in Step 3
+  const handleToggleDamage = (preset: DamageCatalogItem) => {
+    const exists = selectedDamages.some(d => d.damageType === preset.type);
+    if (exists) {
+      setSelectedDamages(prev => prev.filter(d => d.damageType !== preset.type));
+    } else {
+      setSelectedDamages(prev => [
+        ...prev,
+        {
+          id: `damage-${preset.id}`,
+          category: preset.category,
+          damageType: preset.type,
+          deductionValue: preset.defaultDeduction
+        }
+      ]);
+    }
+  };
+
+  // Add Custom Damage Type
+  const handleAddCustomDamage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customDamageName.trim()) return;
+
+    const val = parseFloat(customDamageValue) || 0;
+    const newItem: DamageItem = {
+      id: `custom-damage-${Date.now()}`,
+      category: customDamageCategory,
+      damageType: customDamageName.trim(),
+      deductionValue: val
+    };
+
+    setSelectedDamages([...selectedDamages, newItem]);
+    setCustomDamageName('');
+    setCustomDamageValue('');
+  };
+
+  // Update Deduction Value for an item
+  const handleUpdateDeduction = (id: string, newDeduction: number) => {
+    setSelectedDamages(prev =>
+      prev.map(d => (d.id === id ? { ...d, deductionValue: Math.max(0, newDeduction) } : d))
+    );
+  };
+
+  // Remove damage item
+  const handleRemoveDamage = (id: string) => {
+    setSelectedDamages(prev => prev.filter(d => d.id !== id));
+  };
+
+  // Calculations
+  const totalDamageDeductions = selectedDamages.reduce((sum, d) => sum + d.deductionValue, 0);
+
+  let accessoriesBonus = 0;
+  if (boxAvailable) accessoriesBonus += 500;
+  if (chargerAvailable) accessoriesBonus += 500;
+  if (billAvailable) accessoriesBonus += 1000;
+
+  const calculatedVal = Math.max(1000, Math.round((baseMarketValue + accessoriesBonus - totalDamageDeductions) / 100) * 100);
+  const finalAgreedVal = customValueOverride !== '' ? Math.max(0, parseFloat(customValueOverride) || 0) : calculatedVal;
+
+  // Grade Determination
   const determineGrade = (): ExchangeGrade => {
-    if (condition.screenCondition === 'No Scratch' && condition.bodyCondition === 'Flawless' && condition.batteryHealth >= 85) {
+    if (selectedDamages.length === 0 && totalDamageDeductions === 0) {
       return 'Grade A (Flawless)';
-    } else if (condition.screenCondition === 'Minor Scratch' || condition.bodyCondition === 'Light Scratches') {
+    } else if (totalDamageDeductions <= 4000 && !selectedDamages.some(d => d.category === 'Hardware & Liquid')) {
       return 'Grade B (Minor Wear)';
-    } else if (condition.screenCondition === 'Cracked' || condition.bodyCondition === 'Dented / Bent') {
+    } else if (totalDamageDeductions <= 12000) {
       return 'Grade C (Scratched/Dent)';
     } else {
       return 'Grade D (Damaged)';
@@ -101,25 +325,44 @@ export const ExchangeModule: React.FC = () => {
 
   const grade = determineGrade();
 
-  // Submit Trade-In
+  // Effective Model Name
+  const effectiveModelName = isCustomModel ? (customModelInput.trim() || 'Custom Model') : model;
+
+  // Submit Trade-In Record
   const handleValuationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imei) {
-      alert('Please enter IMEI number for tracking!');
-      return;
-    }
 
+    const activeImei = imei.trim() || `SN-${Math.floor(100000000000 + Math.random() * 900000000000)}`;
     const voucher = actionChoice === 'Store Credit Voucher' ? `VOUCHER-EX${Math.floor(10 + Math.random() * 90)}K` : undefined;
 
-    const record = createExchange({
-      customerName: customerName || 'Walk-in Customer',
-      customerPhone: customerPhone || 'N/A',
-      customerGovtId: govtId || 'N/A',
+    const conditionData: ConditionChecklist = {
+      screenOk: !selectedDamages.some(d => d.damageType.includes('Screen') || d.damageType.includes('Touch')),
+      screenCondition: selectedDamages.some(d => d.damageType.includes('Bleed')) ? 'Display Bleed' :
+                        selectedDamages.some(d => d.damageType.includes('Cracked')) ? 'Cracked' :
+                        selectedDamages.some(d => d.damageType.includes('Scratches')) ? 'Minor Scratch' : 'No Scratch',
+      bodyCondition: selectedDamages.some(d => d.damageType.includes('Back Glass')) ? 'Broken Back' :
+                      selectedDamages.some(d => d.damageType.includes('Dented')) ? 'Dented / Bent' :
+                      selectedDamages.some(d => d.damageType.includes('Scratches')) ? 'Light Scratches' : 'Flawless',
+      batteryHealth: selectedDamages.some(d => d.damageType.includes('Battery')) ? 75 : 90,
+      cameraOk: !selectedDamages.some(d => d.category === 'Camera & Biometrics'),
+      biometricsOk: !selectedDamages.some(d => d.damageType.includes('Face ID') || d.damageType.includes('Touch ID')),
+      callingOk: !selectedDamages.some(d => d.damageType.includes('SIM')),
+      wifiOk: !selectedDamages.some(d => d.damageType.includes('Wi-Fi')),
+      boxAvailable,
+      originalChargerAvailable: chargerAvailable,
+      billAvailable,
+      damageItems: selectedDamages
+    };
+
+    createExchange({
+      customerName: customerName.trim() || 'Walk-in Customer',
+      customerPhone: customerPhone.trim() || 'N/A',
+      customerGovtId: govtId.trim() || 'N/A',
       deviceBrand: brand,
-      deviceModel: model,
+      deviceModel: effectiveModelName,
       storageColor,
-      imeiNumber: imei,
-      condition,
+      imeiNumber: activeImei,
+      condition: conditionData,
       calculatedValue: calculatedVal,
       agreedValue: finalAgreedVal,
       grade,
@@ -127,341 +370,527 @@ export const ExchangeModule: React.FC = () => {
       voucherCode: voucher,
       isVoucherUsed: false,
       status: actionChoice === 'Added to Refurbish Stock' ? 'In Refurbish' : 'Completed',
-      inspectorStaff: 'On Duty Manager',
-      notes
+      inspectorStaff: 'Valuation Inspector',
+      notes: notes.trim() || undefined
     });
 
-    alert(`Trade-In Created! Voucher Code: ${voucher || 'N/A'}. Final Value: ${settings.currencySymbol}${finalAgreedVal.toLocaleString()}`);
+    alert(`Trade-In Certificate Issued!\nDevice: ${brand} ${effectiveModelName}\nFinal Trade-In Valuation: ${settings.currencySymbol}${finalAgreedVal.toLocaleString()}\nVoucher: ${voucher || 'Direct Cash/UPI'}`);
 
     // Reset Form
-    setImei('');
     setCustomValueOverride('');
     setNotes('');
   };
 
   return (
-    <div id="exchange-module-container" className="space-y-6">
+    <div id="valuation-page-container" className="space-y-6 pb-12">
       
-      {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+      {/* Top Banner & Title */}
+      <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <RefreshCw className="w-5 h-5 text-cyan-400" />
-            <span>Used Device Trade-In & Buyback Inspection</span>
-          </h2>
-          <p className="text-xs text-slate-400">
-            Automated market valuation, physical & electronic inspection checklist, store voucher creation.
+          <div className="flex items-center gap-2 text-cyan-400 font-extrabold text-xs uppercase tracking-widest mb-1">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span>Smart Buyback & Trade-In Valuation Engine</span>
+          </div>
+          <h1 className="text-2xl font-black text-white tracking-tight">
+            Device Damage Assessment & Buyback Calculator
+          </h1>
+          <p className="text-slate-400 text-xs mt-1">
+            4-Step Assessment Workflow: Brand → Model → Damage Selection → Auto-Calculated Valuation
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-300">
-          <span className="px-3 py-1 bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 rounded-lg font-medium">
-            Grading Engine Active
-          </span>
+
+        {/* Live Final Assessment Badge Example */}
+        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 flex items-center gap-3 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-extrabold text-lg">
+            {settings.currencySymbol}
+          </div>
+          <div>
+            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Live Assessment Result</div>
+            <div className="text-lg font-black text-emerald-400">
+              {settings.currencySymbol}{finalAgreedVal.toLocaleString()}
+            </div>
+            <div className="text-[10px] text-cyan-300 font-semibold">
+              {brand} {effectiveModelName} ({selectedDamages.length} Damage Faults)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3-Step Interactive Navigation Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-900/80 p-2 rounded-2xl border border-slate-800">
+        {[
+          { step: 1, label: 'Step 1: Select Brand', sub: brand },
+          { step: 2, label: 'Step 2: Select Model', sub: effectiveModelName },
+          { step: 3, label: 'Step 3: Damage Types', sub: `${selectedDamages.length} Faults Selected` }
+        ].map((s) => (
+          <button
+            key={s.step}
+            type="button"
+            onClick={() => setActiveStep(s.step)}
+            className={`p-3 rounded-xl border text-left transition flex items-center justify-between ${
+              activeStep === s.step
+                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-cyan-400 shadow-md'
+                : 'bg-slate-950/60 text-slate-400 border-slate-800/80 hover:bg-slate-800/60 hover:text-slate-200'
+            }`}
+          >
+            <div>
+              <div className="text-xs font-black">{s.label}</div>
+              <div className="text-[10px] opacity-80 font-medium truncate max-w-[140px]">{s.sub}</div>
+            </div>
+            <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${activeStep === s.step ? 'translate-x-1' : 'opacity-40'}`} />
+          </button>
+        ))}
+      </div>
+
+      {/* Final Prompt Workflow Example Indicator Pill */}
+      <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+        <span className="text-slate-400 font-semibold flex items-center gap-1.5">
+          <Info className="w-4 h-4 text-cyan-400 shrink-0" />
+          <span>Active Assessment Prompt:</span>
+        </span>
+        <div className="font-mono text-cyan-300 font-bold bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl text-[11px] break-all">
+          "Brand: <span className="text-white">{brand}</span> → Model: <span className="text-white">{effectiveModelName}</span> → Damage: <span className="text-rose-300">{selectedDamages.length > 0 ? selectedDamages.map(d => d.damageType).join(', ') : 'None (Flawless)'}</span> → Net Deduction: <span className="text-rose-400">-{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}</span>"
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column: Device Valuation & Inspection Checklist Form */}
-        <div className="lg:col-span-7 xl:col-span-8">
-          <form onSubmit={handleValuationSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5">
-            
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-cyan-400" />
-                <span>Trade-In Device Details & Inspection</span>
-              </h3>
-              <span className="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">
-                Step 1 of 2
-              </span>
-            </div>
+        {/* Main Column: Steps 1 to 4 Forms */}
+        <div className="lg:col-span-8 space-y-6">
+          <form onSubmit={handleValuationSubmit} className="space-y-6">
 
-            {/* Customer & Govt ID */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Customer Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Amit Kumar"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Phone Number</label>
-                <input
-                  type="text"
-                  placeholder="+91 98765..."
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Govt ID Proof (Aadhar/PAN)</label>
-                <input
-                  type="text"
-                  placeholder="ID Number for record"
-                  value={govtId}
-                  onChange={(e) => setGovtId(e.target.value)}
-                  className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
-                />
-              </div>
-            </div>
-
-            {/* Device Info */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs pt-3 border-t border-slate-800">
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Brand</label>
-                <select
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
-                  className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700"
-                >
-                  <option value="Apple">Apple</option>
-                  <option value="Samsung">Samsung</option>
-                  <option value="OnePlus">OnePlus</option>
-                  <option value="Xiaomi">Xiaomi</option>
-                  <option value="Vivo">Vivo</option>
-                  <option value="Realme">Realme</option>
-                  <option value="Google Pixel">Google Pixel</option>
-                </select>
+            {/* STEP 1: SELECT BRAND */}
+            <div className={`bg-slate-900 border rounded-3xl p-6 transition-all space-y-4 ${
+              activeStep === 1 ? 'border-cyan-500 shadow-xl shadow-cyan-950/20' : 'border-slate-800'
+            }`}>
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/30">
+                    1
+                  </span>
+                  <div>
+                    <h2 className="text-base font-extrabold text-white">Step 1: Select Brand</h2>
+                    <p className="text-[11px] text-slate-400">Choose manufacturer to load model catalog</p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                  Selected: {brand}
+                </span>
               </div>
 
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Model Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. iPhone 13 Pro / S22 Ultra"
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Storage & Color</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 128GB Blue"
-                  value={storageColor}
-                  onChange={(e) => setStorageColor(e.target.value)}
-                  className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Device IMEI Number *</label>
-                <input
-                  type="text"
-                  placeholder="15-digit IMEI"
-                  value={imei}
-                  onChange={(e) => setImei(e.target.value)}
-                  className="w-full bg-slate-800 text-cyan-300 font-mono font-semibold px-3 py-2 rounded-xl border border-slate-700"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Multi-Point Condition Inspection */}
-            <div className="pt-3 border-t border-slate-800 space-y-3">
-              <div className="font-semibold text-slate-200 text-xs flex items-center justify-between">
-                <span>Multi-Point Condition Checklist</span>
-                <span className="text-[10px] text-cyan-400">Affects Valuation Calculation</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                {/* Screen condition */}
-                <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-1.5">
-                  <label className="text-slate-300 font-medium block">Display & Screen Condition</label>
-                  <select
-                    value={condition.screenCondition}
-                    onChange={(e) => setCondition({ ...condition, screenCondition: e.target.value as any })}
-                    className="w-full bg-slate-900 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700"
+              {/* Brand Grid Selector */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                {BRANDS.map((b) => (
+                  <button
+                    key={b.name}
+                    type="button"
+                    onClick={() => {
+                      handleSelectBrand(b.name);
+                      setActiveStep(2);
+                    }}
+                    className={`p-3.5 rounded-2xl border transition-all flex items-center gap-3 text-left ${
+                      brand === b.name
+                        ? 'bg-cyan-600/20 text-white border-cyan-500 shadow-md shadow-cyan-900/30'
+                        : 'bg-slate-950/70 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
+                    }`}
                   >
-                    <option value="No Scratch">No Scratch (Flawless Display)</option>
-                    <option value="Minor Scratch">Minor Scratch (-{settings.currencySymbol}2,000)</option>
-                    <option value="Cracked">Cracked Glass (-{settings.currencySymbol}7,000)</option>
-                    <option value="Display Bleed">Display Lines / Bleed (-{settings.currencySymbol}10,000)</option>
-                  </select>
+                    <span className="text-xl">{b.icon}</span>
+                    <span className="font-bold text-xs">{b.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* STEP 2: SELECT MODEL */}
+            <div className={`bg-slate-900 border rounded-3xl p-6 transition-all space-y-4 ${
+              activeStep === 2 ? 'border-cyan-500 shadow-xl shadow-cyan-950/20' : 'border-slate-800'
+            }`}>
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/30">
+                    2
+                  </span>
+                  <div>
+                    <h2 className="text-base font-extrabold text-white">Step 2: Select Model ({brand})</h2>
+                    <p className="text-[11px] text-slate-400">Pick device model or enter custom details</p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                  Base Market Benchmark: {settings.currencySymbol}{baseMarketValue.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Models Selector List/Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto pr-1">
+                {(BRANDS_AND_MODELS[brand] || BRANDS_AND_MODELS['Other']).map((m) => (
+                  <button
+                    key={m.name}
+                    type="button"
+                    onClick={() => handleSelectModel(m.name, m.baseValue)}
+                    className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-start ${
+                      model === m.name && !isCustomModel
+                        ? 'bg-cyan-600/20 text-cyan-200 border-cyan-500 font-bold'
+                        : 'bg-slate-950/60 text-slate-300 border-slate-800 hover:bg-slate-800/80'
+                    }`}
+                  >
+                    <div className="text-xs font-semibold truncate">{m.name}</div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom Model Toggle */}
+              <div className="pt-2 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="sm:col-span-1">
+                  <label className="block text-slate-300 mb-1 font-semibold">Custom Model Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. iPhone 13 Pro"
+                    value={isCustomModel ? customModelInput : model}
+                    onChange={(e) => {
+                      setIsCustomModel(true);
+                      setCustomModelInput(e.target.value);
+                      setModel(e.target.value || 'Custom Model');
+                    }}
+                    className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
+                  />
                 </div>
 
-                {/* Body condition */}
-                <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-1.5">
-                  <label className="text-slate-300 font-medium block">Body & Frame Condition</label>
-                  <select
-                    value={condition.bodyCondition}
-                    onChange={(e) => setCondition({ ...condition, bodyCondition: e.target.value as any })}
-                    className="w-full bg-slate-900 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700"
-                  >
-                    <option value="Flawless">Flawless (No Dents)</option>
-                    <option value="Light Scratches">Light Scratches (-{settings.currencySymbol}1,500)</option>
-                    <option value="Dented / Bent">Dented Corners / Bent (-{settings.currencySymbol}4,000)</option>
-                    <option value="Broken Back">Broken Back Glass (-{settings.currencySymbol}6,000)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Battery Health & Functional Checkboxes */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
                 <div>
-                  <label className="text-slate-300 font-medium block mb-1">
-                    Battery Health: <strong>{condition.batteryHealth}%</strong>
-                  </label>
+                  <label className="block text-slate-300 mb-1 font-semibold">Variant / Storage / Color</label>
                   <input
-                    type="range"
-                    min="50"
-                    max="100"
-                    value={condition.batteryHealth}
-                    onChange={(e) => setCondition({ ...condition, batteryHealth: parseInt(e.target.value) })}
-                    className="w-full accent-cyan-500 cursor-pointer"
+                    type="text"
+                    placeholder="e.g. 128GB Sierra Blue"
+                    value={storageColor}
+                    onChange={(e) => setStorageColor(e.target.value)}
+                    className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={condition.cameraOk}
-                      onChange={(e) => setCondition({ ...condition, cameraOk: e.target.checked })}
-                      className="accent-cyan-500"
-                    />
-                    <span>Camera Working</span>
-                  </label>
-                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={condition.biometricsOk}
-                      onChange={(e) => setCondition({ ...condition, biometricsOk: e.target.checked })}
-                      className="accent-cyan-500"
-                    />
-                    <span>Face ID / Touch ID</span>
-                  </label>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={condition.callingOk}
-                      onChange={(e) => setCondition({ ...condition, callingOk: e.target.checked })}
-                      className="accent-cyan-500"
-                    />
-                    <span>SIM & Network Calls</span>
-                  </label>
-                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={condition.wifiOk}
-                      onChange={(e) => setCondition({ ...condition, wifiOk: e.target.checked })}
-                      className="accent-cyan-500"
-                    />
-                    <span>Wi-Fi & Bluetooth</span>
-                  </label>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Total Price ({settings.currencySymbol}) *</label>
+                  <input
+                    type="number"
+                    placeholder={`e.g. 45000`}
+                    value={baseMarketValue || ''}
+                    onChange={(e) => setBaseMarketValue(Math.max(0, parseFloat(e.target.value) || 0))}
+                    className="w-full bg-slate-800 text-emerald-300 font-extrabold px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
+                    required
+                  />
                 </div>
               </div>
 
-              {/* Box & Original Accessories */}
-              <div className="flex flex-wrap items-center gap-4 text-xs bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
-                <span className="font-medium text-slate-300">Box & Bill Availability:</span>
-                <label className="flex items-center gap-1.5 text-slate-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={condition.boxAvailable}
-                    onChange={(e) => setCondition({ ...condition, boxAvailable: e.target.checked })}
-                    className="accent-cyan-500"
-                  />
-                  <span>Original Box</span>
-                </label>
-                <label className="flex items-center gap-1.5 text-slate-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={condition.originalChargerAvailable}
-                    onChange={(e) => setCondition({ ...condition, originalChargerAvailable: e.target.checked })}
-                    className="accent-cyan-500"
-                  />
-                  <span>Original Charger</span>
-                </label>
-                <label className="flex items-center gap-1.5 text-slate-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={condition.billAvailable}
-                    onChange={(e) => setCondition({ ...condition, billAvailable: e.target.checked })}
-                    className="accent-cyan-500"
-                  />
-                  <span>Original Tax Invoice</span>
-                </label>
+              {/* Accessories Bonus Selection */}
+              <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+                  <Tag className="w-4 h-4 text-cyan-400" />
+                  <span>Accessories Bonus:</span>
+                </span>
+                <div className="flex items-center gap-4 flex-wrap">
+                  <label className="flex items-center gap-1.5 text-slate-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={boxAvailable}
+                      onChange={(e) => setBoxAvailable(e.target.checked)}
+                      className="accent-cyan-500 w-4 h-4 rounded"
+                    />
+                    <span>Original Box (+{settings.currencySymbol}500)</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 text-slate-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={chargerAvailable}
+                      onChange={(e) => setChargerAvailable(e.target.checked)}
+                      className="accent-cyan-500 w-4 h-4 rounded"
+                    />
+                    <span>Original Charger (+{settings.currencySymbol}500)</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 text-slate-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={billAvailable}
+                      onChange={(e) => setBillAvailable(e.target.checked)}
+                      className="accent-cyan-500 w-4 h-4 rounded"
+                    />
+                    <span>Tax Invoice (+{settings.currencySymbol}1,000)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 3: SELECT DAMAGE TYPE(S) */}
+            <div className={`bg-slate-900 border rounded-3xl p-6 transition-all space-y-5 ${
+              activeStep === 3 ? 'border-rose-500 shadow-xl shadow-rose-950/20' : 'border-slate-800'
+            }`}>
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-full bg-rose-500/20 text-rose-400 font-black text-xs flex items-center justify-center border border-rose-500/30">
+                    3
+                  </span>
+                  <div>
+                    <h2 className="text-base font-extrabold text-white">Step 3: Select Damage Type(s)</h2>
+                    <p className="text-[11px] text-slate-400">Click any damage type card to select or deselect defect faults.</p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+                  {selectedDamages.length} Damage Fault(s) Selected
+                </span>
+              </div>
+
+              {/* All 18 Predefined Damage Types Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {PRESET_DAMAGE_CATALOG.map((dmg) => {
+                  const selectedItem = selectedDamages.find(d => d.damageType === dmg.type);
+                  const isSelected = !!selectedItem;
+                  return (
+                    <button
+                      key={dmg.id}
+                      type="button"
+                      onClick={() => handleToggleDamage(dmg)}
+                      className={`p-4 rounded-2xl border transition-all text-left flex items-center justify-between gap-3 cursor-pointer ${
+                        isSelected
+                          ? 'bg-rose-500/15 border-rose-500 text-white shadow-md shadow-rose-950/30 ring-1 ring-rose-500/40'
+                          : 'bg-slate-950/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/80 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="space-y-1.5 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
+                            isSelected ? 'bg-rose-500 text-white' : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            {dmg.category}
+                          </span>
+                          {isSelected && (
+                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                              Selected
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs font-bold text-slate-100">{dmg.type}</div>
+                      </div>
+
+                      {/* Toggle Checkbox Icon */}
+                      <div className={`w-7 h-7 rounded-xl border flex items-center justify-center transition shrink-0 ${
+                        isSelected
+                          ? 'bg-rose-500 border-rose-400 text-white'
+                          : 'border-slate-700 bg-slate-900 text-slate-500'
+                      }`}>
+                        <Check className="w-4 h-4 stroke-[3]" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selected Damage List Table inside Step 3 */}
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                    <Sliders className="w-4 h-4 text-rose-400" />
+                    <span>Selected Damage Faults ({selectedDamages.length})</span>
+                  </span>
+                  <span className="text-[10px] text-rose-400 font-bold">
+                    Total Deduction: -{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}
+                  </span>
+                </div>
+
+                {selectedDamages.length === 0 ? (
+                  <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 text-center text-slate-400 text-xs">
+                    No damage faults selected yet. Click any card above or add custom defect below.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950">
+                    <table className="w-full text-left text-xs text-slate-300">
+                      <thead className="bg-slate-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                        <tr>
+                          <th className="p-3">Category</th>
+                          <th className="p-3">Damage Fault</th>
+                          <th className="p-3 text-right">Custom Deduction Price</th>
+                          <th className="p-3 text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/80">
+                        {selectedDamages.map((dmg) => (
+                          <tr key={dmg.id} className="hover:bg-slate-900/50 transition">
+                            <td className="p-3">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                {dmg.category}
+                              </span>
+                            </td>
+                            <td className="p-3 font-semibold text-slate-100">{dmg.damageType}</td>
+                            <td className="p-3 text-right">
+                              <div className="inline-flex items-center gap-1">
+                                <span className="text-rose-400 font-extrabold">- {settings.currencySymbol}</span>
+                                <input
+                                  type="number"
+                                  value={dmg.deductionValue}
+                                  onChange={(e) => handleUpdateDeduction(dmg.id, parseFloat(e.target.value) || 0)}
+                                  className="w-24 bg-slate-900 text-rose-400 font-black text-right px-2 py-1 rounded-xl border border-slate-700 focus:outline-none focus:border-rose-500"
+                                />
+                              </div>
+                            </td>
+                            <td className="p-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveDamage(dmg.id)}
+                                className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition"
+                                title="Remove damage fault"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Add Custom Damage Option */}
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Plus className="w-4 h-4 text-purple-400" />
+                  <span>Add Additional / Custom Defect & Price</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+                  <div className="sm:col-span-3">
+                    <select
+                      value={customDamageCategory}
+                      onChange={(e) => setCustomDamageCategory(e.target.value as any)}
+                      className="w-full bg-slate-900 text-slate-100 px-3 py-2 rounded-xl border border-slate-700"
+                    >
+                      <option value="Display & Screen">Display & Screen</option>
+                      <option value="Body & Frame">Body & Frame</option>
+                      <option value="Battery & Charging">Battery & Charging</option>
+                      <option value="Camera & Biometrics">Camera & Biometrics</option>
+                      <option value="Audio & Network">Audio & Network</option>
+                      <option value="Hardware & Liquid">Hardware & Liquid</option>
+                    </select>
+                  </div>
+                  <div className="sm:col-span-5">
+                    <input
+                      type="text"
+                      placeholder="e.g. Broken Volume Key, SIM Tray Missing..."
+                      value={customDamageName}
+                      onChange={(e) => setCustomDamageName(e.target.value)}
+                      className="w-full bg-slate-900 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <input
+                      type="number"
+                      placeholder={`Custom Amount (${settings.currencySymbol})`}
+                      value={customDamageValue}
+                      onChange={(e) => setCustomDamageValue(e.target.value)}
+                      className="w-full bg-slate-900 text-rose-300 font-bold px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <button
+                      type="button"
+                      onClick={handleAddCustomDamage}
+                      disabled={!customDamageName.trim()}
+                      className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white font-bold py-2 rounded-xl transition"
+                    >
+                      + Add Fault
+                    </button>
+                  </div>
+                </div>
               </div>
 
             </div>
 
-            {/* Base Market Benchmark Adjustment */}
-            <div className="pt-3 border-t border-slate-800 text-xs space-y-2">
-              <div className="flex items-center justify-between text-slate-300">
-                <span>Base Market Valuation Benchmark:</span>
-                <input
-                  type="number"
-                  value={baseMarketValue}
-                  onChange={(e) => setBaseMarketValue(parseFloat(e.target.value) || 0)}
-                  className="w-32 bg-slate-800 text-right text-slate-100 font-bold px-2 py-1 rounded-lg border border-slate-700"
-                />
-              </div>
+            {/* Confirm Valuation Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="w-full py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-base rounded-2xl shadow-xl shadow-emerald-950/40 transition active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer"
+              >
+                <CheckCircle2 className="w-5 h-5 text-emerald-200" />
+                <span>Confirm Valuation</span>
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-cyan-600/20 transition active:scale-95"
-            >
-              Confirm Valuation & Issue Trade-In Record
-            </button>
 
           </form>
         </div>
 
-        {/* Right Column: Calculated Valuation Card & Action Choice */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+        {/* Right Column: Live Assessment Card, Math Breakdown & Payout Method */}
+        <div className="lg:col-span-4 space-y-6">
           
-          {/* Output Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
-            <div className="text-center space-y-1 pb-3 border-b border-slate-800">
-              <span className="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">Automated Assessment Result</span>
-              <div className="text-3xl font-extrabold text-white tracking-tight">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-5 shadow-2xl sticky top-6">
+            
+            <div className="text-center space-y-2 pb-4 border-b border-slate-800">
+              <span className="text-[10px] uppercase font-black text-cyan-400 tracking-widest flex items-center justify-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                Auto-Calculated Assessment
+              </span>
+              
+              <div className="text-4xl font-black text-white tracking-tight">
                 {settings.currencySymbol}{finalAgreedVal.toLocaleString()}
               </div>
+
               <div className="flex items-center justify-center gap-2 pt-1">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                <span className={`text-xs font-black px-3.5 py-1 rounded-full border ${
                   grade.startsWith('Grade A') ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' :
                   grade.startsWith('Grade B') ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' :
-                  'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  grade.startsWith('Grade C') ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' :
+                  'bg-rose-500/20 text-rose-300 border-rose-500/40'
                 }`}>
                   {grade}
                 </span>
               </div>
             </div>
 
-            {/* Custom Override input */}
-            <div className="text-xs space-y-1">
+            {/* Itemized Deduction Math Breakdown */}
+            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
+              <div className="font-bold text-slate-300 text-[11px] uppercase tracking-wider pb-1.5 border-b border-slate-800 flex justify-between">
+                <span>Deduction Itemized Math</span>
+                <span className="text-cyan-400">{brand}</span>
+              </div>
+              
+              <div className="flex items-center justify-between text-slate-300">
+                <span>Base Market Benchmark:</span>
+                <span className="font-extrabold text-emerald-400">+{settings.currencySymbol}{baseMarketValue.toLocaleString()}</span>
+              </div>
+
+              <div className="flex items-center justify-between text-slate-300">
+                <span>Accessories Bonus:</span>
+                <span className="font-extrabold text-cyan-400">+{settings.currencySymbol}{accessoriesBonus.toLocaleString()}</span>
+              </div>
+
+              <div className="flex items-center justify-between text-slate-300">
+                <span>Damage Deductions ({selectedDamages.length}):</span>
+                <span className="font-extrabold text-rose-400">-{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}</span>
+              </div>
+
+              <div className="pt-2 border-t border-slate-800 flex items-center justify-between font-black text-white text-sm">
+                <span>Auto-Calculated Payout:</span>
+                <span className="text-cyan-300">{settings.currencySymbol}{calculatedVal.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Custom Override Option */}
+            <div className="text-xs space-y-1.5">
               <label className="text-slate-300 block font-semibold">Custom Valuation Override ({settings.currencySymbol})</label>
               <input
                 type="number"
                 placeholder={`Calculated: ${calculatedVal}`}
                 value={customValueOverride}
                 onChange={(e) => setCustomValueOverride(e.target.value)}
-                className="w-full bg-slate-800 text-cyan-300 font-bold px-3 py-2 rounded-xl border border-slate-700"
+                className="w-full bg-slate-800 text-cyan-300 font-black text-sm px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
               />
+              <p className="text-[10px] text-slate-400">Leave empty to use auto-calculated amount</p>
             </div>
 
-            {/* Action Choice Selector */}
+            {/* Payout Method */}
             <div className="text-xs space-y-2 pt-2 border-t border-slate-800">
               <label className="text-slate-300 block font-semibold">Trade-In Payout Method</label>
               
               <div className="space-y-2">
                 {[
-                  { id: 'Store Credit Voucher', label: 'Store Credit Voucher (For POS)', desc: 'Generates redeemable coupon code' },
-                  { id: 'Cash Paid', label: 'Cash / UPI Direct Payout', desc: 'Direct cash given to customer' },
-                  { id: 'Added to Refurbish Stock', label: 'Add to Refurbished Inventory', desc: 'Auto-creates resale product (+25% margin)' }
+                  { id: 'Store Credit Voucher', label: 'Store Credit Voucher (POS)', desc: 'Generates redeemable coupon code' },
+                  { id: 'Cash Paid', label: 'Cash / UPI Direct Payout', desc: 'Instant cash payout to seller' },
+                  { id: 'Added to Refurbish Stock', label: 'Add to Refurbished Stock', desc: 'Adds device to resale inventory' }
                 ].map((opt) => (
                   <button
                     key={opt.id}
@@ -486,23 +915,23 @@ export const ExchangeModule: React.FC = () => {
 
       </div>
 
-      {/* Trade-In History Log */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+      {/* History Log of Saved Buyback Assessments */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <h3 className="font-extrabold text-white text-base flex items-center gap-2">
               <FileCheck className="w-5 h-5 text-cyan-400" />
-              <span>Exchange & Buyback History</span>
+              <span>Valuation & Buyback History Log</span>
             </h3>
-            <p className="text-xs text-slate-400">All evaluated devices with voucher codes & refurbish tracking.</p>
+            <p className="text-xs text-slate-400">All issued trade-in vouchers, damage reports & refurbish stock records</p>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-slate-800">
           <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-800/80 text-slate-400 uppercase text-[10px]">
+            <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
               <tr>
-                <th className="p-3">Code / Date</th>
+                <th className="p-3">Exchange Code / Date</th>
                 <th className="p-3">Customer</th>
                 <th className="p-3">Device & IMEI</th>
                 <th className="p-3">Grade</th>
@@ -511,7 +940,7 @@ export const ExchangeModule: React.FC = () => {
                 <th className="p-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-slate-800/80 bg-slate-950/30">
               {exchanges.map((ex) => (
                 <tr key={ex.id} className="hover:bg-slate-800/50 transition">
                   <td className="p-3">

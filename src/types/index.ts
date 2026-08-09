@@ -88,6 +88,13 @@ export type SaleRecord = SaleTransaction;
 
 export type ExchangeGrade = 'Grade A (Flawless)' | 'Grade B (Minor Wear)' | 'Grade C (Scratched/Dent)' | 'Grade D (Damaged)';
 
+export interface DamageItem {
+  id: string;
+  category: string;
+  damageType: string;
+  deductionValue: number;
+}
+
 export interface ConditionChecklist {
   screenOk: boolean;
   screenCondition: 'No Scratch' | 'Minor Scratch' | 'Cracked' | 'Display Bleed';
@@ -100,6 +107,7 @@ export interface ConditionChecklist {
   boxAvailable: boolean;
   originalChargerAvailable: boolean;
   billAvailable: boolean;
+  damageItems?: DamageItem[];
 }
 
 export interface TradeInExchange {
@@ -270,7 +278,9 @@ export interface ExpenseItem {
     | 'Marketing & Ads'
     | 'Transportation & Freight'
     | 'Shop Equipment'
-    | 'Other Expense';
+    | 'Other Expense'
+    | 'Custom Expense'
+    | (string & {});
   amount: number;
   paymentMethod: 'Cash' | 'UPI' | 'Card' | 'Bank Transfer' | 'Other';
   paidTo?: string; // e.g. "Shop Landlord", "Airtel Broadband"
