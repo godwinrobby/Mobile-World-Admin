@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { User } from '../../types';
 import {
@@ -20,12 +21,16 @@ import {
 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const { setCurrentUser, setToken } = useApp();
+  const { currentUser, setCurrentUser, setToken } = useApp();
+  const navigate = useNavigate();
 
-  // Scroll to top on page mount
+  // Scroll to top on page mount & redirect if logged in
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, []);
+    if (currentUser) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const [email, setEmail] = useState('admin@mobileworld.com');
   const [password, setPassword] = useState('admin123');
@@ -86,6 +91,7 @@ export const LoginPage: React.FC = () => {
 
         setTimeout(() => {
           setCurrentUser(adminUser);
+          navigate('/dashboard', { replace: true });
         }, 800);
 
       } else {
@@ -116,6 +122,7 @@ export const LoginPage: React.FC = () => {
 
         setTimeout(() => {
           setCurrentUser(adminUser);
+          navigate('/dashboard', { replace: true });
         }, 1200);
       }
     } catch (err: any) {
@@ -144,6 +151,7 @@ export const LoginPage: React.FC = () => {
 
       setTimeout(() => {
         setCurrentUser(adminUser);
+        navigate('/dashboard', { replace: true });
       }, 1000);
     } finally {
       setLoading(false);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp, ActiveTab } from '../../context/AppContext';
 import {
   LayoutDashboard,
@@ -22,6 +23,11 @@ import {
 
 export const Sidebar: React.FC = () => {
   const { activeTab, setActiveTab, orders, customers, products, settings } = useApp();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Active path determined from location or activeTab fallback
+  const currentPath = location.pathname.replace('/', '') || 'dashboard';
 
   const pendingOrders = orders.filter(o => o.orderStatus === 'Pending').length;
   const overdueCustomers = customers.filter(c => c.currentBalance > 0).length;
@@ -145,13 +151,16 @@ export const Sidebar: React.FC = () => {
 
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = currentPath === item.id || activeTab === item.id;
 
           return (
             <button
               key={item.id}
               id={`nav-item-${item.id}`}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                navigate(`/${item.id}`);
+              }}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition ${
                 isActive
                   ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/20 font-semibold'

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import {
   Smartphone,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
+  const navigate = useNavigate();
   const {
     currentUser,
     setCurrentUser,
@@ -107,7 +109,10 @@ export const Navbar: React.FC = () => {
           {/* Fast POS Button */}
           <button
             id="quick-pos-btn"
-            onClick={() => setActiveTab('sell')}
+            onClick={() => {
+              setActiveTab('sell');
+              navigate('/sell');
+            }}
             className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-medium text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-sm transition active:scale-95"
           >
             <ShoppingCart className="w-4 h-4" />
@@ -169,6 +174,7 @@ export const Navbar: React.FC = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     logout();
+                    navigate('/login');
                   }}
                   className="p-2 text-slate-300 hover:text-rose-400 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800/90 transition ml-1 shrink-0"
                   title="Logout Session"
@@ -233,6 +239,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => {
                         setShowProfileMenu(false);
                         logout();
+                        navigate('/login');
                       }}
                       className="w-full py-2.5 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs rounded-xl transition flex items-center justify-between group cursor-pointer"
                     >

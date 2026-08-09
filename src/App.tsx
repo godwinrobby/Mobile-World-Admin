@@ -4,7 +4,8 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { HashRouter, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
+import { AppProvider, useApp, ActiveTab } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { LoginPage } from './components/auth/LoginPage';
@@ -12,7 +13,6 @@ import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { SellModule } from './components/pos/SellModule';
 import { ExchangeModule } from './components/exchange/ExchangeModule';
 import { BuyModule } from './components/exchange/BuyModule';
-import { EcommerceModule } from './components/ecommerce/EcommerceModule';
 import { CreditModule } from './components/credit/CreditModule';
 import { SettingsModule } from './components/settings/SettingsModule';
 import { CatalogModule } from './components/catalog/CatalogModule';
@@ -20,21 +20,27 @@ import { GenericModuleView } from './components/common/GenericModuleView';
 import { StorefrontPreviewModal } from './components/ecommerce/StorefrontPreviewModal';
 import { RepairsModule } from './components/repairs/RepairsModule';
 
-function MainLayout() {
-  const { currentUser, activeTab, showStorefrontPreview, setShowStorefrontPreview } = useApp();
+// Protected Application Layout & Router Guard
+function ProtectedLayout() {
+  const { currentUser, setActiveTab, showStorefrontPreview, setShowStorefrontPreview } = useApp();
+  const location = useLocation();
   const mainContentRef = useRef<HTMLElement>(null);
 
-  // Scroll to top whenever the active tab changes or on initial load
+  // Sync route path to activeTab state & scroll to top on path change
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     if (mainContentRef.current) {
       mainContentRef.current.scrollTop = 0;
     }
-  }, [activeTab, currentUser]);
+    const currentTab = location.pathname.replace('/', '') as ActiveTab;
+    if (currentTab) {
+      setActiveTab(currentTab);
+    }
+  }, [location.pathname, setActiveTab]);
 
-  // If user is not logged in, render ONLY the Login Page and block dashboard access
+  // If user is not logged in, block access and redirect to /login
   if (!currentUser) {
-    return <LoginPage />;
+    return <Navigate to="/login" replace />;
   }
 
   return (
@@ -43,32 +49,20 @@ function MainLayout() {
       {/* Top Navbar */}
       <Navbar />
 
-      {/* Main Body */}
+      {/* Main Container */}
       <div className="flex-1 w-full flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
         
         {/* Navigation Sidebar */}
         <Sidebar />
 
-        {/* Dynamic Tab Content Area */}
+        {/* Dynamic Page Route Content */}
         <main ref={mainContentRef} className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          {activeTab === 'dashboard' && <DashboardOverview />}
-          {activeTab === 'catalog' && <CatalogModule />}
-          {activeTab === 'sell' && <SellModule />}
-          {activeTab === 'buy' && <BuyModule />}
-          {activeTab === 'valuation' && <ExchangeModule />}
-          {activeTab === 'credits' && <CreditModule />}
-          {(activeTab === 'repairs' || activeTab === 'jobcard') && <RepairsModule />}
-          {activeTab === 'settings' && <SettingsModule />}
-
-          {/* Generic & Detailed Module Router for remaining sidebar items */}
-          {['purchases', 'logistics', 'stores', 'payments', 'customer', 'cms', 'reports', 'users'].includes(activeTab) && (
-            <GenericModuleView tab={activeTab} />
-          )}
+          <Outlet />
         </main>
 
       </div>
 
-      {/* Live Storefront Simulator Modal */}
+      {/* Live Storefront Preview Modal */}
       {showStorefrontPreview && (
         <StorefrontPreviewModal onClose={() => setShowStorefrontPreview(false)} />
       )}
@@ -80,7 +74,39 @@ function MainLayout() {
 export default function App() {
   return (
     <AppProvider>
-      <MainLayout />
+      <HashRouter>
+        <Routes>
+          {/* Login Page Route */}
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Protected Application Page Routes */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/dashboard" element={<DashboardOverview />} />
+            <Route path="/catalog" element={<CatalogModule />} />
+            <Route path="/sell" element={<SellModule />} />
+            <Route path="/buy" element={<BuyModule />} />
+            <Route path="/valuation" element={<ExchangeModule />} />
+            <Route path="/credits" element={<CreditModule />} />
+            <Route path="/repairs" element={<RepairsModule />} />
+            <Route path="/jobcard" element={<RepairsModule />} />
+            <Route path="/settings" element={<SettingsModule />} />
+
+            {/* Generic Page Views */}
+            <Route path="/purchases" element={<GenericModuleView tab="purchases" />} />
+            <Route path="/logistics" element={<GenericModuleView tab="logistics" />} />
+            <Route path="/stores" element={<GenericModuleView tab="stores" />} />
+            <Route path="/payments" element={<GenericModuleView tab="payments" />} />
+            <Route path="/customer" element={<GenericModuleView tab="customer" />} />
+            <Route path="/cms" element={<GenericModuleView tab="cms" />} />
+            <Route path="/reports" element={<GenericModuleView tab="reports" />} />
+            <Route path="/users" element={<GenericModuleView tab="users" />} />
+          </Route>
+
+          {/* Fallback Redirects */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </HashRouter>
     </AppProvider>
   );
 }
