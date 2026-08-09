@@ -7,6 +7,8 @@ import {
   SupplierDebitAccount,
   ShopSettings,
   PurchaseOrder,
+  RepairJobCard,
+  ExpenseItem,
   User
 } from '../types';
 
@@ -767,6 +769,69 @@ export const INITIAL_JOB_CARDS: any[] = [
       { partName: 'Redmi Note 12 Pro Speaker Module', costPrice: 400, sellingPrice: 900 }
     ],
     notes: 'Speaker replaced and mother board cleaned with isopropyl alcohol. Device delivered.'
+  }
+];
+
+export const INITIAL_EXPENSES: ExpenseItem[] = [
+  {
+    id: 'exp-101',
+    expenseNumber: 'EXP-2026-101',
+    date: '2026-08-01',
+    category: 'Rent',
+    amount: 35000,
+    paymentMethod: 'Bank Transfer',
+    paidTo: 'Metro Plaza Landlord (Mr. Sharma)',
+    notes: 'Monthly shop premises rent for August 2026'
+  },
+  {
+    id: 'exp-102',
+    expenseNumber: 'EXP-2026-102',
+    date: '2026-08-03',
+    category: 'Electricity & Utilities',
+    amount: 6850,
+    paymentMethod: 'UPI',
+    paidTo: 'BSES Electricity Board',
+    notes: 'Commercial AC & lighting power bill for July'
+  },
+  {
+    id: 'exp-103',
+    expenseNumber: 'EXP-2026-103',
+    date: '2026-08-05',
+    category: 'Internet & Wifi',
+    amount: 1499,
+    paymentMethod: 'UPI',
+    paidTo: 'Airtel Xstream Fiber Broadband',
+    notes: '300 Mbps unlimited store Wi-Fi plan'
+  },
+  {
+    id: 'exp-104',
+    expenseNumber: 'EXP-2026-104',
+    date: '2026-08-08',
+    category: 'Tea & Snacks',
+    amount: 450,
+    paymentMethod: 'Cash',
+    paidTo: 'Raju Tea Stall',
+    notes: 'Daily staff tea and customer hospitality refreshments'
+  },
+  {
+    id: 'exp-105',
+    expenseNumber: 'EXP-2026-105',
+    date: '2026-08-09',
+    category: 'Food & Refreshments',
+    amount: 850,
+    paymentMethod: 'UPI',
+    paidTo: 'Swiggy / Haldirams',
+    notes: 'Lunch treat for store sales and technician team'
+  },
+  {
+    id: 'exp-106',
+    expenseNumber: 'EXP-2026-106',
+    date: '2026-08-09',
+    category: 'Mobile / DTH Recharge',
+    amount: 799,
+    paymentMethod: 'UPI',
+    paidTo: 'Jio Store Hotline',
+    notes: 'Store official WhatsApp hotline phone recharge'
   }
 ];
 

@@ -11,7 +11,8 @@ import {
   CartItem,
   PaymentMethod,
   PurchaseOrder,
-  RepairJobCard
+  RepairJobCard,
+  ExpenseItem
 } from '../types';
 import {
   INITIAL_USERS,
@@ -23,6 +24,7 @@ import {
   INITIAL_SUPPLIERS,
   INITIAL_PURCHASE_ORDERS,
   INITIAL_JOB_CARDS,
+  INITIAL_EXPENSES,
   DEFAULT_SETTINGS
 } from '../data/initialData';
 
@@ -102,6 +104,10 @@ interface AppContextType {
   updateJobCard: (id: string, updated: Partial<RepairJobCard>) => void;
   deleteJobCard: (id: string) => void;
 
+  expenses: ExpenseItem[];
+  addExpense: (expData: Omit<ExpenseItem, 'id' | 'expenseNumber'>) => ExpenseItem;
+  deleteExpense: (id: string) => void;
+
   settings: ShopSettings;
   updateSettings: (newSettings: Partial<ShopSettings>) => void;
   resetAllData: () => void;
@@ -176,6 +182,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_JOB_CARDS;
   });
 
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
+    const saved = localStorage.getItem('mshop_expenses');
+    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
+  });
+
   const [settings, setSettings] = useState<ShopSettings>(() => {
     const saved = localStorage.getItem('mshop_settings');
     return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
@@ -233,6 +244,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('mshop_jobcards', JSON.stringify(jobCards));
   }, [jobCards]);
+
+  useEffect(() => {
+    localStorage.setItem('mshop_expenses', JSON.stringify(expenses));
+  }, [expenses]);
 
   useEffect(() => {
     localStorage.setItem('mshop_settings', JSON.stringify(settings));
@@ -743,6 +758,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setJobCards(prev => prev.filter(jc => jc.id !== id));
   };
 
+  const addExpense = (expData: Omit<ExpenseItem, 'id' | 'expenseNumber'>): ExpenseItem => {
+    const nextNum = 100 + expenses.length + 1;
+    const newExp: ExpenseItem = {
+      ...expData,
+      id: `exp-${Date.now()}`,
+      expenseNumber: `EXP-2026-${nextNum}`,
+      createdBy: currentUser?.name || 'Staff'
+    };
+    setExpenses(prev => [newExp, ...prev]);
+    return newExp;
+  };
+
+  const deleteExpense = (id: string) => {
+    setExpenses(prev => prev.filter(e => e.id !== id));
+  };
+
   const updateSettings = (newSettings: Partial<ShopSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
@@ -756,6 +787,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSuppliers(INITIAL_SUPPLIERS);
     setPurchaseOrders(INITIAL_PURCHASE_ORDERS);
     setJobCards(INITIAL_JOB_CARDS);
+    setExpenses(INITIAL_EXPENSES);
     setSettings(DEFAULT_SETTINGS);
     localStorage.removeItem('mshop_products');
     localStorage.removeItem('mshop_sales');
@@ -765,6 +797,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem('mshop_suppliers');
     localStorage.removeItem('mshop_purchase_orders');
     localStorage.removeItem('mshop_jobcards');
+    localStorage.removeItem('mshop_expenses');
     localStorage.removeItem('mshop_settings');
   };
 
@@ -807,6 +840,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateJobCardStatus,
       updateJobCard,
       deleteJobCard,
+      expenses,
+      addExpense,
+      deleteExpense,
       settings,
       updateSettings,
       resetAllData,

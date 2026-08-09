@@ -251,6 +251,31 @@ export interface RepairJobCard {
   notes?: string;
 }
 
+export interface ExpenseItem {
+  id: string;
+  expenseNumber: string; // e.g. "EXP-2026-001"
+  date: string; // YYYY-MM-DD
+  category: 
+    | 'Rent'
+    | 'Food & Refreshments'
+    | 'Mobile / DTH Recharge'
+    | 'Internet & Wifi'
+    | 'Electricity & Utilities'
+    | 'Salaries & Wages'
+    | 'Maintenance & Repairs'
+    | 'Printing & Stationery'
+    | 'Tea & Snacks'
+    | 'Marketing & Ads'
+    | 'Transportation & Freight'
+    | 'Shop Equipment'
+    | 'Other Expense';
+  amount: number;
+  paymentMethod: 'Cash' | 'UPI' | 'Card' | 'Bank Transfer' | 'Other';
+  paidTo?: string; // e.g. "Shop Landlord", "Airtel Broadband"
+  notes?: string;
+  createdBy?: string;
+}
+
 export interface ShopSettings {
   shopName: string;
   tagline: string;

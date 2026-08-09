@@ -130,7 +130,6 @@ export const GenericModuleView: React.FC<Props> = ({ tab }) => {
       case 'jobcard':
         return <RepairsModule />;
 
-      case 'accounts':
       case 'payments':
         return <PaymentsModule />;
 

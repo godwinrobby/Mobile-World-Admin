@@ -46,7 +46,7 @@ function MainLayout() {
           {activeTab === 'settings' && <SettingsModule />}
 
           {/* Generic & Detailed Module Router for remaining sidebar items */}
-          {['purchases', 'logistics', 'accounts', 'stores', 'payments', 'customer', 'cms', 'reports', 'users'].includes(activeTab) && (
+          {['purchases', 'logistics', 'stores', 'payments', 'customer', 'cms', 'reports', 'users'].includes(activeTab) && (
             <GenericModuleView tab={activeTab} />
           )}
         </main>

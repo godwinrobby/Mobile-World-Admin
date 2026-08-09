@@ -8,7 +8,6 @@ import {
   ShoppingCart,
   Truck,
   Wrench,
-  IndianRupee,
   CreditCard,
   Building2,
   Wallet,
@@ -72,12 +71,6 @@ export const Sidebar: React.FC = () => {
       label: 'Repairs',
       icon: Wrench,
       description: 'Service & Device Repairs'
-    },
-    {
-      id: 'accounts',
-      label: '₹ Accounts',
-      icon: IndianRupee,
-      description: 'Cashbook & Expense Ledger'
     },
     {
       id: 'credits',
