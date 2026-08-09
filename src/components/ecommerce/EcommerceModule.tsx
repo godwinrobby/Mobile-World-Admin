@@ -102,14 +102,17 @@ export const EcommerceModule: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowStorefrontPreview(true)}
+          <a
+            href="https://mobileworldrehub.in"
+            target="_blank"
+            rel="noopener noreferrer"
             id="open-storefront-modal-btn"
             className="flex items-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-md shadow-cyan-600/20"
           >
             <Globe className="w-4 h-4" />
-            <span>Launch Ecom Storefront Preview</span>
-          </button>
+            <span>Open Ecom Storefront</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
           
           <button
             onClick={() => setShowAddModal(true)}

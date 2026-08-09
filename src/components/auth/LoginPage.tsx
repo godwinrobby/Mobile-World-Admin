@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { User } from '../../types';
 import {
@@ -21,6 +21,11 @@ import {
 
 export const LoginPage: React.FC = () => {
   const { setCurrentUser, setToken } = useApp();
+
+  // Scroll to top on page mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
 
   const [email, setEmail] = useState('admin@mobileworld.com');
   const [password, setPassword] = useState('admin123');
@@ -174,24 +179,6 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* API Endpoint Spec Info Card */}
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-2 text-xs">
-          <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800/80 pb-1.5">
-            <span className="flex items-center gap-1.5 text-indigo-400">
-              <Globe className="w-3.5 h-3.5" />
-              API Authentication Specs
-            </span>
-            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-mono font-bold">
-              POST
-            </span>
-          </div>
-
-          <div className="font-mono text-[11px] text-cyan-300 bg-slate-900 p-2 rounded-xl border border-slate-800 break-all flex items-center gap-2">
-            <Code className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-            <span>https://api.mobileworldrehub.in/api/admin/login</span>
-          </div>
-        </div>
-
         {/* Status Alert Banner */}
         {statusMessage && (
           <div
@@ -270,14 +257,6 @@ export const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Preset Payload Hint Button */}
-          <div className="bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Default Payload: <strong className="text-slate-200">admin@mobileworld.com / admin123</strong></span>
-            </div>
-          </div>
-
           {/* Submit Button */}
           <button
             type="submit"
@@ -292,7 +271,7 @@ export const LoginPage: React.FC = () => {
             ) : (
               <>
                 <ShieldCheck className="w-4 h-4 text-cyan-200" />
-                <span>Sign In via JWT API</span>
+                <span>Sign In</span>
                 <ArrowRight className="w-4 h-4 text-cyan-200" />
               </>
             )}
