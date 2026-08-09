@@ -1049,5 +1049,44 @@ export const DEFAULT_SETTINGS: ShopSettings = {
   receiptFooterMessage: 'Thank you for shopping with us! Standard IMEI Warranty terms apply. Exchange or refund valid within 7 days with original invoice.',
   demoApiMode: true,
   apiBaseUrl: 'https://api.mobileshopadmin.com/v1',
-  apiKey: 'demo_live_sk_892173918273123'
+  apiKey: 'demo_live_sk_892173918273123',
+
+  // Site Information Defaults
+  websiteUrl: 'https://mobileworldcare.com',
+  logoUrl: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=300&q=80',
+  supportEmail: 'support@mobileworldcare.com',
+  supportPhone: '+91 98765 43210',
+
+  // Payment Gateway Defaults
+  paymentGatewayProvider: 'Razorpay',
+  paymentGatewayMode: 'Test Sandbox',
+  paymentGatewayKeyId: 'rzp_test_98AJSKD91823',
+  paymentGatewaySecretKey: '••••••••••••••••••••',
+  paymentGatewayMerchantId: 'MERCHANT_MWC_9918',
+  autoVerifyUpiStatus: true,
+
+  // WhatsApp API Defaults
+  whatsappApiProvider: 'Meta Cloud API',
+  whatsappApiToken: 'EAAG98271391283120391209381023',
+  whatsappPhoneNumberId: '109283719283712',
+  whatsappBusinessNumber: '+919876543210',
+  autoSendInvoiceWhatsApp: true,
+  autoSendJobCardUpdatesWhatsApp: true,
+
+  // Email API Defaults
+  emailApiProvider: 'SMTP',
+  emailSmtpHost: 'smtp.sendgrid.net',
+  emailSmtpPort: 587,
+  emailSmtpUser: 'apikey',
+  emailSmtpPassword: '••••••••••••••••••••',
+  emailFromAddress: 'billing@mobileworldcare.com',
+  autoEmailInvoiceReceipts: true,
+
+  // Invoice Headers Defaults
+  invoicePrefix: 'INV-MWC-',
+  repairJobCardPrefix: 'JC-MWC-',
+  invoiceHeaderNote: 'Authorized Sales, Multi-Brand Mobile Repairs & Digital Electronics Outlet',
+  termsAndConditions: '1. Goods once sold are subject to manufacturer warranty terms.\n2. Screen replacement warranty is 90 days against touch failure.\n3. Physical or water damage voids all warranties.',
+  returnPolicyText: '7-Day replacement guarantee on un-opened accessories with original VAT/GST tax bill.',
+  authorizedSignatoryName: 'Mobile World Store Manager'
 };

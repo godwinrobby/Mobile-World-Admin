@@ -305,4 +305,43 @@ export interface ShopSettings {
   demoApiMode: boolean; // toggle between simulated local state & mock API endpoint config
   apiBaseUrl: string;
   apiKey: string;
+
+  // Site Information
+  websiteUrl?: string;
+  logoUrl?: string;
+  supportEmail?: string;
+  supportPhone?: string;
+
+  // Payment Gateway Config
+  paymentGatewayProvider?: 'Razorpay' | 'PhonePe' | 'Paytm' | 'Stripe' | 'Offline Cash/UPI';
+  paymentGatewayMode?: 'Test Sandbox' | 'Live Production';
+  paymentGatewayKeyId?: string;
+  paymentGatewaySecretKey?: string;
+  paymentGatewayMerchantId?: string;
+  autoVerifyUpiStatus?: boolean;
+
+  // WhatsApp API Config
+  whatsappApiProvider?: 'Meta Cloud API' | 'Twilio WhatsApp' | 'WATI Gateway' | 'Custom Webhook';
+  whatsappApiToken?: string;
+  whatsappPhoneNumberId?: string;
+  whatsappBusinessNumber?: string;
+  autoSendInvoiceWhatsApp?: boolean;
+  autoSendJobCardUpdatesWhatsApp?: boolean;
+
+  // Email API Config
+  emailApiProvider?: 'SMTP' | 'SendGrid' | 'Resend' | 'Mailgun';
+  emailSmtpHost?: string;
+  emailSmtpPort?: number;
+  emailSmtpUser?: string;
+  emailSmtpPassword?: string;
+  emailFromAddress?: string;
+  autoEmailInvoiceReceipts?: boolean;
+
+  // Invoice Headers & Legal
+  invoicePrefix?: string;
+  repairJobCardPrefix?: string;
+  invoiceHeaderNote?: string;
+  termsAndConditions?: string;
+  returnPolicyText?: string;
+  authorizedSignatoryName?: string;
 }
