@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { CustomerCreditAccount, SupplierDebitAccount, LedgerEntry, ExpenseItem } from '../../types';
+import { Pagination } from '../common/Pagination';
 import {
   CreditCard,
   UserCheck,
@@ -73,6 +74,24 @@ export const CreditModule: React.FC = () => {
   const [expenseSearchQuery, setExpenseSearchQuery] = useState('');
   const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string>('All');
 
+  // Pagination States
+  const [expensePage, setExpensePage] = useState(1);
+  const [expensePageSize, setExpensePageSize] = useState(10);
+
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [customerPage, setCustomerPage] = useState(1);
+  const [customerPageSize, setCustomerPageSize] = useState(5);
+
+  const [custLedgerPage, setCustLedgerPage] = useState(1);
+  const [custLedgerPageSize, setCustLedgerPageSize] = useState(5);
+
+  const [supplierSearch, setSupplierSearch] = useState('');
+  const [supplierPage, setSupplierPage] = useState(1);
+  const [supplierPageSize, setSupplierPageSize] = useState(5);
+
+  const [supLedgerPage, setSupLedgerPage] = useState(1);
+  const [supLedgerPageSize, setSupLedgerPageSize] = useState(5);
+
   // Form Inputs
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentMode, setPaymentMode] = useState('UPI');
@@ -98,7 +117,7 @@ export const CreditModule: React.FC = () => {
   const totalSupplierPayable = suppliers.reduce((sum, s) => sum + s.currentPayable, 0);
   const totalShopExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-  // Filtered Expenses Logic
+  // Filtered & Paginated Expenses Logic
   const filteredExpenses = expenses.filter(e => {
     const matchesCat = selectedExpenseCategory === 'All' || e.category === selectedExpenseCategory;
     const q = expenseSearchQuery.toLowerCase().trim();
@@ -113,6 +132,47 @@ export const CreditModule: React.FC = () => {
   });
 
   const filteredExpensesTotal = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+  const paginatedExpenses = filteredExpenses.slice(
+    (expensePage - 1) * expensePageSize,
+    expensePage * expensePageSize
+  );
+
+  // Filtered & Paginated Customers
+  const filteredCustomers = customers.filter(c => {
+    const q = customerSearch.toLowerCase().trim();
+    return !q || c.name.toLowerCase().includes(q) || c.phone.includes(q);
+  });
+
+  const paginatedCustomers = filteredCustomers.slice(
+    (customerPage - 1) * customerPageSize,
+    customerPage * customerPageSize
+  );
+
+  // Paginated Selected Customer Ledger History
+  const custLedgerHistory = selectedCustomer?.ledgerHistory || [];
+  const paginatedCustLedger = custLedgerHistory.slice(
+    (custLedgerPage - 1) * custLedgerPageSize,
+    custLedgerPage * custLedgerPageSize
+  );
+
+  // Filtered & Paginated Suppliers
+  const filteredSuppliers = suppliers.filter(s => {
+    const q = supplierSearch.toLowerCase().trim();
+    return !q || s.companyName.toLowerCase().includes(q) || s.contactPerson.toLowerCase().includes(q) || s.phone.includes(q);
+  });
+
+  const paginatedSuppliers = filteredSuppliers.slice(
+    (supplierPage - 1) * supplierPageSize,
+    supplierPage * supplierPageSize
+  );
+
+  // Paginated Selected Supplier Ledger History
+  const supLedgerHistory = selectedSupplier?.ledgerHistory || [];
+  const paginatedSupLedger = supLedgerHistory.slice(
+    (supLedgerPage - 1) * supLedgerPageSize,
+    supLedgerPage * supLedgerPageSize
+  );
 
   const handleAddExpenseSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -339,39 +399,77 @@ export const CreditModule: React.FC = () => {
           {/* Customer Accounts List */}
           <div className="lg:col-span-5 xl:col-span-4 space-y-3">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-              <h3 className="font-bold text-white text-sm">Customer Accounts ({customers.length})</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-white text-sm">Customer Accounts ({filteredCustomers.length})</h3>
+              </div>
+
+              {/* Customer Search Input */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search customer name, phone..."
+                  value={customerSearch}
+                  onChange={(e) => {
+                    setCustomerSearch(e.target.value);
+                    setCustomerPage(1);
+                  }}
+                  className="w-full bg-slate-950 text-slate-100 pl-8 pr-3 py-1.5 rounded-xl border border-slate-800 text-xs focus:outline-none focus:border-amber-500"
+                />
+              </div>
 
               <div className="space-y-2">
-                {customers.map(c => {
-                  const isSelected = selectedCustomer?.id === c.id;
+                {paginatedCustomers.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-500">No matching customer accounts found</div>
+                ) : (
+                  paginatedCustomers.map(c => {
+                    const isSelected = selectedCustomer?.id === c.id;
 
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => setSelectedCustomer(c)}
-                      className={`w-full p-3 rounded-xl border text-left transition flex items-center justify-between ${
-                        isSelected
-                          ? 'bg-amber-500/10 text-white border-amber-500/50 shadow-md'
-                          : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-bold text-sm text-slate-100">{c.name}</div>
-                        <div className="text-[11px] text-slate-400">{c.phone}</div>
-                      </div>
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          setSelectedCustomer(c);
+                          setCustLedgerPage(1);
+                        }}
+                        className={`w-full p-3 rounded-xl border text-left transition flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-amber-500/10 text-white border-amber-500/50 shadow-md'
+                            : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
+                        }`}
+                      >
+                        <div>
+                          <div className="font-bold text-sm text-slate-100">{c.name}</div>
+                          <div className="text-[11px] text-slate-400">{c.phone}</div>
+                        </div>
 
-                      <div className="text-right">
-                        <div className={`font-extrabold text-sm ${c.currentBalance > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                          {settings.currencySymbol}{c.currentBalance.toLocaleString()}
+                        <div className="text-right">
+                          <div className={`font-extrabold text-sm ${c.currentBalance > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                            {settings.currencySymbol}{c.currentBalance.toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {c.currentBalance > 0 ? 'Udhar Balance' : 'Clear Balance'}
+                          </div>
                         </div>
-                        <div className="text-[10px] text-slate-400">
-                          {c.currentBalance > 0 ? 'Udhar Balance' : 'Clear Balance'}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })
+                )}
               </div>
+
+              {/* Customer List Pagination */}
+              <Pagination
+                currentPage={customerPage}
+                totalPages={Math.ceil(filteredCustomers.length / customerPageSize) || 1}
+                totalItems={filteredCustomers.length}
+                pageSize={customerPageSize}
+                onPageChange={(p) => setCustomerPage(p)}
+                onPageSizeChange={(sz) => {
+                  setCustomerPageSize(sz);
+                  setCustomerPage(1);
+                }}
+                pageSizeOptions={[5, 10, 20]}
+              />
             </div>
           </div>
 
@@ -433,7 +531,7 @@ export const CreditModule: React.FC = () => {
                 <div className="space-y-3">
                   <h4 className="font-bold text-white text-sm flex items-center gap-2">
                     <FileText className="w-4 h-4 text-indigo-400" />
-                    <span>Account Statement Ledger</span>
+                    <span>Account Statement Ledger ({custLedgerHistory.length})</span>
                   </h4>
 
                   <div className="overflow-x-auto">
@@ -447,32 +545,52 @@ export const CreditModule: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
-                        {selectedCustomer.ledgerHistory.map((e) => (
-                          <tr key={e.id} className="hover:bg-slate-800/50 transition">
-                            <td className="p-3 text-slate-400 font-mono">{e.timestamp}</td>
-                            <td className="p-3">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                e.type.includes('Debit') ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
-                              }`}>
-                                {e.type}
-                              </span>
-                            </td>
-                            <td className="p-3">
-                              <div className="text-slate-200">{e.note}</div>
-                              {e.referenceInvoice && (
-                                <div className="text-[10px] text-indigo-400 font-mono">Ref: {e.referenceInvoice}</div>
-                              )}
-                            </td>
-                            <td className={`p-3 text-right font-bold ${
-                              e.type.includes('Debit') ? 'text-amber-400' : 'text-emerald-400'
-                            }`}>
-                              {settings.currencySymbol}{e.amount.toLocaleString()}
-                            </td>
+                        {paginatedCustLedger.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} className="p-4 text-center text-slate-500">No ledger transactions found</td>
                           </tr>
-                        ))}
+                        ) : (
+                          paginatedCustLedger.map((e) => (
+                            <tr key={e.id} className="hover:bg-slate-800/50 transition">
+                              <td className="p-3 text-slate-400 font-mono">{e.timestamp}</td>
+                              <td className="p-3">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                  e.type.includes('Debit') ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
+                                }`}>
+                                  {e.type}
+                                </span>
+                              </td>
+                              <td className="p-3">
+                                <div className="text-slate-200">{e.note}</div>
+                                {e.referenceInvoice && (
+                                  <div className="text-[10px] text-indigo-400 font-mono">Ref: {e.referenceInvoice}</div>
+                                )}
+                              </td>
+                              <td className={`p-3 text-right font-bold ${
+                                e.type.includes('Debit') ? 'text-amber-400' : 'text-emerald-400'
+                              }`}>
+                                {settings.currencySymbol}{e.amount.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Customer Ledger Pagination */}
+                  <Pagination
+                    currentPage={custLedgerPage}
+                    totalPages={Math.ceil(custLedgerHistory.length / custLedgerPageSize) || 1}
+                    totalItems={custLedgerHistory.length}
+                    pageSize={custLedgerPageSize}
+                    onPageChange={(p) => setCustLedgerPage(p)}
+                    onPageSizeChange={(sz) => {
+                      setCustLedgerPageSize(sz);
+                      setCustLedgerPage(1);
+                    }}
+                    pageSizeOptions={[5, 10, 20]}
+                  />
                 </div>
 
               </div>
@@ -484,43 +602,79 @@ export const CreditModule: React.FC = () => {
           </div>
 
         </div>
-      ) : (
+      ) : activeTab === 'suppliers' ? (
         /* Supplier Tab View */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-5 xl:col-span-4 space-y-3">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-              <h3 className="font-bold text-white text-sm">Wholesaler Distributors ({suppliers.length})</h3>
+              <h3 className="font-bold text-white text-sm">Wholesaler Distributors ({filteredSuppliers.length})</h3>
+
+              {/* Supplier Search Input */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search wholesaler company, person, phone..."
+                  value={supplierSearch}
+                  onChange={(e) => {
+                    setSupplierSearch(e.target.value);
+                    setSupplierPage(1);
+                  }}
+                  className="w-full bg-slate-950 text-slate-100 pl-8 pr-3 py-1.5 rounded-xl border border-slate-800 text-xs focus:outline-none focus:border-rose-500"
+                />
+              </div>
 
               <div className="space-y-2">
-                {suppliers.map(s => (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedSupplier(s)}
-                    className={`w-full p-3 rounded-xl border text-left transition flex items-center justify-between ${
-                      selectedSupplier?.id === s.id
-                        ? 'bg-rose-500/10 text-white border-rose-500/50 shadow-md'
-                        : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold text-sm text-slate-100">{s.companyName}</div>
-                      <div className="text-[11px] text-slate-400">{s.category}</div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="font-extrabold text-sm text-rose-400">
-                        {settings.currencySymbol}{s.currentPayable.toLocaleString()}
+                {paginatedSuppliers.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-500">No matching wholesaler distributors found</div>
+                ) : (
+                  paginatedSuppliers.map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => {
+                        setSelectedSupplier(s);
+                        setSupLedgerPage(1);
+                      }}
+                      className={`w-full p-3 rounded-xl border text-left transition flex items-center justify-between ${
+                        selectedSupplier?.id === s.id
+                          ? 'bg-rose-500/10 text-white border-rose-500/50 shadow-md'
+                          : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-bold text-sm text-slate-100">{s.companyName}</div>
+                        <div className="text-[11px] text-slate-400">{s.category}</div>
                       </div>
-                      <div className="text-[10px] text-slate-400">Shop Owes</div>
-                    </div>
-                  </button>
-                ))}
+
+                      <div className="text-right">
+                        <div className="font-extrabold text-sm text-rose-400">
+                          {settings.currencySymbol}{s.currentPayable.toLocaleString()}
+                        </div>
+                        <div className="text-[10px] text-slate-400">Shop Owes</div>
+                      </div>
+                    </button>
+                  ))
+                )}
               </div>
+
+              {/* Supplier List Pagination */}
+              <Pagination
+                currentPage={supplierPage}
+                totalPages={Math.ceil(filteredSuppliers.length / supplierPageSize) || 1}
+                totalItems={filteredSuppliers.length}
+                pageSize={supplierPageSize}
+                onPageChange={(p) => setSupplierPage(p)}
+                onPageSizeChange={(sz) => {
+                  setSupplierPageSize(sz);
+                  setSupplierPage(1);
+                }}
+                pageSizeOptions={[5, 10, 20]}
+              />
             </div>
           </div>
 
           <div className="lg:col-span-7 xl:col-span-8 space-y-4">
-            {selectedSupplier && (
+            {selectedSupplier ? (
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div>
@@ -548,7 +702,7 @@ export const CreditModule: React.FC = () => {
 
                 {/* Ledger History */}
                 <div className="space-y-2">
-                  <h4 className="font-bold text-white text-sm">Supplier Ledger History</h4>
+                  <h4 className="font-bold text-white text-sm">Supplier Ledger History ({supLedgerHistory.length})</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs text-slate-300">
                       <thead className="bg-slate-800/80 text-slate-400 uppercase text-[10px]">
@@ -560,30 +714,54 @@ export const CreditModule: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
-                        {selectedSupplier.ledgerHistory.map(e => (
-                          <tr key={e.id} className="hover:bg-slate-800/50">
-                            <td className="p-3 font-mono text-slate-400">{e.timestamp}</td>
-                            <td className="p-3">
-                              <span className="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px]">
-                                {e.type}
-                              </span>
-                            </td>
-                            <td className="p-3 text-slate-200">{e.note}</td>
-                            <td className="p-3 text-right font-bold text-rose-400">
-                              {settings.currencySymbol}{e.amount.toLocaleString()}
-                            </td>
+                        {paginatedSupLedger.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} className="p-4 text-center text-slate-500">No supplier ledger entries found</td>
                           </tr>
-                        ))}
+                        ) : (
+                          paginatedSupLedger.map(e => (
+                            <tr key={e.id} className="hover:bg-slate-800/50">
+                              <td className="p-3 font-mono text-slate-400">{e.timestamp}</td>
+                              <td className="p-3">
+                                <span className="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px]">
+                                  {e.type}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-200">{e.note}</td>
+                              <td className="p-3 text-right font-bold text-rose-400">
+                                {settings.currencySymbol}{e.amount.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Supplier Ledger Pagination */}
+                  <Pagination
+                    currentPage={supLedgerPage}
+                    totalPages={Math.ceil(supLedgerHistory.length / supLedgerPageSize) || 1}
+                    totalItems={supLedgerHistory.length}
+                    pageSize={supLedgerPageSize}
+                    onPageChange={(p) => setSupLedgerPage(p)}
+                    onPageSizeChange={(sz) => {
+                      setSupLedgerPageSize(sz);
+                      setSupLedgerPage(1);
+                    }}
+                    pageSizeOptions={[5, 10, 20]}
+                  />
                 </div>
 
+              </div>
+            ) : (
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-500">
+                Select a wholesaler account to view ledger statement.
               </div>
             )}
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Expenses Management View */}
       {activeTab === 'expenses' && (
@@ -718,62 +896,78 @@ export const CreditModule: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-                    <tr>
-                      <th className="p-3.5">Date & Ref #</th>
-                      <th className="p-3.5">Type of Expense</th>
-                      <th className="p-3.5">Paid To / Recipient</th>
-                      <th className="p-3.5">Method</th>
-                      <th className="p-3.5">Notes / Purpose</th>
-                      <th className="p-3.5 text-right">Amount</th>
-                      <th className="p-3.5 text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800">
-                    {filteredExpenses.map(e => (
-                      <tr key={e.id} className="hover:bg-slate-800/50 transition">
-                        <td className="p-3.5">
-                          <div className="font-mono text-slate-200 font-bold">{e.expenseNumber}</div>
-                          <div className="text-[10px] text-slate-400">{e.date}</div>
-                        </td>
-                        <td className="p-3.5">
-                          <span className="inline-flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold">
-                            {e.category}
-                          </span>
-                        </td>
-                        <td className="p-3.5 font-medium text-slate-200">
-                          {e.paidTo || 'General Vendor'}
-                        </td>
-                        <td className="p-3.5">
-                          <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono">
-                            {e.paymentMethod}
-                          </span>
-                        </td>
-                        <td className="p-3.5 text-slate-300 max-w-xs truncate">
-                          {e.notes || '-'}
-                        </td>
-                        <td className="p-3.5 text-right font-extrabold text-purple-400 text-sm">
-                          {settings.currencySymbol}{e.amount.toLocaleString()}
-                        </td>
-                        <td className="p-3.5 text-center">
-                          <button
-                            onClick={() => {
-                              if (confirm(`Delete expense voucher ${e.expenseNumber} (${settings.currencySymbol}${e.amount})?`)) {
-                                deleteExpense(e.id);
-                              }
-                            }}
-                            className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition"
-                            title="Delete Expense Record"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
+              <div className="space-y-3 p-3">
+                <div className="overflow-x-auto rounded-xl border border-slate-800">
+                  <table className="w-full text-left text-xs text-slate-300">
+                    <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                      <tr>
+                        <th className="p-3.5">Date & Ref #</th>
+                        <th className="p-3.5">Type of Expense</th>
+                        <th className="p-3.5">Paid To / Recipient</th>
+                        <th className="p-3.5">Method</th>
+                        <th className="p-3.5">Notes / Purpose</th>
+                        <th className="p-3.5 text-right">Amount</th>
+                        <th className="p-3.5 text-center">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {paginatedExpenses.map(e => (
+                        <tr key={e.id} className="hover:bg-slate-800/50 transition">
+                          <td className="p-3.5">
+                            <div className="font-mono text-slate-200 font-bold">{e.expenseNumber}</div>
+                            <div className="text-[10px] text-slate-400">{e.date}</div>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="inline-flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                              {e.category}
+                            </span>
+                          </td>
+                          <td className="p-3.5 font-medium text-slate-200">
+                            {e.paidTo || 'General Vendor'}
+                          </td>
+                          <td className="p-3.5">
+                            <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono">
+                              {e.paymentMethod}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-slate-300 max-w-xs truncate">
+                            {e.notes || '-'}
+                          </td>
+                          <td className="p-3.5 text-right font-extrabold text-purple-400 text-sm">
+                            {settings.currencySymbol}{e.amount.toLocaleString()}
+                          </td>
+                          <td className="p-3.5 text-center">
+                            <button
+                              onClick={() => {
+                                if (confirm(`Delete expense voucher ${e.expenseNumber} (${settings.currencySymbol}${e.amount})?`)) {
+                                  deleteExpense(e.id);
+                                }
+                              }}
+                              className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition"
+                              title="Delete Expense Record"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Expense List Pagination */}
+                <Pagination
+                  currentPage={expensePage}
+                  totalPages={Math.ceil(filteredExpenses.length / expensePageSize) || 1}
+                  totalItems={filteredExpenses.length}
+                  pageSize={expensePageSize}
+                  onPageChange={(p) => setExpensePage(p)}
+                  onPageSizeChange={(sz) => {
+                    setExpensePageSize(sz);
+                    setExpensePage(1);
+                  }}
+                  pageSizeOptions={[5, 10, 20, 50]}
+                />
               </div>
             )}
           </div>

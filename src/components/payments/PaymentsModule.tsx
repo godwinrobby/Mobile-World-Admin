@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { Pagination } from '../common/Pagination';
 import {
   CreditCard,
   Search,
@@ -58,6 +59,10 @@ export const PaymentsModule: React.FC = () => {
 
   // Selected payment for detail modal
   const [selectedPayment, setSelectedPayment] = useState<UnifiedPaymentItem | null>(null);
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Today's date helper
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
@@ -276,6 +281,10 @@ export const PaymentsModule: React.FC = () => {
     };
   }, [filteredPayments]);
 
+  const paginatedPayments = useMemo(() => {
+    return filteredPayments.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  }, [filteredPayments, currentPage, pageSize]);
+
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedMethod('All');
@@ -284,6 +293,7 @@ export const PaymentsModule: React.FC = () => {
     setDatePreset('all');
     setFromDate('');
     setToDate('');
+    setCurrentPage(1);
   };
 
   return (
@@ -531,119 +541,135 @@ export const PaymentsModule: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-                <tr>
-                  <th className="p-3.5">Date & Time</th>
-                  <th className="p-3.5">Reference #</th>
-                  <th className="p-3.5">Customer / Wholesaler</th>
-                  <th className="p-3.5">Category</th>
-                  <th className="p-3.5">Payment Method</th>
-                  <th className="p-3.5">Direction</th>
-                  <th className="p-3.5 text-right">Amount</th>
-                  <th className="p-3.5 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filteredPayments.map(pay => (
-                  <tr key={pay.id} className="hover:bg-slate-800/30 transition-colors">
-                    {/* Date */}
-                    <td className="p-3.5">
-                      <div className="font-bold text-slate-200">{pay.date}</div>
-                      <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-                        {pay.rawTimestamp.split(' ')[1] || '12:00'}
-                      </div>
-                    </td>
-
-                    {/* Reference */}
-                    <td className="p-3.5 font-mono">
-                      <span className="font-bold text-indigo-300">{pay.transactionRef}</span>
-                      {pay.notes && (
-                        <div className="text-[10px] text-slate-500 truncate max-w-xs mt-0.5" title={pay.notes}>
-                          {pay.notes}
-                        </div>
-                      )}
-                    </td>
-
-                    {/* Party */}
-                    <td className="p-3.5">
-                      <div className="font-semibold text-white">{pay.partyName}</div>
-                      {pay.partyPhone && (
-                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">{pay.partyPhone}</div>
-                      )}
-                    </td>
-
-                    {/* Category */}
-                    <td className="p-3.5">
-                      {pay.category === 'POS Sale' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                          <ShoppingBag className="w-3 h-3" /> POS Sale
-                        </span>
-                      )}
-                      {pay.category === 'Repair Service' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                          <Wrench className="w-3 h-3" /> Repair Service
-                        </span>
-                      )}
-                      {pay.category === 'Credit Repayment' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                          <User className="w-3 h-3" /> Credit Repayment
-                        </span>
-                      )}
-                      {pay.category === 'Supplier Payment' && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/20">
-                          <Building2 className="w-3 h-3" /> Supplier PO
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Method */}
-                    <td className="p-3.5">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 border border-slate-700">
-                        {pay.paymentMethod === 'Cash' && <Wallet className="w-3 h-3 text-amber-400" />}
-                        {pay.paymentMethod === 'UPI' && <QrCode className="w-3 h-3 text-cyan-400" />}
-                        {pay.paymentMethod === 'Card' && <CreditCard className="w-3 h-3 text-indigo-400" />}
-                        {pay.paymentMethod === 'Credit / Udhar' && <IndianRupee className="w-3 h-3 text-rose-400" />}
-                        {pay.paymentMethod === 'Bank Transfer' && <Building2 className="w-3 h-3 text-blue-400" />}
-                        <span>{pay.paymentMethod}</span>
-                      </span>
-                    </td>
-
-                    {/* Direction */}
-                    <td className="p-3.5">
-                      {pay.direction === 'Inflow' ? (
-                        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                          <ArrowUpRight className="w-4 h-4" /> Income
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-rose-400">
-                          <ArrowDownRight className="w-4 h-4" /> Outflow
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Amount */}
-                    <td className="p-3.5 text-right font-extrabold text-sm">
-                      <span className={pay.direction === 'Inflow' ? 'text-emerald-400' : 'text-rose-400'}>
-                        {pay.direction === 'Inflow' ? '+' : '-'}{settings.currencySymbol}{pay.amount.toLocaleString('en-IN')}
-                      </span>
-                    </td>
-
-                    {/* Action */}
-                    <td className="p-3.5 text-center">
-                      <button
-                        onClick={() => setSelectedPayment(pay)}
-                        className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors inline-flex items-center gap-1 text-[11px]"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>View</span>
-                      </button>
-                    </td>
+          <div className="space-y-3 p-3">
+            <div className="overflow-x-auto border border-slate-800 rounded-xl">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th className="p-3.5">Date & Time</th>
+                    <th className="p-3.5">Reference #</th>
+                    <th className="p-3.5">Customer / Wholesaler</th>
+                    <th className="p-3.5">Category</th>
+                    <th className="p-3.5">Payment Method</th>
+                    <th className="p-3.5">Direction</th>
+                    <th className="p-3.5 text-right">Amount</th>
+                    <th className="p-3.5 text-center">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {paginatedPayments.map(pay => (
+                    <tr key={pay.id} className="hover:bg-slate-800/30 transition-colors">
+                      {/* Date */}
+                      <td className="p-3.5">
+                        <div className="font-bold text-slate-200">{pay.date}</div>
+                        <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                          {pay.rawTimestamp.split(' ')[1] || '12:00'}
+                        </div>
+                      </td>
+
+                      {/* Reference */}
+                      <td className="p-3.5 font-mono">
+                        <span className="font-bold text-indigo-300">{pay.transactionRef}</span>
+                        {pay.notes && (
+                          <div className="text-[10px] text-slate-500 truncate max-w-xs mt-0.5" title={pay.notes}>
+                            {pay.notes}
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Party */}
+                      <td className="p-3.5">
+                        <div className="font-semibold text-white">{pay.partyName}</div>
+                        {pay.partyPhone && (
+                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">{pay.partyPhone}</div>
+                        )}
+                      </td>
+
+                      {/* Category */}
+                      <td className="p-3.5">
+                        {pay.category === 'POS Sale' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                            <ShoppingBag className="w-3 h-3" /> POS Sale
+                          </span>
+                        )}
+                        {pay.category === 'Repair Service' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                            <Wrench className="w-3 h-3" /> Repair Service
+                          </span>
+                        )}
+                        {pay.category === 'Credit Repayment' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                            <User className="w-3 h-3" /> Credit Repayment
+                          </span>
+                        )}
+                        {pay.category === 'Supplier Payment' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/20">
+                            <Building2 className="w-3 h-3" /> Supplier PO
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Method */}
+                      <td className="p-3.5">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 border border-slate-700">
+                          {pay.paymentMethod === 'Cash' && <Wallet className="w-3 h-3 text-amber-400" />}
+                          {pay.paymentMethod === 'UPI' && <QrCode className="w-3 h-3 text-cyan-400" />}
+                          {pay.paymentMethod === 'Card' && <CreditCard className="w-3 h-3 text-indigo-400" />}
+                          {pay.paymentMethod === 'Credit / Udhar' && <IndianRupee className="w-3 h-3 text-rose-400" />}
+                          {pay.paymentMethod === 'Bank Transfer' && <Building2 className="w-3 h-3 text-blue-400" />}
+                          <span>{pay.paymentMethod}</span>
+                        </span>
+                      </td>
+
+                      {/* Direction */}
+                      <td className="p-3.5">
+                        {pay.direction === 'Inflow' ? (
+                          <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                            <ArrowUpRight className="w-4 h-4" /> Income
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-0.5 text-xs font-bold text-rose-400">
+                            <ArrowDownRight className="w-4 h-4" /> Outflow
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Amount */}
+                      <td className="p-3.5 text-right font-extrabold text-sm">
+                        <span className={pay.direction === 'Inflow' ? 'text-emerald-400' : 'text-rose-400'}>
+                          {pay.direction === 'Inflow' ? '+' : '-'}{settings.currencySymbol}{pay.amount.toLocaleString('en-IN')}
+                        </span>
+                      </td>
+
+                      {/* Action */}
+                      <td className="p-3.5 text-center">
+                        <button
+                          onClick={() => setSelectedPayment(pay)}
+                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors inline-flex items-center gap-1 text-[11px]"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>View</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredPayments.length / pageSize) || 1}
+              totalItems={filteredPayments.length}
+              pageSize={pageSize}
+              onPageChange={(p) => setCurrentPage(p)}
+              onPageSizeChange={(sz) => {
+                setPageSize(sz);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[5, 10, 20, 50]}
+            />
           </div>
         )}
       </div>

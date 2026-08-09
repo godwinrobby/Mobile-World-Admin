@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { RepairJobCard } from '../../types';
+import { Pagination } from '../common/Pagination';
 import {
   Wrench,
   Plus,
@@ -41,6 +42,10 @@ export const RepairsModule: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatusTab, setSelectedStatusTab] = useState<string>('All');
+
+  // Pagination State
+  const [repairPage, setRepairPage] = useState(1);
+  const [repairPageSize, setRepairPageSize] = useState(10);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedJobCardForView, setSelectedJobCardForView] = useState<RepairJobCard | null>(null);
   const [selectedJobCardForPrint, setSelectedJobCardForPrint] = useState<RepairJobCard | null>(null);
@@ -101,6 +106,11 @@ export const RepairsModule: React.FC = () => {
     if (selectedStatusTab === 'Completed') return jc.status === 'Completed & Delivered';
     return jc.status === selectedStatusTab;
   });
+
+  const paginatedJobCards = filteredJobCards.slice(
+    (repairPage - 1) * repairPageSize,
+    repairPage * repairPageSize
+  );
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -361,23 +371,24 @@ export const RepairsModule: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-                <tr>
-                  <th className="p-3.5">Job Card # & Date</th>
-                  <th className="p-3.5">Customer Details</th>
-                  <th className="p-3.5">Device & IMEI</th>
-                  <th className="p-3.5">Reported Issue & Diagnosis</th>
-                  <th className="p-3.5">Technician</th>
-                  <th className="p-3.5 text-right">Estimate / Paid</th>
-                  <th className="p-3.5">Status</th>
-                  <th className="p-3.5 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filteredJobCards.map(jc => {
-                  const est = jc.finalCost || jc.estimatedCost;
+          <div className="space-y-3 p-3">
+            <div className="overflow-x-auto border border-slate-800 rounded-xl">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th className="p-3.5">Job Card # & Date</th>
+                    <th className="p-3.5">Customer Details</th>
+                    <th className="p-3.5">Device & IMEI</th>
+                    <th className="p-3.5">Reported Issue & Diagnosis</th>
+                    <th className="p-3.5">Technician</th>
+                    <th className="p-3.5 text-right">Estimate / Paid</th>
+                    <th className="p-3.5">Status</th>
+                    <th className="p-3.5 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {paginatedJobCards.map(jc => {
+                    const est = jc.finalCost || jc.estimatedCost;
                   const adv = jc.advancePaid || 0;
                   const bal = Math.max(0, est - adv);
 
@@ -538,7 +549,22 @@ export const RepairsModule: React.FC = () => {
               </tbody>
             </table>
           </div>
-        )}
+
+          {/* Repairs Pagination Controls */}
+          <Pagination
+            currentPage={repairPage}
+            totalPages={Math.ceil(filteredJobCards.length / repairPageSize) || 1}
+            totalItems={filteredJobCards.length}
+            pageSize={repairPageSize}
+            onPageChange={(p) => setRepairPage(p)}
+            onPageSizeChange={(sz) => {
+              setRepairPageSize(sz);
+              setRepairPage(1);
+            }}
+            pageSizeOptions={[5, 10, 20, 50]}
+          />
+        </div>
+      )}
       </div>
 
       {/* SIDE POPUP / DRAWER: CREATE NEW REPAIR JOB CARD */}

@@ -84,6 +84,8 @@ export interface SaleTransaction {
   notes?: string;
 }
 
+export type SaleRecord = SaleTransaction;
+
 export type ExchangeGrade = 'Grade A (Flawless)' | 'Grade B (Minor Wear)' | 'Grade C (Scratched/Dent)' | 'Grade D (Damaged)';
 
 export interface ConditionChecklist {
