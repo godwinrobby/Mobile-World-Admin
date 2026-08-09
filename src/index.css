@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@layer base {
+  html, body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
 /* Hide scrollbar for Chrome, Safari, Opera, Edge, and Firefox globally in side popups, panels, and containers */
 .no-scrollbar::-webkit-scrollbar,
 #admin-sidebar::-webkit-scrollbar,
