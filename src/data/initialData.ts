@@ -16,27 +16,99 @@ export const INITIAL_USERS: User[] = [
   {
     id: 'u-1',
     name: 'Rajesh Sharma',
+    username: 'rajesh_admin',
     email: 'admin@mobileshop.com',
+    password: 'password123',
+    pinCode: '1234',
     role: 'Admin',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
     phone: '+91 98765 43210',
+    status: 'Active',
+    lastActive: 'Just Now',
+    createdAt: '2025-01-10',
+    permissions: {
+      posBilling: true,
+      buyTradeIn: true,
+      inventoryControl: true,
+      repairJobs: true,
+      udharLedger: true,
+      reportsAnalytics: true,
+      settingsConfig: true,
+      userManagement: true
+    }
   },
   {
     id: 'u-2',
     name: 'Anish Verma',
+    username: 'anish_mngr',
     email: 'manager@mobileshop.com',
+    password: 'password123',
+    pinCode: '2233',
     role: 'Manager',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
     phone: '+91 98765 11223',
+    status: 'Active',
+    lastActive: '10 mins ago',
+    createdAt: '2025-02-15',
+    permissions: {
+      posBilling: true,
+      buyTradeIn: true,
+      inventoryControl: true,
+      repairJobs: true,
+      udharLedger: true,
+      reportsAnalytics: true,
+      settingsConfig: false,
+      userManagement: false
+    }
   },
   {
     id: 'u-3',
     name: 'Priya Patel',
+    username: 'priya_cashier',
     email: 'sales@mobileshop.com',
-    role: 'Sales Executive',
+    password: 'password123',
+    pinCode: '5566',
+    role: 'Cashier',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
     phone: '+91 98765 99887',
+    status: 'Active',
+    lastActive: '2 hours ago',
+    createdAt: '2025-03-01',
+    permissions: {
+      posBilling: true,
+      buyTradeIn: false,
+      inventoryControl: false,
+      repairJobs: false,
+      udharLedger: true,
+      reportsAnalytics: false,
+      settingsConfig: false,
+      userManagement: false
+    }
   },
+  {
+    id: 'u-4',
+    name: 'Vikram Singh',
+    username: 'vikram_tech',
+    email: 'repairs@mobileshop.com',
+    password: 'password123',
+    pinCode: '9900',
+    role: 'Repair Technician',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+    phone: '+91 98765 44332',
+    status: 'Active',
+    lastActive: 'Yesterday',
+    createdAt: '2025-04-12',
+    permissions: {
+      posBilling: false,
+      buyTradeIn: false,
+      inventoryControl: false,
+      repairJobs: true,
+      udharLedger: false,
+      reportsAnalytics: false,
+      settingsConfig: false,
+      userManagement: false
+    }
+  }
 ];
 
 export const INITIAL_PRODUCTS: Product[] = [
@@ -435,8 +507,8 @@ export const INITIAL_EXCHANGES: TradeInExchange[] = [
     imeiNumber: '861029384712093',
     condition: {
       screenOk: true,
-      screenCondition: 'Cracked Outer Glass',
-      bodyCondition: 'Dented Corners',
+      screenCondition: 'Cracked',
+      bodyCondition: 'Dented / Bent',
       batteryHealth: 82,
       cameraOk: true,
       biometricsOk: true,
@@ -448,7 +520,7 @@ export const INITIAL_EXCHANGES: TradeInExchange[] = [
     },
     calculatedValue: 16500,
     agreedValue: 15000,
-    grade: 'Grade C (Heavy Defect)',
+    grade: 'Grade D (Damaged)',
     actionTaken: 'Added to Refurbish Stock',
     status: 'In Refurbish',
     inspectorStaff: 'Rajesh Sharma',
@@ -547,8 +619,8 @@ export const INITIAL_EXCHANGES: TradeInExchange[] = [
     calculatedValue: 28000,
     agreedValue: 27500,
     grade: 'Grade B (Minor Wear)',
-    actionTaken: 'Cash Payout',
-    status: 'Pending',
+    actionTaken: 'Cash Paid',
+    status: 'Pending Inspection',
     inspectorStaff: 'Rajesh Sharma',
     notes: 'Awaiting cash disbursement confirmation.'
   }

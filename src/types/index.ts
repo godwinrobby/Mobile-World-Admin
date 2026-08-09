@@ -1,12 +1,30 @@
-export type Role = 'Admin' | 'Manager' | 'Sales Executive';
+export type Role = 'Admin' | 'Manager' | 'Sales Executive' | 'Cashier' | 'Repair Technician';
+
+export interface UserPermissions {
+  posBilling: boolean;
+  buyTradeIn: boolean;
+  inventoryControl: boolean;
+  repairJobs: boolean;
+  udharLedger: boolean;
+  reportsAnalytics: boolean;
+  settingsConfig: boolean;
+  userManagement: boolean;
+}
 
 export interface User {
   id: string;
   name: string;
+  username?: string;
   email: string;
+  password?: string;
+  pinCode?: string;
   role: Role;
   avatar: string;
   phone: string;
+  status?: 'Active' | 'Suspended' | 'Inactive';
+  permissions?: UserPermissions;
+  lastActive?: string;
+  createdAt?: string;
 }
 
 export type Category = 'Smartphones' | 'Accessories' | 'Spare Parts' | 'Services & Repairs';

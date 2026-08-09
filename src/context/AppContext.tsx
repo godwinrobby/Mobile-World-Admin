@@ -55,6 +55,9 @@ interface AppContextType {
   setToken: (token: string | null) => void;
   logout: () => void;
   users: User[];
+  addUser: (userData: Omit<User, 'id'>) => User;
+  updateUser: (id: string, updated: Partial<User>) => void;
+  deleteUser: (id: string) => void;
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
 
@@ -88,6 +91,8 @@ interface AppContextType {
 
   customers: CustomerCreditAccount[];
   addCustomer: (cust: Omit<CustomerCreditAccount, 'id' | 'currentBalance' | 'ledgerHistory'>) => CustomerCreditAccount;
+  updateCustomer: (id: string, updated: Partial<CustomerCreditAccount>) => void;
+  deleteCustomer: (id: string) => void;
   recordCustomerPayment: (customerId: string, amount: number, paymentMode: string, note: string) => void;
   recordCustomerUdhar: (customerId: string, amount: number, referenceInvoice: string, note: string) => void;
 
@@ -109,6 +114,7 @@ interface AppContextType {
 
   expenses: ExpenseItem[];
   addExpense: (expData: Omit<ExpenseItem, 'id' | 'expenseNumber'>) => ExpenseItem;
+  updateExpense: (id: string, updated: Partial<ExpenseItem>) => void;
   deleteExpense: (id: string) => void;
 
   settings: ShopSettings;
@@ -147,6 +153,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [users, setUsers] = useState<User[]>(() => {
+    const saved = localStorage.getItem('mshop_users');
+    return saved ? JSON.parse(saved) : INITIAL_USERS;
+  });
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem('mshop_products');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
@@ -268,7 +278,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('mshop_settings', JSON.stringify(settings));
   }, [settings]);
 
+  useEffect(() => {
+    localStorage.setItem('mshop_users', JSON.stringify(users));
+  }, [users]);
+
   // Handler functions
+  const addUser = (userData: Omit<User, 'id'>): User => {
+    const newUser: User = {
+      ...userData,
+      id: `u-${Date.now()}`,
+      status: userData.status || 'Active',
+      createdAt: new Date().toISOString().split('T')[0],
+      lastActive: 'Just Now'
+    };
+    setUsers(prev => [newUser, ...prev]);
+    return newUser;
+  };
+
+  const updateUser = (id: string, updated: Partial<User>) => {
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updated } : u));
+    if (currentUser && currentUser.id === id) {
+      setCurrentUser(prev => prev ? { ...prev, ...updated } : null);
+    }
+  };
+
+  const deleteUser = (id: string) => {
+    setUsers(prev => prev.filter(u => u.id !== id));
+  };
   const addProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       ...productData,
@@ -489,6 +525,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setCustomers(prev => [newC, ...prev]);
     return newC;
+  };
+
+  const updateCustomer = (id: string, updated: Partial<CustomerCreditAccount>) => {
+    setCustomers(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c));
+  };
+
+  const deleteCustomer = (id: string) => {
+    setCustomers(prev => prev.filter(c => c.id !== id));
   };
 
   const recordCustomerPayment = (customerId: string, amount: number, paymentMode: string, note: string) => {
@@ -785,6 +829,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newExp;
   };
 
+  const updateExpense = (id: string, updated: Partial<ExpenseItem>) => {
+    setExpenses(prev => prev.map(e => e.id === id ? { ...e, ...updated } : e));
+  };
+
   const deleteExpense = (id: string) => {
     setExpenses(prev => prev.filter(e => e.id !== id));
   };
@@ -804,6 +852,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setJobCards(INITIAL_JOB_CARDS);
     setExpenses(INITIAL_EXPENSES);
     setSettings(DEFAULT_SETTINGS);
+    setUsers(INITIAL_USERS);
     localStorage.removeItem('mshop_products');
     localStorage.removeItem('mshop_sales');
     localStorage.removeItem('mshop_exchanges');
@@ -814,6 +863,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem('mshop_jobcards');
     localStorage.removeItem('mshop_expenses');
     localStorage.removeItem('mshop_settings');
+    localStorage.removeItem('mshop_users');
   };
 
   return (
@@ -823,7 +873,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       token,
       setToken,
       logout,
-      users: INITIAL_USERS,
+      users,
+      addUser,
+      updateUser,
+      deleteUser,
       activeTab,
       setActiveTab,
       products,
@@ -843,6 +896,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateOrderStatus,
       customers,
       addCustomer,
+      updateCustomer,
+      deleteCustomer,
       recordCustomerPayment,
       recordCustomerUdhar,
       suppliers,
@@ -860,6 +915,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       deleteJobCard,
       expenses,
       addExpense,
+      updateExpense,
       deleteExpense,
       settings,
       updateSettings,

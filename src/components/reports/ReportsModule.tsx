@@ -26,7 +26,9 @@ import {
   Clock,
   Layers,
   Percent,
-  RefreshCw
+  RefreshCw,
+  Bot,
+  Sparkles
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -270,6 +272,14 @@ export const ReportsModule: React.FC = () => {
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => document.getElementById('ai-assistant-btn')?.click()}
+            className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl flex items-center gap-2 shadow-md shadow-indigo-600/20 transition cursor-pointer border border-indigo-400/30"
+          >
+            <Bot className="w-4 h-4 text-purple-200" />
+            <span>AI Income & Report Assistant</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+          </button>
           <button
             onClick={() => handleExportCSV('sales')}
             className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition cursor-pointer"

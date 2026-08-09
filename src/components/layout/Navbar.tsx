@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
 import {
   Smartphone,
   Search,
@@ -15,7 +16,9 @@ import {
   Shield,
   Key,
   ChevronDown,
-  CheckCircle2
+  CheckCircle2,
+  Bot,
+  Sparkles
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -35,6 +38,7 @@ export const Navbar: React.FC = () => {
   } = useApp();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const pendingOrdersCount = orders.filter(o => o.orderStatus === 'Pending').length;
@@ -106,6 +110,18 @@ export const Navbar: React.FC = () => {
         {/* Quick Action Controls */}
         <div className="flex items-center gap-2.5 shrink-0">
           
+          {/* AI Store Assistant Button */}
+          <button
+            id="ai-assistant-btn"
+            onClick={() => setIsAIOpen(true)}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-md shadow-indigo-500/20 transition active:scale-95 cursor-pointer relative border border-indigo-400/30"
+            title="Chat with AI Assistant for Store Reports, Income, and Analytics"
+          >
+            <Bot className="w-4 h-4 text-purple-200 animate-pulse" />
+            <span className="hidden sm:inline">AI Assistant</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+          </button>
+
           {/* Fast POS Button */}
           <button
             id="quick-pos-btn"
@@ -267,6 +283,9 @@ export const Navbar: React.FC = () => {
 
         </div>
       </div>
+
+      {/* AI Assistant Side Popup Drawer */}
+      <AIAssistantDrawer isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
     </header>
   );
 };

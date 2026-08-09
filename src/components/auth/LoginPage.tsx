@@ -76,6 +76,7 @@ export const LoginPage: React.FC = () => {
           id: data.user?.id || 'admin-jwt-01',
           name: data.user?.name || data.user?.username || 'Mobile World Admin',
           email: email,
+          phone: '+91 98765 00000',
           role: 'Admin',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
         };
@@ -107,6 +108,7 @@ export const LoginPage: React.FC = () => {
           id: 'admin-jwt-fallback',
           name: 'Mobile World Admin',
           email: email,
+          phone: '+91 98765 00000',
           role: 'Admin',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
         };
@@ -136,6 +138,7 @@ export const LoginPage: React.FC = () => {
         id: 'admin-jwt-offline',
         name: 'Mobile World Admin',
         email: email,
+        phone: '+91 98765 00000',
         role: 'Admin',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
       };

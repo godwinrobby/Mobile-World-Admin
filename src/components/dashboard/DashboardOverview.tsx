@@ -22,7 +22,7 @@ import {
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts';
 
 export const DashboardOverview: React.FC = () => {
-  const { sales, products, exchanges, customers, suppliers, setActiveTab, settings } = useApp();
+  const { sales, products, exchanges, customers, suppliers, users, setActiveTab, settings } = useApp();
 
   const totalSalesVal = sales.reduce((a, b) => a + b.totalAmount, 0);
   const totalPhonesSold = sales.reduce((acc, s) => acc + s.items.filter(i => i.imei).length, 0);
@@ -75,9 +75,9 @@ export const DashboardOverview: React.FC = () => {
       color: 'text-blue-400 bg-blue-500/10 border-blue-500/30'
     },
     {
-      label: 'Active Agents',
-      percentage: '0%',
-      value: '0',
+      label: 'Staff & Cashiers',
+      percentage: 'Active',
+      value: users ? users.filter(u => (u.status || 'Active') === 'Active').length.toString() : '0',
       icon: Users,
       color: 'text-purple-400 bg-purple-500/10 border-purple-500/30'
     },
@@ -131,8 +131,15 @@ export const DashboardOverview: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setActiveTab('users')}
+            className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs px-3.5 py-2 rounded-xl transition cursor-pointer"
+          >
+            <Users className="w-4 h-4" />
+            <span>Staff & Cashiers</span>
+          </button>
+          <button
             onClick={() => setActiveTab('sell')}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md transition"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md transition cursor-pointer"
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Open POS Counter</span>
