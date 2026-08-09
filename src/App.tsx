@@ -32,6 +32,11 @@ function MainLayout() {
     }
   }, [activeTab, currentUser]);
 
+  // If user is not logged in, render ONLY the Login Page and block dashboard access
+  if (!currentUser) {
+    return <LoginPage />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased">
       
@@ -62,9 +67,6 @@ function MainLayout() {
         </main>
 
       </div>
-
-      {/* Dedicated JWT Login Page (if logged out or switching user) */}
-      {!currentUser && <LoginPage />}
 
       {/* Live Storefront Simulator Modal */}
       {showStorefrontPreview && (

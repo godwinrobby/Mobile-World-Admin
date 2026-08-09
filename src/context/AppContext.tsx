@@ -132,10 +132,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return localStorage.getItem('admin_token') || localStorage.getItem('mshop_jwt_token') || null;
   });
 
-  // Load from localStorage if present
+  // Load from localStorage if present; default to null so login is required
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('mshop_user');
-    return saved ? JSON.parse(saved) : INITIAL_USERS[0]; // default logged in as Admin for instant usability
+    return saved ? JSON.parse(saved) : null;
   });
 
   const logout = () => {
