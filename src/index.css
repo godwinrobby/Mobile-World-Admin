@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+/* Hide scrollbar for Chrome, Safari, Opera, Edge, and Firefox globally in side popups, panels, and containers */
+.no-scrollbar::-webkit-scrollbar,
+#admin-sidebar::-webkit-scrollbar,
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+.no-scrollbar,
+#admin-sidebar,
+html, body, div, form, section, aside, nav, article {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}

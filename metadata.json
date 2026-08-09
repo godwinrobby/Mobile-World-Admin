@@ -1,0 +1,6 @@
+{
+  "name": "Mobile World Care & Digital Store",
+  "description": "Comprehensive Mobile World Care & Digital Store Management System for POS Sales, Device Buyback & Exchange, Product Catalog, Inventory IMEI Tracking, Repairs, and Accounts Ledger.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
