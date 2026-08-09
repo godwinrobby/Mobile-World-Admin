@@ -137,14 +137,14 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside id="admin-sidebar" className="w-full md:w-64 bg-slate-900 border-r border-slate-800 shrink-0 flex flex-col justify-between py-4 max-h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar sticky top-16">
+    <aside id="admin-sidebar" className="w-full md:w-72 bg-slate-900 border-r border-slate-800 shrink-0 flex flex-col justify-between py-4 max-h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar sticky top-16">
       <div className="px-3 space-y-1">
         
-        <div className="px-3 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+        <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
           <span>Main Navigation</span>
           {lowStockCount > 0 && (
-            <span id="low-stock-alert-badge" className="text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/30 px-1.5 py-0.5 rounded font-normal flex items-center gap-1">
-              <AlertTriangle className="w-3 h-3" /> {lowStockCount} Low
+            <span id="low-stock-alert-badge" className="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded font-normal flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5" /> {lowStockCount} Low
             </span>
           )}
         </div>
@@ -161,18 +161,18 @@ export const Sidebar: React.FC = () => {
                 setActiveTab(item.id);
                 navigate(`/${item.id}`);
               }}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left transition ${
                 isActive
                   ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/20 font-semibold'
                   : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
               }`}
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <div className="flex items-center gap-3.5 min-w-0">
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                 <div className="min-w-0">
-                  <div className="text-xs font-semibold truncate">{item.label}</div>
+                  <div className="text-sm font-semibold truncate">{item.label}</div>
                   {item.description && (
-                    <div className={`text-[10px] truncate ${isActive ? 'text-indigo-100' : 'text-slate-400'}`}>
+                    <div className={`text-xs truncate ${isActive ? 'text-indigo-100' : 'text-slate-400'}`}>
                       {item.description}
                     </div>
                   )}
@@ -180,7 +180,7 @@ export const Sidebar: React.FC = () => {
               </div>
 
               {item.badge !== undefined && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${item.badgeColor || 'bg-slate-700 text-slate-200'}`}>
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full shrink-0 ${item.badgeColor || 'bg-slate-700 text-slate-200'}`}>
                   {item.badge}
                 </span>
               )}
@@ -191,18 +191,18 @@ export const Sidebar: React.FC = () => {
 
       {/* Footer Info Box */}
       <div className="px-3 pt-4 border-t border-slate-800/80 mt-4">
-        <div id="sidebar-shop-quick-info" className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 text-xs text-slate-300 space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] text-slate-400">
+        <div id="sidebar-shop-quick-info" className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 text-xs text-slate-300 space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-400">
             <span>Currency:</span>
             <span className="font-semibold text-slate-200">{settings.currencySymbol} (INR)</span>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-slate-400">
+          <div className="flex items-center justify-between text-xs text-slate-400">
             <span>GST Rate:</span>
             <span className="font-semibold text-slate-200">{settings.taxRatePercent}%</span>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-slate-400">
+          <div className="flex items-center justify-between text-xs text-slate-400">
             <span>System Status:</span>
-            <span className="font-semibold text-emerald-400">Live POS POS/REST</span>
+            <span className="font-semibold text-emerald-400">Live POS/REST</span>
           </div>
         </div>
       </div>
