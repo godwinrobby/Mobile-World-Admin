@@ -51,6 +51,9 @@ export type ActiveTab =
 interface AppContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
+  token: string | null;
+  setToken: (token: string | null) => void;
+  logout: () => void;
   users: User[];
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
@@ -125,11 +128,23 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('admin_token') || localStorage.getItem('mshop_jwt_token') || null;
+  });
+
   // Load from localStorage if present
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('mshop_user');
     return saved ? JSON.parse(saved) : INITIAL_USERS[0]; // default logged in as Admin for instant usability
   });
+
+  const logout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('mshop_jwt_token');
+    localStorage.removeItem('mshop_user');
+    setToken(null);
+    setCurrentUser(null);
+  };
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [products, setProducts] = useState<Product[]>(() => {
@@ -805,6 +820,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider value={{
       currentUser,
       setCurrentUser,
+      token,
+      setToken,
+      logout,
       users: INITIAL_USERS,
       activeTab,
       setActiveTab,

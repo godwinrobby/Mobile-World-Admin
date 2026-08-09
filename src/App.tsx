@@ -7,7 +7,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
-import { LoginModal } from './components/auth/LoginModal';
+import { LoginPage } from './components/auth/LoginPage';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { SellModule } from './components/pos/SellModule';
 import { ExchangeModule } from './components/exchange/ExchangeModule';
@@ -54,8 +54,8 @@ function MainLayout() {
 
       </div>
 
-      {/* Demo Login Modal (if logged out or switching user) */}
-      {!currentUser && <LoginModal />}
+      {/* Dedicated JWT Login Page (if logged out or switching user) */}
+      {!currentUser && <LoginPage />}
 
       {/* Live Storefront Simulator Modal */}
       {showStorefrontPreview && (

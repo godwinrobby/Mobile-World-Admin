@@ -18,6 +18,8 @@ export const Navbar: React.FC = () => {
   const {
     currentUser,
     setCurrentUser,
+    token,
+    logout,
     setActiveTab,
     settings,
     setShowStorefrontPreview,
@@ -121,14 +123,17 @@ export const Navbar: React.FC = () => {
                 className="w-8 h-8 rounded-md object-cover border border-slate-600"
               />
               <div className="hidden sm:block text-left text-xs leading-tight">
-                <div className="font-semibold text-slate-200 truncate max-w-[100px]">{currentUser.name}</div>
-                <div className="text-[10px] text-indigo-400 font-medium">{currentUser.role}</div>
+                <div className="font-semibold text-slate-200 truncate max-w-[110px]">{currentUser.name}</div>
+                <div className="text-[10px] text-indigo-400 font-bold flex items-center gap-1">
+                  <span>{currentUser.role}</span>
+                  {token && <span className="text-[9px] bg-cyan-500/20 text-cyan-300 px-1 py-0.2 rounded font-mono">JWT</span>}
+                </div>
               </div>
               <button
                 id="demo-logout-btn"
-                onClick={() => setCurrentUser(null)}
-                className="p-1 text-slate-400 hover:text-rose-400 transition ml-1"
-                title="Switch User / Logout"
+                onClick={logout}
+                className="p-1.5 text-slate-400 hover:text-rose-400 transition ml-1 bg-slate-900 rounded-md border border-slate-700"
+                title="Logout & Clear JWT Session"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -136,11 +141,11 @@ export const Navbar: React.FC = () => {
           ) : (
             <button
               id="login-trigger-btn"
-              onClick={() => setCurrentUser(null)}
-              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+              onClick={logout}
+              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition shadow-md shadow-indigo-600/30"
             >
               <UserCheck className="w-4 h-4" />
-              <span>Demo Login</span>
+              <span>Sign In (JWT)</span>
             </button>
           )}
 
