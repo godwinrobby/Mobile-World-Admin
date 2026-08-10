@@ -34,6 +34,37 @@ async function startServer() {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+// Helper to sanitize and clean AI response text, extracting text if model outputs JSON structure
+function cleanAiResponseText(rawText: string): string {
+  if (!rawText) return "";
+  let text = rawText.trim();
+
+  // Remove markdown codeblock wrapper if present
+  if (text.startsWith("```")) {
+    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  }
+
+  // If text is a raw JSON string or object string, parse and extract message content
+  if ((text.startsWith("{") && text.endsWith("}")) || (text.startsWith("[") && text.endsWith("]"))) {
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed === "string") return parsed;
+      if (typeof parsed.reply === "string") return parsed.reply;
+      if (typeof parsed.text === "string") return parsed.text;
+      if (typeof parsed.message === "string") return parsed.message;
+      if (typeof parsed.response === "string") return parsed.response;
+      if (typeof parsed.content === "string") return parsed.content;
+      if (Array.isArray(parsed)) {
+        return parsed.map((item: any) => typeof item === "string" ? item : JSON.stringify(item)).join("\n");
+      }
+    } catch {
+      // If parsing fails, fall back to cleaned text
+    }
+  }
+
+  return text;
+}
+
 // Helper to generate intelligent local analytics response if Gemini API hits quota limits or errors
 function generateFallbackAnalyticsResponse(prompt: string, storeContext: any): string {
   const lowerPrompt = (prompt || '').toLowerCase();
@@ -281,6 +312,8 @@ INSTRUCTIONS:
 
       if (!responseText) {
         responseText = generateFallbackAnalyticsResponse(prompt, storeContext);
+      } else {
+        responseText = cleanAiResponseText(responseText);
       }
 
       return res.json({ reply: responseText });

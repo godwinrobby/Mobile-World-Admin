@@ -149,32 +149,77 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
         })
       });
 
-      const data = await res.json();
+      let data;
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const errorText = await res.text();
+        if (errorText.includes('<!doctype') || errorText.includes('<html')) {
+          throw new Error('AI Assistant endpoint currently restarting or unavailable. Switched to offline analytics mode.');
+        } else {
+          throw new Error(errorText.slice(0, 120) || `Server response status: ${res.status}`);
+        }
+      }
 
       if (!res.ok) {
         throw new Error(data.error || 'Server error occurred');
       }
 
+      let cleanReply = data.reply || 'No response returned.';
+      if (typeof cleanReply === 'string' && (cleanReply.trim().startsWith('{') || cleanReply.trim().startsWith('```json'))) {
+        try {
+          let s = cleanReply.trim();
+          if (s.startsWith('```json')) s = s.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+          else if (s.startsWith('```')) s = s.replace(/^```\s*/, '').replace(/\s*```$/, '');
+          const p = JSON.parse(s);
+          if (typeof p === 'string') cleanReply = p;
+          else if (p.reply) cleanReply = p.reply;
+          else if (p.text) cleanReply = p.text;
+          else if (p.message) cleanReply = p.message;
+        } catch {
+          // Keep as is
+        }
+      }
+
       const aiMsg: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         role: 'assistant',
-        text: data.reply || 'No response returned.',
+        text: cleanReply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages(prev => [...prev, aiMsg]);
     } catch (err: any) {
       console.error('Error fetching AI reply:', err);
+      let rawMsg = err?.message || 'Failed to reach AI Assistant server.';
+      if (rawMsg.includes('<!doctype') || rawMsg.includes('<html')) {
+        rawMsg = 'Server endpoint was briefly unavailable.';
+      }
       const errorMsg: ChatMessage = {
         id: `msg-err-${Date.now()}`,
         role: 'assistant',
-        text: `⚠️ **AI Service Error**: ${err.message || 'Failed to reach AI Assistant server.'}\n\nPlease verify that your \`GEMINI_API_KEY\` is configured in Secrets.`,
+        text: `⚠️ **AI Notice**: ${rawMsg}\n\n*Note: Store financial analytics and reports are synchronized and active in live shop mode.*`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderFormattedText = (lineText: string) => {
+    const parts = lineText.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong key={i} className="font-semibold text-indigo-300">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
   };
 
   const handleCopyText = (id: string, text: string) => {
@@ -291,20 +336,20 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
                 <div className="whitespace-pre-wrap font-sans space-y-2">
                   {msg.text.split('\n').map((line, idx) => {
                     if (line.startsWith('### ')) {
-                      return <h4 key={idx} className="font-bold text-base mt-2 text-indigo-400">{line.replace('### ', '')}</h4>;
+                      return <h4 key={idx} className="font-bold text-base mt-2 text-indigo-400">{renderFormattedText(line.replace('### ', ''))}</h4>;
                     }
                     if (line.startsWith('## ')) {
-                      return <h3 key={idx} className="font-bold text-lg mt-2 text-indigo-400">{line.replace('## ', '')}</h3>;
+                      return <h3 key={idx} className="font-bold text-lg mt-2 text-indigo-400">{renderFormattedText(line.replace('## ', ''))}</h3>;
                     }
                     if (line.startsWith('* ') || line.startsWith('- ')) {
                       return (
                         <div key={idx} className="flex items-start space-x-2 pl-2">
                           <span className="text-indigo-400 font-bold">•</span>
-                          <span>{line.substring(2)}</span>
+                          <span>{renderFormattedText(line.substring(2))}</span>
                         </div>
                       );
                     }
-                    return <p key={idx}>{line}</p>;
+                    return <p key={idx}>{renderFormattedText(line)}</p>;
                   })}
                 </div>
 

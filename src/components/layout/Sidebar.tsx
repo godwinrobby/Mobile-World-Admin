@@ -18,11 +18,23 @@ import {
   BarChart3,
   Users,
   Settings,
-  AlertTriangle
+  AlertTriangle,
+  Menu,
+  X,
+  Bot
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, orders, customers, products, settings } = useApp();
+  const {
+    activeTab,
+    setActiveTab,
+    orders,
+    customers,
+    products,
+    settings,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen
+  } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -136,76 +148,188 @@ export const Sidebar: React.FC = () => {
     }
   ];
 
+  const handleNavigate = (tabId: ActiveTab) => {
+    setActiveTab(tabId);
+    navigate(`/${tabId}`);
+    setIsMobileMenuOpen(false);
+  };
+
+  const navContent = (
+    <div className="space-y-1">
+      <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+        <span>Main Navigation</span>
+        {lowStockCount > 0 && (
+          <span id="low-stock-alert-badge" className="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded font-normal flex items-center gap-1">
+            <AlertTriangle className="w-3.5 h-3.5" /> {lowStockCount} Low
+          </span>
+        )}
+      </div>
+
+      {menuItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = currentPath === item.id || activeTab === item.id;
+
+        return (
+          <button
+            key={item.id}
+            id={`nav-item-${item.id}`}
+            onClick={() => handleNavigate(item.id)}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left transition ${
+              isActive
+                ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/20 font-semibold'
+                : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+            }`}
+          >
+            <div className="flex items-center gap-3.5 min-w-0">
+              <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <div className="min-w-0">
+                <div className="text-sm font-semibold truncate">{item.label}</div>
+                {item.description && (
+                  <div className={`text-xs truncate ${isActive ? 'text-indigo-100' : 'text-slate-400'}`}>
+                    {item.description}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {item.badge !== undefined && (
+              <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full shrink-0 ${item.badgeColor || 'bg-slate-700 text-slate-200'}`}>
+                {item.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
-    <aside id="admin-sidebar" className="w-full md:w-72 bg-slate-900 border-r border-slate-800 shrink-0 flex flex-col justify-between py-4 max-h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar sticky top-16">
-      <div className="px-3 space-y-1">
-        
-        <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-          <span>Main Navigation</span>
-          {lowStockCount > 0 && (
-            <span id="low-stock-alert-badge" className="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded font-normal flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5" /> {lowStockCount} Low
-            </span>
-          )}
+    <>
+      {/* Desktop Permanent Sidebar */}
+      <aside id="admin-sidebar" className="hidden md:flex w-72 bg-slate-900 border-r border-slate-800 shrink-0 flex-col justify-between py-4 max-h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar sticky top-16">
+        <div className="px-3">
+          {navContent}
         </div>
 
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentPath === item.id || activeTab === item.id;
+        {/* Footer Info Box */}
+        <div className="px-3 pt-4 border-t border-slate-800/80 mt-4">
+          <div id="sidebar-shop-quick-info" className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 text-xs text-slate-300 space-y-2">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span>Currency:</span>
+              <span className="font-semibold text-slate-200">{settings.currencySymbol} (INR)</span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span>GST Rate:</span>
+              <span className="font-semibold text-slate-200">{settings.taxRatePercent}%</span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span>System Status:</span>
+              <span className="font-semibold text-emerald-400">Live POS/REST</span>
+            </div>
+          </div>
+        </div>
+      </aside>
 
-          return (
-            <button
-              key={item.id}
-              id={`nav-item-${item.id}`}
-              onClick={() => {
-                setActiveTab(item.id);
-                navigate(`/${item.id}`);
-              }}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left transition ${
-                isActive
-                  ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/20 font-semibold'
-                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold truncate">{item.label}</div>
-                  {item.description && (
-                    <div className={`text-xs truncate ${isActive ? 'text-indigo-100' : 'text-slate-400'}`}>
-                      {item.description}
-                    </div>
-                  )}
+      {/* Mobile Off-Canvas Drawer Overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Dark Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          {/* Drawer Menu Content */}
+          <div className="relative w-4/5 max-w-xs bg-slate-900 border-r border-slate-800 h-full flex flex-col justify-between p-4 overflow-y-auto shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                    MW
+                  </div>
+                  <span className="font-bold text-white text-base">{settings.shopName}</span>
                 </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 text-slate-400 hover:text-white rounded-lg bg-slate-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              {item.badge !== undefined && (
-                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full shrink-0 ${item.badgeColor || 'bg-slate-700 text-slate-200'}`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+              {navContent}
+            </div>
 
-      {/* Footer Info Box */}
-      <div className="px-3 pt-4 border-t border-slate-800/80 mt-4">
-        <div id="sidebar-shop-quick-info" className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 text-xs text-slate-300 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Currency:</span>
-            <span className="font-semibold text-slate-200">{settings.currencySymbol} (INR)</span>
-          </div>
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>GST Rate:</span>
-            <span className="font-semibold text-slate-200">{settings.taxRatePercent}%</span>
-          </div>
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>System Status:</span>
-            <span className="font-semibold text-emerald-400">Live POS/REST</span>
+            <div className="pt-4 border-t border-slate-800 text-xs text-slate-400">
+              <p className="text-center">Mobile World Care ERP v2.5</p>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Mobile Fixed Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex items-center justify-around py-2 px-1 shadow-2xl">
+        <button
+          onClick={() => handleNavigate('dashboard')}
+          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg text-xs font-medium transition ${
+            activeTab === 'dashboard' ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <LayoutDashboard className="w-5 h-5" />
+          <span className="text-[10px]">Home</span>
+        </button>
+
+        <button
+          onClick={() => handleNavigate('sell')}
+          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg text-xs font-medium transition ${
+            activeTab === 'sell' ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <span className="text-[10px]">POS Sale</span>
+        </button>
+
+        <button
+          onClick={() => handleNavigate('catalog')}
+          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg text-xs font-medium transition ${
+            activeTab === 'catalog' ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Package className="w-5 h-5" />
+          <span className="text-[10px]">Catalog</span>
+        </button>
+
+        <button
+          onClick={() => handleNavigate('repairs')}
+          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg text-xs font-medium transition ${
+            activeTab === 'repairs' ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Wrench className="w-5 h-5" />
+          <span className="text-[10px]">Repairs</span>
+        </button>
+
+        <button
+          onClick={() => handleNavigate('credits')}
+          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg text-xs font-medium transition ${
+            activeTab === 'credits' ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <CreditCard className="w-5 h-5" />
+          <span className="text-[10px]">Udhar</span>
+        </button>
+
+        <button
+          onClick={() => setIsMobileMenuOpen(prev => !prev)}
+          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg text-xs font-medium transition ${
+            isMobileMenuOpen ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Menu className="w-5 h-5" />
+          <span className="text-[10px]">More</span>
+        </button>
       </div>
-    </aside>
+    </>
   );
 };
+

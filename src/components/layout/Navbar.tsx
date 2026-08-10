@@ -18,7 +18,9 @@ import {
   ChevronDown,
   CheckCircle2,
   Bot,
-  Sparkles
+  Sparkles,
+  Menu,
+  X
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -34,10 +36,13 @@ export const Navbar: React.FC = () => {
     searchQuery,
     setSearchQuery,
     orders,
-    products
+    products,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen
   } = useApp();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -56,25 +61,35 @@ export const Navbar: React.FC = () => {
 
   return (
     <header id="admin-navbar" className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-30 shadow-md">
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Brand & Shop Title */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div id="shop-logo-container" className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 shrink-0">
+        {/* Left Side: Mobile Menu Button & Brand Title */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            id="mobile-menu-toggle-btn"
+            onClick={() => setIsMobileMenuOpen(prev => !prev)}
+            className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition shrink-0 cursor-pointer"
+            aria-label="Toggle Mobile Navigation Menu"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6 text-rose-400" /> : <Menu className="w-6 h-6 text-slate-200" />}
+          </button>
+
+          <div id="shop-logo-container" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 shrink-0">
             <Smartphone className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 id="shop-header-title" className="font-bold text-slate-100 text-base sm:text-lg truncate tracking-tight">
+              <h1 id="shop-header-title" className="font-bold text-slate-100 text-sm sm:text-lg truncate tracking-tight">
                 {settings.shopName}
               </h1>
-              <span id="api-status-badge" className={`hidden md:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+              <span id="api-status-badge" className={`hidden lg:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
                 settings.demoApiMode
                   ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                   : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
               }`}>
                 <Database className="w-3 h-3" />
-                {settings.demoApiMode ? 'Mock API Active' : 'Live API Mode'}
+                {settings.demoApiMode ? 'Mock API' : 'Live API'}
               </span>
             </div>
             <p className="text-xs text-slate-400 truncate hidden sm:block">
@@ -83,7 +98,7 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Desktop Search Bar */}
         <div className="flex-1 max-w-md hidden md:block">
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -108,13 +123,23 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Quick Action Controls */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           
+          {/* Mobile Search Icon Toggle */}
+          <button
+            id="mobile-search-toggle"
+            onClick={() => setShowMobileSearch(!showMobileSearch)}
+            className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
+            title="Search Store"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+
           {/* AI Store Assistant Button */}
           <button
             id="ai-assistant-btn"
             onClick={() => setIsAIOpen(true)}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-md shadow-indigo-500/20 transition active:scale-95 cursor-pointer relative border border-indigo-400/30"
+            className="flex items-center gap-1 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg shadow-md shadow-indigo-500/20 transition active:scale-95 cursor-pointer relative border border-indigo-400/30"
             title="Chat with AI Assistant for Store Reports, Income, and Analytics"
           >
             <Bot className="w-4 h-4 text-purple-200 animate-pulse" />
@@ -129,7 +154,7 @@ export const Navbar: React.FC = () => {
               setActiveTab('sell');
               navigate('/sell');
             }}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-medium text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-sm transition active:scale-95"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-medium text-xs sm:text-sm px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg shadow-sm transition active:scale-95"
           >
             <ShoppingCart className="w-4 h-4" />
             <span className="hidden sm:inline">New POS Sale</span>
@@ -177,8 +202,8 @@ export const Navbar: React.FC = () => {
                   </div>
                   <div className="text-[11px] font-bold text-indigo-400 flex items-center gap-1.5 mt-0.5">
                     <span>{currentUser.role}</span>
-                    <span className="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.2 rounded font-mono font-bold tracking-wider border border-cyan-500/30">
-                      JWT
+                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold tracking-wider border border-emerald-500/30">
+                      Active
                     </span>
                   </div>
                 </div>
@@ -222,7 +247,7 @@ export const Navbar: React.FC = () => {
                         </span>
                         <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/30 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
-                          <span>JWT Active</span>
+                          <span>Session Active</span>
                         </span>
                       </div>
                     </div>
@@ -238,9 +263,9 @@ export const Navbar: React.FC = () => {
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-slate-400 flex items-center gap-1.5">
                           <Key className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>Auth Token:</span>
+                          <span>Auth Status:</span>
                         </span>
-                        <span className="font-mono text-cyan-300 font-bold text-[10px]">JWT Verified</span>
+                        <span className="font-mono text-emerald-300 font-bold text-[10px]">Verified</span>
                       </div>
                       <div className="text-[10px] text-slate-500 truncate font-mono">
                         {token ? `${token.substring(0, 24)}...` : 'Session Active'}
@@ -277,12 +302,38 @@ export const Navbar: React.FC = () => {
               className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition shadow-md shadow-indigo-600/30"
             >
               <UserCheck className="w-4 h-4" />
-              <span>Sign In (JWT)</span>
+              <span>Sign In</span>
             </button>
           )}
 
         </div>
       </div>
+
+      {/* Mobile Expandable Search Bar */}
+      {showMobileSearch && (
+        <div className="md:hidden px-4 py-2.5 bg-slate-950 border-b border-slate-800 animate-in slide-in-from-top-2 duration-150">
+          <div className="relative flex items-center">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3" />
+            <input
+              id="mobile-global-admin-search"
+              type="text"
+              autoFocus
+              placeholder="Search phones, IMEI, customer, invoice..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-900 text-sm text-slate-100 pl-9 pr-8 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500 text-xs"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 text-xs text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* AI Assistant Side Popup Drawer */}
       <AIAssistantDrawer isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />

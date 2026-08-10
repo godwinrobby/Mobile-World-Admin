@@ -36,7 +36,7 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string; tokenPreview?: string } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   const handleJwtLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,8 +86,7 @@ export const LoginPage: React.FC = () => {
         
         setStatusMessage({
           type: 'success',
-          text: 'JWT Authentication successful! Access token received from Mobile World Rehub API.',
-          tokenPreview: extractedToken
+          text: 'Authentication successful! Access token received from Mobile World Rehub API.'
         });
 
         setTimeout(() => {
@@ -118,8 +117,7 @@ export const LoginPage: React.FC = () => {
 
         setStatusMessage({
           type: 'info',
-          text: `API Response: "${errorMsg}". Offline preview JWT session created for testing.`,
-          tokenPreview: fallbackToken
+          text: `API Response: "${errorMsg}". Offline preview session created for testing.`
         });
 
         setTimeout(() => {
@@ -148,8 +146,7 @@ export const LoginPage: React.FC = () => {
 
       setStatusMessage({
         type: 'info',
-        text: `Target API https://api.mobileworldrehub.in/api/admin/login reached. Preview environment JWT stored in admin_token.`,
-        tokenPreview: fallbackToken
+        text: `Target API https://api.mobileworldrehub.in/api/admin/login reached. Preview environment token stored in session.`
       });
 
       setTimeout(() => {
@@ -185,7 +182,7 @@ export const LoginPage: React.FC = () => {
               Mobile World Rehub Admin
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              JWT Authenticated Portal & POS Control Center
+              Portal & POS Control Center
             </p>
           </div>
         </div>
@@ -209,11 +206,6 @@ export const LoginPage: React.FC = () => {
               )}
               <span>{statusMessage.text}</span>
             </div>
-            {statusMessage.tokenPreview && (
-              <div className="font-mono text-[10px] bg-slate-950/80 p-2 rounded-xl border border-slate-800 truncate text-slate-400">
-                JWT Token: <span className="text-cyan-300">{statusMessage.tokenPreview}</span>
-              </div>
-            )}
           </div>
         )}
 
@@ -277,7 +269,7 @@ export const LoginPage: React.FC = () => {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span>Authenticating JWT Endpoint...</span>
+                <span>Authenticating Endpoint...</span>
               </>
             ) : (
               <>
@@ -291,7 +283,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Security Footer Note */}
         <div className="text-center text-[11px] text-slate-500 pt-2 border-t border-slate-800/80">
-          Mobile World Rehub &copy; 2026 &bull; Secure JWT Token Authorization Engine
+          Mobile World Rehub &copy; 2026 &bull; Secure Authorization Engine
         </div>
 
       </div>

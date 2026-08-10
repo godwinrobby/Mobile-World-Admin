@@ -58,7 +58,7 @@ function ProtectedLayout() {
         <Sidebar />
 
         {/* Dynamic Page Route Content */}
-        <main ref={mainContentRef} className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <main ref={mainContentRef} className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 overflow-y-auto">
           <Outlet />
         </main>
 

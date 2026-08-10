@@ -129,6 +129,9 @@ interface AppContextType {
 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -153,6 +156,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('mshop_users');
     return saved ? JSON.parse(saved) : INITIAL_USERS;
@@ -925,7 +929,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showStorefrontPreview,
       setShowStorefrontPreview,
       searchQuery,
-      setSearchQuery
+      setSearchQuery,
+      isMobileMenuOpen,
+      setIsMobileMenuOpen
     }}>
       {children}
     </AppContext.Provider>
