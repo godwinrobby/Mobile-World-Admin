@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Product, CartItem, PaymentMethod, Category, ProductVariant, SaleRecord } from '../../types';
+import { Product, CartItem, PaymentMethod, Category, ProductVariant, SaleRecord, SaleTransaction } from '../../types';
 import { ReceiptModal } from './ReceiptModal';
+import { PdfInvoiceModal } from '../common/PdfInvoiceModal';
 import {
   ShoppingCart,
   Search,
@@ -29,7 +30,9 @@ import {
   ArrowUpRight,
   BarChart3,
   Calendar,
-  Grid
+  Grid,
+  Download,
+  Printer
 } from 'lucide-react';
 
 export const SellModule: React.FC = () => {
@@ -70,6 +73,9 @@ export const SellModule: React.FC = () => {
   const [selectedProductForImei, setSelectedProductForImei] = useState<Product | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(undefined);
   const [chosenImei, setChosenImei] = useState<string>('');
+
+  // PDF Invoice Modal state
+  const [selectedSaleForPdf, setSelectedSaleForPdf] = useState<SaleTransaction | null>(null);
 
   // Filter products for POS
   const filteredProducts = products.filter(p => {
@@ -847,12 +853,21 @@ export const SellModule: React.FC = () => {
 
                       {/* Action */}
                       <td className="p-3 text-center">
-                        <button
-                          onClick={() => setActiveReceipt(item.saleRecord)}
-                          className="text-[11px] font-bold bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white px-2.5 py-1 rounded-lg border border-indigo-500/30 transition cursor-pointer"
-                        >
-                          View Receipt
-                        </button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => setSelectedSaleForPdf(item.saleRecord)}
+                            className="text-[11px] font-bold bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600 hover:text-white px-2 py-1 rounded-lg border border-emerald-500/30 transition cursor-pointer flex items-center gap-1"
+                            title="Generate PDF Invoice"
+                          >
+                            <Download className="w-3 h-3" /> PDF
+                          </button>
+                          <button
+                            onClick={() => setActiveReceipt(item.saleRecord)}
+                            className="text-[11px] font-bold bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white px-2 py-1 rounded-lg border border-indigo-500/30 transition cursor-pointer"
+                          >
+                            Receipt
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -872,7 +887,7 @@ export const SellModule: React.FC = () => {
                 <FileText className="w-5 h-5 text-indigo-400" />
                 <span>Today's Sales Register ({sales.length} Invoices)</span>
               </h3>
-              <p className="text-xs text-slate-400">All recorded transactions with printable receipt backup.</p>
+              <p className="text-xs text-slate-400">All recorded transactions with PDF invoice generation & printable receipt backup.</p>
             </div>
             <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full font-mono">
               Total Today: {settings.currencySymbol}{sales.reduce((acc, s) => acc + s.totalAmount, 0).toLocaleString()}
@@ -888,7 +903,7 @@ export const SellModule: React.FC = () => {
                   <th className="p-3">Items Sold</th>
                   <th className="p-3">Payment Mode</th>
                   <th className="p-3 text-right">Total Invoice</th>
-                  <th className="p-3 text-center">Receipt</th>
+                  <th className="p-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -918,12 +933,20 @@ export const SellModule: React.FC = () => {
                       {settings.currencySymbol}{s.totalAmount.toLocaleString()}
                     </td>
                     <td className="p-3 text-center">
-                      <button
-                        onClick={() => setActiveReceipt(s)}
-                        className="text-xs bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white px-2.5 py-1 rounded-lg border border-indigo-500/30 transition cursor-pointer font-bold"
-                      >
-                        View Receipt
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => setSelectedSaleForPdf(s)}
+                          className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg shadow-sm transition cursor-pointer font-bold flex items-center gap-1"
+                        >
+                          <Download className="w-3.5 h-3.5" /> PDF
+                        </button>
+                        <button
+                          onClick={() => setActiveReceipt(s)}
+                          className="text-xs bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white px-2.5 py-1 rounded-lg border border-indigo-500/30 transition cursor-pointer font-bold"
+                        >
+                          Receipt
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1002,6 +1025,16 @@ export const SellModule: React.FC = () => {
           sale={activeReceipt}
           settings={settings}
           onClose={() => setActiveReceipt(null)}
+        />
+      )}
+
+      {/* PDF Invoice Modal Trigger */}
+      {selectedSaleForPdf && (
+        <PdfInvoiceModal
+          type="sale"
+          data={selectedSaleForPdf}
+          settings={settings}
+          onClose={() => setSelectedSaleForPdf(null)}
         />
       )}
 

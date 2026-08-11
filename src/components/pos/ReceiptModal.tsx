@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SaleTransaction, ShopSettings } from '../../types';
-import { Printer, X, Download, CheckCircle2, ShieldCheck, QrCode, Smartphone } from 'lucide-react';
+import { Printer, X, Download, CheckCircle2, ShieldCheck, QrCode, Smartphone, FileText } from 'lucide-react';
+import { PdfInvoiceModal } from '../common/PdfInvoiceModal';
 
 interface ReceiptModalProps {
   sale: SaleTransaction;
@@ -9,9 +10,22 @@ interface ReceiptModalProps {
 }
 
 export const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, settings, onClose }) => {
+  const [showPdfInvoiceModal, setShowPdfInvoiceModal] = useState(false);
+
   const handlePrint = () => {
     window.print();
   };
+
+  if (showPdfInvoiceModal) {
+    return (
+      <PdfInvoiceModal
+        type="sale"
+        data={sale}
+        settings={settings}
+        onClose={() => setShowPdfInvoiceModal(false)}
+      />
+    );
+  }
 
   return (
     <div id="receipt-modal-overlay" className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
@@ -30,17 +44,25 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, settings, onCl
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowPdfInvoiceModal(true)}
+              id="generate-pdf-invoice-btn"
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>PDF Invoice</span>
+            </button>
+            <button
               onClick={handlePrint}
               id="print-receipt-btn"
-              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Print / Download</span>
+              <span>Print</span>
             </button>
             <button
               onClick={onClose}
               id="close-receipt-btn"
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
