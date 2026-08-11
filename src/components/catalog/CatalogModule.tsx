@@ -48,7 +48,8 @@ export const CatalogModule: React.FC = () => {
     addCategory,
     brands,
     addBrand,
-    settings
+    settings,
+    updateSettings
   } = useApp();
 
   // Filters & Views
@@ -439,14 +440,61 @@ export const CatalogModule: React.FC = () => {
           <p className="text-[10px] text-slate-400">Barcode / Warranty ready</p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Low Stock Alerts</span>
-          <div className={`text-lg font-extrabold ${lowStockCount > 0 ? 'text-rose-400' : 'text-emerald-400'} mt-0.5`}>
+        <div
+          onClick={() => setStockFilter('LOW_STOCK')}
+          className="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-3.5 rounded-2xl cursor-pointer transition group"
+          title="Click to view low stock items"
+        >
+          <span className="text-[11px] font-semibold text-slate-400 uppercase group-hover:text-amber-400 transition flex items-center justify-between">
+            <span>Low Stock Alerts</span>
+            <AlertTriangle className={`w-3.5 h-3.5 ${lowStockCount > 0 ? 'text-amber-400 animate-pulse' : 'text-slate-600'}`} />
+          </span>
+          <div className={`text-lg font-extrabold ${lowStockCount > 0 ? 'text-amber-400' : 'text-emerald-400'} mt-0.5`}>
             {lowStockCount} Products
           </div>
-          <p className="text-[10px] text-slate-400">Threshold ≤ {settings.lowStockThreshold} units</p>
+          <p className="text-[10px] text-slate-400 group-hover:text-slate-300">
+            Threshold ≤ {settings.lowStockThreshold} units • <span className="underline text-indigo-400">Click to filter</span>
+          </p>
         </div>
       </div>
+
+      {/* Low-Stock High-Priority Alert Banner */}
+      {lowStockCount > 0 && (
+        <div className="bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/15 border border-amber-500/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg shadow-amber-500/5 animate-in fade-in duration-200">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 bg-amber-500/20 rounded-xl border border-amber-500/40 text-amber-300 shrink-0 mt-0.5">
+              <AlertTriangle className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-amber-300 text-sm">
+                  Low Stock Alert ({lowStockCount} {lowStockCount === 1 ? 'Product' : 'Products'} Below Threshold)
+                </h3>
+                <span className="bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-500/30">
+                  ≤ {settings.lowStockThreshold} Items
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Certain inventory models are running low on stock. Re-order from suppliers or create Purchase Orders to prevent lost sales.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
+            <button
+              onClick={() => setStockFilter(stockFilter === 'LOW_STOCK' ? 'ALL' : 'LOW_STOCK')}
+              className={`text-xs font-bold px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
+                stockFilter === 'LOW_STOCK'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40'
+              }`}
+            >
+              <Filter className="w-3.5 h-3.5" />
+              <span>{stockFilter === 'LOW_STOCK' ? 'Showing Low Stock Only' : 'Filter Low Stock Items'}</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Filter & Search Toolbar */}
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3">
@@ -468,9 +516,28 @@ export const CatalogModule: React.FC = () => {
           )}
         </div>
 
-        {/* Dropdown Filters */}
+        {/* Dropdown Filters & Low Stock Threshold Adjuster */}
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           
+          {/* Low Stock Threshold Setting Control */}
+          <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 px-2.5 py-1.5 rounded-xl text-xs">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight shrink-0 flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3 text-amber-400" /> Threshold:
+            </span>
+            <select
+              value={settings.lowStockThreshold}
+              onChange={e => updateSettings({ lowStockThreshold: Number(e.target.value) })}
+              className="bg-transparent text-amber-300 font-bold focus:outline-none cursor-pointer"
+              title="Set Low Stock Quantity Threshold"
+            >
+              <option value={3} className="bg-slate-900 text-slate-200">&lt; 3 items</option>
+              <option value={5} className="bg-slate-900 text-slate-200">&lt; 5 items (Default)</option>
+              <option value={10} className="bg-slate-900 text-slate-200">&lt; 10 items</option>
+              <option value={15} className="bg-slate-900 text-slate-200">&lt; 15 items</option>
+              <option value={20} className="bg-slate-900 text-slate-200">&lt; 20 items</option>
+            </select>
+          </div>
+
           {/* Category Filter */}
           <select
             value={selectedCategory}
@@ -499,12 +566,16 @@ export const CatalogModule: React.FC = () => {
           <select
             value={stockFilter}
             onChange={e => setStockFilter(e.target.value as any)}
-            className="text-xs bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:border-indigo-500"
+            className={`text-xs border px-3 py-2 rounded-xl focus:outline-none transition ${
+              stockFilter === 'LOW_STOCK'
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 font-bold'
+                : 'bg-slate-950 border-slate-800 text-slate-200 focus:border-indigo-500'
+            }`}
           >
             <option value="ALL">All Stock Status</option>
             <option value="IN_STOCK">In Stock (&gt; {settings.lowStockThreshold})</option>
-            <option value="LOW_STOCK">Low Stock (≤ {settings.lowStockThreshold})</option>
-            <option value="OUT_OF_STOCK">Out of Stock (0)</option>
+            <option value="LOW_STOCK">⚠️ Low Stock (≤ {settings.lowStockThreshold}) [{lowStockCount}]</option>
+            <option value="OUT_OF_STOCK">❌ Out of Stock (0)</option>
           </select>
 
           {/* View Toggle */}
@@ -551,11 +622,19 @@ export const CatalogModule: React.FC = () => {
           {filteredProducts.map(product => {
             const isLow = product.stock <= settings.lowStockThreshold && product.stock > 0;
             const isOut = product.stock === 0;
+            const maxStockScale = Math.max(settings.lowStockThreshold * 2, 10);
+            const stockFillPercent = Math.min(100, Math.max(6, (product.stock / maxStockScale) * 100));
 
             return (
               <div
                 key={product.id}
-                className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-md relative group transition"
+                className={`bg-slate-900 border rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-md relative group transition ${
+                  isOut
+                    ? 'border-rose-500/50 bg-gradient-to-b from-rose-500/10 via-slate-900 to-slate-900 shadow-rose-500/5'
+                    : isLow
+                    ? 'border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-slate-900 to-slate-900 shadow-amber-500/5'
+                    : 'border-slate-800 hover:border-slate-700'
+                }`}
               >
                 {/* Product Image & Badges */}
                 <div className="relative">
@@ -573,7 +652,21 @@ export const CatalogModule: React.FC = () => {
                     </span>
                   </div>
 
-                  {product.featuredInEcommerce && (
+                  {isLow && (
+                    <span className="absolute top-2 right-2 text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 px-2 py-0.5 rounded-md shadow-lg flex items-center gap-1 animate-pulse z-10">
+                      <AlertTriangle className="w-3 h-3 text-slate-950 fill-slate-950" />
+                      <span>LOW STOCK: {product.stock} LEFT</span>
+                    </span>
+                  )}
+
+                  {isOut && (
+                    <span className="absolute top-2 right-2 text-[10px] font-extrabold bg-rose-600 text-white px-2 py-0.5 rounded-md shadow-lg flex items-center gap-1 z-10">
+                      <XCircle className="w-3 h-3 text-white" />
+                      <span>OUT OF STOCK</span>
+                    </span>
+                  )}
+
+                  {!isLow && !isOut && product.featuredInEcommerce && (
                     <span className="absolute top-2 right-2 text-[10px] font-bold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-md shadow flex items-center gap-1">
                       <Sparkles className="w-3 h-3 fill-slate-950" /> Featured
                     </span>
@@ -631,12 +724,40 @@ export const CatalogModule: React.FC = () => {
                   <div className="text-right">
                     <span className="text-[10px] text-slate-500 block">Stock Level</span>
                     <span
-                      className={`font-extrabold ${
+                      className={`font-extrabold flex items-center justify-end gap-1 ${
                         isOut ? 'text-rose-500' : isLow ? 'text-amber-400' : 'text-emerald-400'
                       }`}
                     >
-                      {product.stock} Units {isOut ? '(Out)' : isLow ? '(Low)' : ''}
+                      {isLow && <AlertTriangle className="w-3 h-3 text-amber-400 animate-pulse" />}
+                      {product.stock} Units {isOut ? '(Out)' : isLow ? '(Low Stock)' : ''}
                     </span>
+                  </div>
+                </div>
+
+                {/* Stock Level Progress Bar Indicator */}
+                <div className="space-y-1 pt-1">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-slate-400 font-medium flex items-center gap-1">
+                      {isOut ? (
+                        <XCircle className="w-3 h-3 text-rose-400" />
+                      ) : isLow ? (
+                        <AlertTriangle className="w-3 h-3 text-amber-400" />
+                      ) : (
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      )}
+                      Inventory Level
+                    </span>
+                    <span className={`font-bold ${isOut ? 'text-rose-400' : isLow ? 'text-amber-300' : 'text-slate-400'}`}>
+                      {product.stock} / {settings.lowStockThreshold} threshold
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                    <div
+                      style={{ width: `${stockFillPercent}%` }}
+                      className={`h-full transition-all duration-300 ${
+                        isOut ? 'bg-rose-500' : isLow ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-emerald-500'
+                      }`}
+                    />
                   </div>
                 </div>
 
@@ -692,69 +813,95 @@ export const CatalogModule: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {filteredProducts.map(product => (
-                  <tr key={product.id} className="hover:bg-slate-800/40 transition">
-                    <td className="p-3">
-                      <div className="flex items-center gap-3">
-                        <img src={product.image} alt={product.name} className="w-10 h-10 rounded-lg object-cover bg-slate-950 border border-slate-800" />
-                        <div>
-                          <div className="font-bold text-slate-100">{product.name}</div>
-                          <div className="text-[10px] text-slate-400">{product.specifications?.['RAM']} • {product.specifications?.['Storage']}</div>
+                {filteredProducts.map(product => {
+                  const isLow = product.stock <= settings.lowStockThreshold && product.stock > 0;
+                  const isOut = product.stock === 0;
+
+                  return (
+                    <tr
+                      key={product.id}
+                      className={`transition ${
+                        isOut
+                          ? 'bg-rose-500/10 hover:bg-rose-500/15 border-l-4 border-l-rose-500'
+                          : isLow
+                          ? 'bg-amber-500/10 hover:bg-amber-500/15 border-l-4 border-l-amber-500'
+                          : 'hover:bg-slate-800/40'
+                      }`}
+                    >
+                      <td className="p-3">
+                        <div className="flex items-center gap-3">
+                          <img src={product.image} alt={product.name} className="w-10 h-10 rounded-lg object-cover bg-slate-950 border border-slate-800" />
+                          <div>
+                            <div className="font-bold text-slate-100">{product.name}</div>
+                            <div className="text-[10px] text-slate-400">{product.specifications?.['RAM']} • {product.specifications?.['Storage']}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <div className="font-semibold text-indigo-400">{product.brand}</div>
-                      <div className="text-[10px] text-slate-400">{product.category}</div>
-                    </td>
-                    <td className="p-3 font-semibold text-slate-300">
-                      {settings.currencySymbol}{product.costPrice.toLocaleString()}
-                    </td>
-                    <td className="p-3 font-extrabold text-emerald-400">
-                      {settings.currencySymbol}{product.posPrice.toLocaleString()}
-                    </td>
-                    <td className="p-3">
-                      <div className={`font-bold ${product.stock === 0 ? 'text-rose-400' : product.stock <= settings.lowStockThreshold ? 'text-amber-400' : 'text-slate-200'}`}>
-                        {product.stock} Units
-                      </div>
-                      {product.hasImeiTracking && (
-                        <button
-                          onClick={() => setViewImeiProduct(product)}
-                          className="text-[10px] text-cyan-400 hover:underline flex items-center gap-0.5 mt-0.5"
-                        >
-                          <Hash className="w-2.5 h-2.5" /> {product.imeiList?.length || 0} IMEIs
-                        </button>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        product.status === 'Active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700 text-slate-300'
-                      }`}>
-                        {product.status}
-                      </span>
-                    </td>
-                    <td className="p-3 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => handleEditInit(product)}
-                          className="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-700"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-3.5 h-3.5 text-indigo-400" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (confirm(`Delete "${product.name}"?`)) deleteProduct(product.id);
-                          }}
-                          className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 p-1.5 rounded-lg border border-rose-500/20"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-3">
+                        <div className="font-semibold text-indigo-400">{product.brand}</div>
+                        <div className="text-[10px] text-slate-400">{product.category}</div>
+                      </td>
+                      <td className="p-3 font-semibold text-slate-300">
+                        {settings.currencySymbol}{product.costPrice.toLocaleString()}
+                      </td>
+                      <td className="p-3 font-extrabold text-emerald-400">
+                        {settings.currencySymbol}{product.posPrice.toLocaleString()}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`font-extrabold ${isOut ? 'text-rose-400' : isLow ? 'text-amber-300 font-black' : 'text-slate-200'}`}>
+                            {product.stock} Units
+                          </span>
+                          {isLow && (
+                            <span className="text-[9px] font-extrabold bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/40 flex items-center gap-0.5">
+                              <AlertTriangle className="w-2.5 h-2.5 text-amber-400 animate-pulse" /> Low Stock
+                            </span>
+                          )}
+                          {isOut && (
+                            <span className="text-[9px] font-extrabold bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded border border-rose-500/40 flex items-center gap-0.5">
+                              <XCircle className="w-2.5 h-2.5 text-rose-400" /> Out of Stock
+                            </span>
+                          )}
+                        </div>
+                        {product.hasImeiTracking && (
+                          <button
+                            onClick={() => setViewImeiProduct(product)}
+                            className="text-[10px] text-cyan-400 hover:underline flex items-center gap-0.5 mt-0.5"
+                          >
+                            <Hash className="w-2.5 h-2.5" /> {product.imeiList?.length || 0} IMEIs
+                          </button>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          product.status === 'Active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700 text-slate-300'
+                        }`}>
+                          {product.status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleEditInit(product)}
+                            className="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-700"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-3.5 h-3.5 text-indigo-400" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`Delete "${product.name}"?`)) deleteProduct(product.id);
+                            }}
+                            className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 p-1.5 rounded-lg border border-rose-500/20"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -120,6 +120,8 @@ interface AppContextType {
   settings: ShopSettings;
   updateSettings: (newSettings: Partial<ShopSettings>) => void;
   resetAllData: () => void;
+  exportBackupData: () => any;
+  restoreBackupData: (data: any) => boolean;
 
   activeReceipt: SaleTransaction | null;
   setActiveReceipt: (sale: SaleTransaction | null) => void;
@@ -870,6 +872,55 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem('mshop_users');
   };
 
+  const exportBackupData = () => {
+    return {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      appName: settings.shopName || 'Metro Mobile Care POS',
+      data: {
+        products,
+        categories,
+        brands,
+        sales,
+        exchanges,
+        orders,
+        customers,
+        suppliers,
+        purchaseOrders,
+        jobCards,
+        expenses,
+        settings,
+        users
+      }
+    };
+  };
+
+  const restoreBackupData = (backupData: any): boolean => {
+    try {
+      if (!backupData || typeof backupData !== 'object') return false;
+      const payload = backupData.data || backupData;
+
+      if (Array.isArray(payload.products)) setProducts(payload.products);
+      if (Array.isArray(payload.categories)) setCategories(payload.categories);
+      if (Array.isArray(payload.brands)) setBrands(payload.brands);
+      if (Array.isArray(payload.sales)) setSales(payload.sales);
+      if (Array.isArray(payload.exchanges)) setExchanges(payload.exchanges);
+      if (Array.isArray(payload.orders)) setOrders(payload.orders);
+      if (Array.isArray(payload.customers)) setCustomers(payload.customers);
+      if (Array.isArray(payload.suppliers)) setSuppliers(payload.suppliers);
+      if (Array.isArray(payload.purchaseOrders)) setPurchaseOrders(payload.purchaseOrders);
+      if (Array.isArray(payload.jobCards)) setJobCards(payload.jobCards);
+      if (Array.isArray(payload.expenses)) setExpenses(payload.expenses);
+      if (payload.settings && typeof payload.settings === 'object') setSettings(payload.settings);
+      if (Array.isArray(payload.users)) setUsers(payload.users);
+
+      return true;
+    } catch (err) {
+      console.error('Failed to restore backup snapshot:', err);
+      return false;
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       currentUser,
@@ -924,6 +975,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       settings,
       updateSettings,
       resetAllData,
+      exportBackupData,
+      restoreBackupData,
       activeReceipt,
       setActiveReceipt,
       showStorefrontPreview,

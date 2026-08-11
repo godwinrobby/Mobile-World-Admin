@@ -57,6 +57,8 @@ export interface Product {
   imeiList?: string[]; // list of available IMEIs for this product
   status: 'Active' | 'Out of Stock' | 'Draft';
   featuredInEcommerce: boolean;
+  sku?: string;
+  barcode?: string;
   specifications?: Record<string, string>;
 }
 
@@ -196,6 +198,11 @@ export interface CustomerCreditAccount {
   ledgerHistory: LedgerEntry[];
   lastPaymentDate?: string;
   status: 'Active' | 'Blocked' | 'Overdue Alert';
+  customerType?: 'Retail' | 'Wholesale' | 'VIP' | 'Corporate' | 'Walk-in';
+  gstin?: string;
+  notes?: string;
+  city?: string;
+  createdAt?: string;
 }
 
 export interface SupplierDebitAccount {
@@ -355,11 +362,16 @@ export interface ShopSettings {
   emailFromAddress?: string;
   autoEmailInvoiceReceipts?: boolean;
 
-  // Invoice Headers & Legal
+  // Invoice Headers, Branding & Print PDF Config
   invoicePrefix?: string;
   repairJobCardPrefix?: string;
+  invoiceHeaderTitle?: string;
   invoiceHeaderNote?: string;
+  customInvoiceFooterNote?: string;
   termsAndConditions?: string;
   returnPolicyText?: string;
   authorizedSignatoryName?: string;
+  showShopLogoOnInvoice?: boolean;
+  showQrCodeOnInvoice?: boolean;
+  invoiceThemeColor?: string;
 }

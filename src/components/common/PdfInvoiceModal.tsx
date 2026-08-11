@@ -65,11 +65,16 @@ export const PdfInvoiceModal: React.FC<PdfInvoiceModalProps> = ({
     ? repairData!.jobCardNumber
     : purchaseData!.poNumber;
 
+  const customHeaderTitle = settings.invoiceHeaderTitle || 'RETAIL TAX INVOICE';
   const documentTitle = isSale
-    ? 'RETAIL TAX INVOICE'
+    ? customHeaderTitle
     : isRepair
     ? 'REPAIR SERVICE INVOICE & JOB CARD'
     : 'PURCHASE ORDER VOUCHER & INWARD INVOICE';
+
+  const themeColor = settings.invoiceThemeColor || '#4f46e5';
+  const showLogo = settings.showShopLogoOnInvoice !== false && Boolean(settings.logoUrl);
+  const showQr = settings.showQrCodeOnInvoice !== false;
 
   const customerName = isSale
     ? saleData!.customerName
@@ -380,14 +385,21 @@ Thank you for shopping with us!`;
             style={{ color: '#0f172a', backgroundColor: '#ffffff' }}
           >
             {/* Header: Shop Branding & Invoice Title */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b-2 border-slate-900 gap-4" style={{ borderBottomColor: '#0f172a' }}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b-2 gap-4" style={{ borderBottomColor: themeColor }}>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 font-black text-xl tracking-tight" style={{ color: '#0f172a' }}>
-                  <Smartphone className="w-6 h-6 shrink-0" style={{ color: '#4f46e5' }} />
+                  {showLogo ? (
+                    <img src={settings.logoUrl} alt="Store Logo" className="w-8 h-8 object-contain rounded border p-0.5 shrink-0" />
+                  ) : (
+                    <Smartphone className="w-6 h-6 shrink-0" style={{ color: themeColor }} />
+                  )}
                   <span>{settings.shopName}</span>
                 </div>
                 <p className="text-xs font-medium" style={{ color: '#475569' }}>{settings.tagline}</p>
                 <p className="text-[11px] leading-tight max-w-xs" style={{ color: '#64748b' }}>{settings.address}</p>
+                {settings.invoiceHeaderNote && (
+                  <p className="text-[11px] font-semibold italic pt-0.5" style={{ color: themeColor }}>{settings.invoiceHeaderNote}</p>
+                )}
                 <div className="flex flex-wrap items-center gap-x-3 text-[11px] pt-1 font-medium" style={{ color: '#475569' }}>
                   <span>Ph: {settings.phone}</span>
                   {settings.email && <span>• {settings.email}</span>}
@@ -398,7 +410,7 @@ Thank you for shopping with us!`;
               </div>
 
               <div className="text-left sm:text-right space-y-1 p-3 rounded-xl border min-w-[200px]" style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#0f172a' }}>
-                <span className="text-[10px] font-black tracking-wider uppercase block" style={{ color: '#4338ca' }}>
+                <span className="text-[10px] font-black tracking-wider uppercase block" style={{ color: themeColor }}>
                   {documentTitle}
                 </span>
                 <div className="font-mono font-black text-base" style={{ color: '#0f172a' }}>{invoiceNumber}</div>
@@ -649,19 +661,32 @@ Thank you for shopping with us!`;
               </div>
             </div>
 
+            {/* Custom Footer Support Note */}
+            {settings.customInvoiceFooterNote && (
+              <div className="pt-3 pb-1 text-center font-semibold text-xs border-t italic" style={{ color: themeColor, borderColor: '#e2e8f0' }}>
+                {settings.customInvoiceFooterNote}
+              </div>
+            )}
+
             {/* Footer Signature & Verification Barcode */}
-            <div className="pt-6 border-t flex items-center justify-between gap-4 text-[11px]" style={{ borderTopColor: '#e2e8f0', color: '#475569' }}>
+            <div className="pt-4 border-t flex items-center justify-between gap-4 text-[11px]" style={{ borderTopColor: '#e2e8f0', color: '#475569' }}>
               <div className="space-y-1">
                 <div className="w-32 border-b" style={{ borderBottomColor: '#94a3b8' }}></div>
                 <div className="text-[10px] font-medium" style={{ color: '#64748b' }}>Customer Signature</div>
               </div>
 
-              <div className="text-center">
-                <div className="w-12 h-12 mx-auto p-1 rounded border flex items-center justify-center" style={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }}>
-                  <QrCode className="w-full h-full" style={{ color: '#0f172a' }} />
+              {showQr ? (
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto p-1 rounded border flex items-center justify-center" style={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }}>
+                    <QrCode className="w-full h-full" style={{ color: '#0f172a' }} />
+                  </div>
+                  <span className="text-[9px] block mt-0.5" style={{ color: '#94a3b8' }}>Scan to Verify Invoice</span>
                 </div>
-                <span className="text-[9px] block mt-0.5" style={{ color: '#94a3b8' }}>Scan to Verify Invoice</span>
-              </div>
+              ) : (
+                <div className="text-center text-[10px] font-mono font-semibold text-slate-400">
+                  INV#{invoiceNumber}
+                </div>
+              )}
 
               <div className="text-right space-y-1">
                 <div className="w-36 border-b ml-auto" style={{ borderBottomColor: '#94a3b8' }}></div>

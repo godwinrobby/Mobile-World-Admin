@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Product, CartItem, PaymentMethod, Category, ProductVariant, SaleRecord, SaleTransaction } from '../../types';
 import { ReceiptModal } from './ReceiptModal';
 import { PdfInvoiceModal } from '../common/PdfInvoiceModal';
+import { BarcodeScannerModal } from './BarcodeScannerModal';
 import {
   ShoppingCart,
   Search,
@@ -32,7 +33,11 @@ import {
   Calendar,
   Grid,
   Download,
-  Printer
+  Printer,
+  Camera,
+  Scan,
+  Zap,
+  Volume2
 } from 'lucide-react';
 
 export const SellModule: React.FC = () => {
@@ -54,6 +59,12 @@ export const SellModule: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Barcode & IMEI Scanning state
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState<boolean>(false);
+  const [quickScanInput, setQuickScanInput] = useState<string>('');
+  const [scanToast, setScanToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [usbScannerActive, setUsbScannerActive] = useState<boolean>(true);
 
   // Sold Items Datatable filters
   const [soldSearchTerm, setSoldSearchTerm] = useState<string>('');
@@ -195,6 +206,148 @@ export const SellModule: React.FC = () => {
       setChosenImei('');
     }
   };
+
+  // Scanner Audio Beep Synthesizer
+  const playScanBeep = (isSuccess = true) => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = isSuccess ? 'sine' : 'sawtooth';
+      osc.frequency.setValueAtTime(isSuccess ? 1200 : 300, ctx.currentTime);
+      if (isSuccess) {
+        osc.frequency.exponentialRampToValueAtTime(1800, ctx.currentTime + 0.08);
+      }
+
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (isSuccess ? 0.12 : 0.2));
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + (isSuccess ? 0.12 : 0.2));
+    } catch (e) {
+      console.warn('Audio Context error:', e);
+    }
+  };
+
+  // Barcode / IMEI Lookup Handler
+  const handleBarCodeLookup = (code: string) => {
+    const cleanCode = code.trim();
+    if (!cleanCode) return;
+
+    const normalized = cleanCode.toLowerCase();
+
+    let matchedProduct: Product | undefined;
+    let matchedVariant: ProductVariant | undefined;
+    let matchedImei: string | undefined;
+
+    for (const p of products) {
+      // 1. Check IMEI list
+      if (p.imeiList && p.imeiList.length > 0) {
+        const foundImei = p.imeiList.find(i => i.toLowerCase().trim() === normalized);
+        if (foundImei) {
+          matchedProduct = p;
+          matchedImei = foundImei;
+          break;
+        }
+      }
+
+      // 2. Check barcode
+      if ((p as any).barcode && (p as any).barcode.toLowerCase().trim() === normalized) {
+        matchedProduct = p;
+        break;
+      }
+
+      // 3. Check SKU
+      if ((p as any).sku && (p as any).sku.toLowerCase().trim() === normalized) {
+        matchedProduct = p;
+        break;
+      }
+
+      // 4. Check Product ID
+      if (p.id.toLowerCase().trim() === normalized) {
+        matchedProduct = p;
+        break;
+      }
+
+      // 5. Check Product Variants SKU
+      if (p.variants && p.variants.length > 0) {
+        const v = p.variants.find(v => v.sku.toLowerCase().trim() === normalized);
+        if (v) {
+          matchedProduct = p;
+          matchedVariant = v;
+          break;
+        }
+      }
+
+      // 6. Exact name match
+      if (p.name.toLowerCase().trim() === normalized) {
+        matchedProduct = p;
+        break;
+      }
+    }
+
+    if (matchedProduct) {
+      if (matchedProduct.stock <= 0) {
+        playScanBeep(false);
+        setScanToast({ message: `"${matchedProduct.name}" is currently Out of Stock!`, type: 'error' });
+      } else {
+        addToCartDirect(matchedProduct, matchedVariant, matchedImei);
+        playScanBeep(true);
+        const imeiText = matchedImei ? ` (IMEI: ${matchedImei})` : '';
+        setScanToast({ message: `✓ Scanned: Added "${matchedProduct.name}"${imeiText} to cart!`, type: 'success' });
+      }
+    } else {
+      playScanBeep(false);
+      setScanToast({ message: `❌ No item found matching barcode/IMEI: "${cleanCode}"`, type: 'error' });
+    }
+
+    setTimeout(() => {
+      setScanToast(null);
+    }, 4000);
+  };
+
+  // Hardware USB Barcode Scanner Listener
+  useEffect(() => {
+    if (activeSellTab !== 'counter' || !usbScannerActive) return;
+
+    let keyBuffer = '';
+    let lastTime = Date.now();
+
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const targetEl = e.target as HTMLElement;
+      if (targetEl && (targetEl.tagName === 'INPUT' || targetEl.tagName === 'TEXTAREA' || targetEl.tagName === 'SELECT')) {
+        if (targetEl.id !== 'pos-quick-barcode-input') {
+          return;
+        }
+      }
+
+      const now = Date.now();
+      const diff = now - lastTime;
+      lastTime = now;
+
+      // Reset buffer if delay > 120ms (manual typing vs hardware scanner pulse)
+      if (diff > 120) {
+        keyBuffer = '';
+      }
+
+      if (e.key === 'Enter') {
+        if (keyBuffer.trim().length >= 3) {
+          e.preventDefault();
+          handleBarCodeLookup(keyBuffer);
+          keyBuffer = '';
+        }
+      } else if (e.key.length === 1) {
+        keyBuffer += e.key;
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [activeSellTab, usbScannerActive, products]);
 
   const updateCartQty = (index: number, delta: number) => {
     setCart(prev => {
@@ -401,35 +554,123 @@ export const SellModule: React.FC = () => {
           {/* Left Column: Product Selection Catalog */}
           <div className="lg:col-span-7 xl:col-span-8 space-y-4">
             
-            {/* Category Tabs & Search Bar */}
-            <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3">
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                {['All', 'Smartphones', 'Accessories', 'Spare Parts'].map(cat => (
+            {/* Scan Toast Alert Banner */}
+            {scanToast && (
+              <div className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-between shadow-lg transition-all animate-in fade-in duration-200 ${
+                scanToast.type === 'success'
+                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                  : 'bg-rose-500/15 border-rose-500/40 text-rose-300'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {scanToast.type === 'success' ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  )}
+                  <span>{scanToast.message}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setScanToast(null)}
+                  className="text-slate-400 hover:text-white text-xs font-bold px-2 py-0.5"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Barcode & IMEI Scanner Toolbar */}
+            <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3 shadow-md">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                
+                {/* Quick USB Scan Input Field */}
+                <div className="relative flex-1 w-full">
+                  <Scan className="w-4 h-4 text-indigo-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="pos-quick-barcode-input"
+                    type="text"
+                    placeholder="Scan barcode with USB reader or type IMEI + Enter..."
+                    value={quickScanInput}
+                    onChange={(e) => setQuickScanInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleBarCodeLookup(quickScanInput);
+                        setQuickScanInput('');
+                      }
+                    }}
+                    className="w-full bg-slate-950 text-xs font-mono text-indigo-200 pl-9 pr-20 py-2.5 rounded-xl border border-indigo-500/30 focus:outline-none focus:border-indigo-400 placeholder:text-slate-500"
+                  />
                   <button
-                    key={cat}
-                    id={`cat-filter-${cat.toLowerCase().replace(/\s+/g, '-')}`}
-                    onClick={() => setCategoryFilter(cat)}
-                    className={`text-xs font-bold px-4 py-2 rounded-xl whitespace-nowrap transition cursor-pointer ${
-                      categoryFilter === cat
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
-                    }`}
+                    type="button"
+                    onClick={() => {
+                      handleBarCodeLookup(quickScanInput);
+                      setQuickScanInput('');
+                    }}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold px-3 py-1 rounded-lg transition cursor-pointer shadow-sm"
                   >
-                    {cat}
+                    Scan Add
                   </button>
-                ))}
+                </div>
+
+                {/* Camera Barcode Scanner Trigger Button */}
+                <button
+                  type="button"
+                  id="btn-open-camera-scanner"
+                  onClick={() => setIsBarcodeScannerOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/25 transition cursor-pointer flex items-center justify-center gap-2 shrink-0 active:scale-95"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span>Camera Scan</span>
+                </button>
+
+                {/* Hardware USB Scanner Mode Switch */}
+                <button
+                  type="button"
+                  onClick={() => setUsbScannerActive(!usbScannerActive)}
+                  className={`w-full sm:w-auto px-3 py-2 rounded-xl border text-[11px] font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shrink-0 ${
+                    usbScannerActive
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                      : 'bg-slate-950 border-slate-800 text-slate-500'
+                  }`}
+                  title={usbScannerActive ? 'USB Hardware Scanner Listening' : 'USB Hardware Scanner Muted'}
+                >
+                  <Zap className={`w-3.5 h-3.5 ${usbScannerActive ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
+                  <span>{usbScannerActive ? 'USB Scanner ON' : 'USB Scanner OFF'}</span>
+                </button>
+
               </div>
 
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  id="pos-product-search"
-                  type="text"
-                  placeholder="Search by model, brand, accessories, or scan IMEI number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-slate-950 text-xs text-slate-100 pl-9 pr-4 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500"
-                />
+              {/* Category Tabs & Product Search Bar */}
+              <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                  {['All', 'Smartphones', 'Accessories', 'Spare Parts'].map(cat => (
+                    <button
+                      key={cat}
+                      id={`cat-filter-${cat.toLowerCase().replace(/\s+/g, '-')}`}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`text-xs font-bold px-4 py-1.5 rounded-xl whitespace-nowrap transition cursor-pointer ${
+                        categoryFilter === cat
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="pos-product-search"
+                    type="text"
+                    placeholder="Search catalog by model name, brand, or accessory..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-slate-950 text-xs text-slate-100 pl-9 pr-4 py-2 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
               </div>
             </div>
 
@@ -1037,6 +1278,26 @@ export const SellModule: React.FC = () => {
           onClose={() => setSelectedSaleForPdf(null)}
         />
       )}
+
+      {/* Camera Barcode & IMEI Scanner Modal */}
+      <BarcodeScannerModal
+        isOpen={isBarcodeScannerOpen}
+        onClose={() => setIsBarcodeScannerOpen(false)}
+        products={products}
+        onProductScanned={(scannedProduct, matchedVariant, matchedImei) => {
+          if (scannedProduct.hasImeiTracking && scannedProduct.imeiList && scannedProduct.imeiList.length > 0 && !matchedImei) {
+            setSelectedProductForImei(scannedProduct);
+            setSelectedVariant(matchedVariant || scannedProduct.variants?.[0]);
+            setChosenImei(scannedProduct.imeiList[0]);
+          } else {
+            addToCartDirect(scannedProduct, matchedVariant, matchedImei);
+            playScanBeep(true);
+            const imeiText = matchedImei ? ` (IMEI: ${matchedImei})` : '';
+            setScanToast({ message: `✓ Camera Scan: Added "${scannedProduct.name}"${imeiText} to cart!`, type: 'success' });
+            setTimeout(() => setScanToast(null), 3500);
+          }
+        }}
+      />
 
     </div>
   );

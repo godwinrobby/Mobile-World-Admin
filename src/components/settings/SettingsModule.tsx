@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ShopSettings } from '../../types';
+import { ImportSettingsTab } from './ImportSettingsTab';
+import { BackupRestoreSettingsTab } from './BackupRestoreSettingsTab';
+import { DatabaseSchemaTab } from './DatabaseSchemaTab';
+import { UsersModule } from '../users/UsersModule';
 import {
   Settings,
   Store,
@@ -22,10 +26,12 @@ import {
   Zap,
   HelpCircle,
   Smartphone,
-  Check
+  Check,
+  Upload,
+  HardDrive
 } from 'lucide-react';
 
-type SettingsTab = 'site_info' | 'payment_gateway' | 'whatsapp_api' | 'email_api' | 'invoice_headers' | 'api_dev' | 'staff_data';
+type SettingsTab = 'site_info' | 'mysql_database' | 'import_data' | 'backup_restore' | 'payment_gateway' | 'whatsapp_api' | 'email_api' | 'invoice_headers' | 'api_dev' | 'staff_data';
 
 export const SettingsModule: React.FC = () => {
   const { settings, updateSettings, resetAllData, users, products, sales, exchanges, customers } = useApp();
@@ -78,11 +84,31 @@ export const SettingsModule: React.FC = () => {
   // 5. Invoice Headers & Legal State
   const [invoicePrefix, setInvoicePrefix] = useState(settings.invoicePrefix || 'INV-MWC-');
   const [repairJobCardPrefix, setRepairJobCardPrefix] = useState(settings.repairJobCardPrefix || 'JC-MWC-');
+  const [invoiceHeaderTitle, setInvoiceHeaderTitle] = useState(settings.invoiceHeaderTitle || 'RETAIL TAX INVOICE & DIGITAL RECEIPT');
   const [invoiceHeaderNote, setInvoiceHeaderNote] = useState(settings.invoiceHeaderNote || '');
+  const [customInvoiceFooterNote, setCustomInvoiceFooterNote] = useState(settings.customInvoiceFooterNote || '');
   const [termsAndConditions, setTermsAndConditions] = useState(settings.termsAndConditions || '');
   const [returnPolicyText, setReturnPolicyText] = useState(settings.returnPolicyText || '');
   const [receiptFooterMessage, setReceiptFooterMessage] = useState(settings.receiptFooterMessage || '');
   const [authorizedSignatoryName, setAuthorizedSignatoryName] = useState(settings.authorizedSignatoryName || '');
+  const [showShopLogoOnInvoice, setShowShopLogoOnInvoice] = useState(settings.showShopLogoOnInvoice ?? true);
+  const [showQrCodeOnInvoice, setShowQrCodeOnInvoice] = useState(settings.showQrCodeOnInvoice ?? true);
+  const [invoiceThemeColor, setInvoiceThemeColor] = useState(settings.invoiceThemeColor || '#4f46e5');
+
+  // Logo file upload handler
+  const logoInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setLogoUrl(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // 6. Developer API State
   const [demoApiMode, setDemoApiMode] = useState(settings.demoApiMode ?? true);
@@ -133,10 +159,15 @@ export const SettingsModule: React.FC = () => {
 
       invoicePrefix,
       repairJobCardPrefix,
+      invoiceHeaderTitle,
       invoiceHeaderNote,
+      customInvoiceFooterNote,
       termsAndConditions,
       returnPolicyText,
       authorizedSignatoryName,
+      showShopLogoOnInvoice,
+      showQrCodeOnInvoice,
+      invoiceThemeColor,
 
       demoApiMode,
       apiBaseUrl,
@@ -190,12 +221,15 @@ export const SettingsModule: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         {[
           { id: 'site_info', label: 'Site Information', icon: Store },
+          { id: 'mysql_database', label: 'MySQL Database (.SQL)', icon: Database },
+          { id: 'import_data', label: 'Import Data', icon: Upload },
+          { id: 'backup_restore', label: 'Backup & Restore', icon: HardDrive },
           { id: 'payment_gateway', label: 'Payment Gateway', icon: CreditCard },
           { id: 'whatsapp_api', label: 'WhatsApp API', icon: MessageSquare },
           { id: 'email_api', label: 'Email API', icon: Mail },
           { id: 'invoice_headers', label: 'Invoice Headers', icon: FileText },
           { id: 'api_dev', label: 'API & Dev Keys', icon: Code },
-          { id: 'staff_data', label: 'Staff & Data Tools', icon: Users }
+          { id: 'staff_data', label: 'Active Staff & Access Roles', icon: Users }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -263,15 +297,78 @@ export const SettingsModule: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-slate-300 mb-1.5 font-semibold">Store Logo Image URL</label>
-                <input
-                  type="url"
-                  value={logoUrl}
-                  onChange={(e) => setLogoUrl(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500"
-                  placeholder="https://domain.com/logo.png"
-                />
+              <div className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-slate-200 font-bold text-xs">Branding Logo Selection & Image URL</label>
+                  <label className="flex items-center gap-2 text-[11px] text-indigo-400 font-semibold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showShopLogoOnInvoice}
+                      onChange={(e) => setShowShopLogoOnInvoice(e.target.checked)}
+                      className="accent-indigo-500 w-4 h-4 rounded"
+                    />
+                    <span>Print Logo on PDF Invoices & Receipts</span>
+                  </label>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  {/* Thumbnail Preview */}
+                  <div className="w-16 h-16 rounded-xl border border-slate-800 bg-slate-900 flex items-center justify-center overflow-hidden shrink-0 relative group">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="Store Logo" className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <Smartphone className="w-8 h-8 text-indigo-400" />
+                    )}
+                  </div>
+
+                  {/* Input & Upload button */}
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={logoUrl}
+                        onChange={(e) => setLogoUrl(e.target.value)}
+                        className="flex-1 bg-slate-900 text-slate-100 px-3.5 py-2 rounded-lg border border-slate-800 text-xs font-mono focus:outline-none focus:border-indigo-500"
+                        placeholder="https://domain.com/logo.png or Upload File"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => logoInputRef.current?.click()}
+                        className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg transition cursor-pointer flex items-center gap-1.5 shrink-0"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Logo File</span>
+                      </button>
+                      <input
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoFileUpload}
+                        className="hidden"
+                      />
+                    </div>
+
+                    {/* Presets */}
+                    <div className="flex items-center gap-2 overflow-x-auto text-[10px]">
+                      <span className="text-slate-400 font-semibold shrink-0">Sample Presets:</span>
+                      {[
+                        { name: 'Tech Shield', url: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=300&q=80' },
+                        { name: 'Repair Emblem', url: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=300&q=80' },
+                        { name: 'Smart Mobile', url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80' },
+                        { name: 'Gadget Seal', url: 'https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&w=300&q=80' }
+                      ].map((preset, pIdx) => (
+                        <button
+                          key={pIdx}
+                          type="button"
+                          onClick={() => setLogoUrl(preset.url)}
+                          className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-md font-medium transition shrink-0 cursor-pointer"
+                        >
+                          {preset.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="md:col-span-2">
@@ -649,18 +746,89 @@ export const SettingsModule: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 5: INVOICE HEADERS & LEGAL */}
+        {/* TAB 5: INVOICE HEADERS & PRINT PDF CONFIGURATION */}
         {activeTab === 'invoice_headers' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
             <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
               <h3 className="font-bold text-white text-base flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-400" />
-                <span>Invoice Headers, Warranty Terms & Signatures</span>
+                <span>Custom PDF Invoice Header, Footer & Branding Customization</span>
               </h3>
-              <span className="text-xs text-slate-400">Printed on thermal receipts and PDF invoices</span>
+              <span className="text-xs text-slate-400">Controls layout & text on PDF bills and thermal receipts</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              
+              {/* Document Header Title */}
+              <div className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                <h4 className="font-bold text-slate-200 text-xs flex items-center gap-2">
+                  <Store className="w-4 h-4 text-indigo-400" />
+                  <span>Custom Invoice Header Title & Accent Branding</span>
+                </h4>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">Document Title Header</label>
+                    <input
+                      type="text"
+                      value={invoiceHeaderTitle}
+                      onChange={(e) => setInvoiceHeaderTitle(e.target.value)}
+                      className="w-full bg-slate-900 text-slate-100 px-3.5 py-2 rounded-lg border border-slate-800 font-bold focus:outline-none focus:border-indigo-500"
+                      placeholder="RETAIL TAX INVOICE & DIGITAL RECEIPT"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">Invoice Theme Accent Color</label>
+                    <div className="flex items-center gap-2 pt-0.5">
+                      {[
+                        { name: 'Indigo', color: '#4f46e5' },
+                        { name: 'Emerald', color: '#059669' },
+                        { name: 'Deep Slate', color: '#0f172a' },
+                        { name: 'Crimson', color: '#e11d48' },
+                        { name: 'Royal Blue', color: '#1d4ed8' },
+                        { name: 'Amber', color: '#d97706' }
+                      ].map((c) => (
+                        <button
+                          key={c.color}
+                          type="button"
+                          onClick={() => setInvoiceThemeColor(c.color)}
+                          className={`w-7 h-7 rounded-full border-2 transition cursor-pointer flex items-center justify-center ${
+                            invoiceThemeColor === c.color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-80 hover:opacity-100'
+                          }`}
+                          style={{ backgroundColor: c.color }}
+                          title={c.name}
+                        >
+                          {invoiceThemeColor === c.color && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-slate-900">
+                  <label className="flex items-center gap-2 text-slate-300 font-semibold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showShopLogoOnInvoice}
+                      onChange={(e) => setShowShopLogoOnInvoice(e.target.checked)}
+                      className="accent-indigo-500 w-4 h-4 rounded"
+                    />
+                    <span>Show Store Logo Image in PDF Header</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-slate-300 font-semibold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showQrCodeOnInvoice}
+                      onChange={(e) => setShowQrCodeOnInvoice(e.target.checked)}
+                      className="accent-indigo-500 w-4 h-4 rounded"
+                    />
+                    <span>Show Verification QR Code in PDF Footer</span>
+                  </label>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-slate-300 mb-1.5 font-semibold">Tax Invoice Number Prefix</label>
                 <input
@@ -684,55 +852,144 @@ export const SettingsModule: React.FC = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-slate-300 mb-1.5 font-semibold">Top Banner Header Note</label>
+                <label className="block text-slate-300 mb-1.5 font-semibold">Top Banner Header Subtitle / Slogan</label>
                 <input
                   type="text"
                   value={invoiceHeaderNote}
                   onChange={(e) => setInvoiceHeaderNote(e.target.value)}
                   className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800"
-                  placeholder="Authorized Multi-Brand Smartphone Sales & Express Service Center"
+                  placeholder="Authorized Sales, Express Mobile Service & Multi-Brand Accessories"
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-slate-300 mb-1.5 font-semibold">Terms & Conditions (Printed at Bottom of Bill)</label>
-                <textarea
-                  rows={3}
-                  value={termsAndConditions}
-                  onChange={(e) => setTermsAndConditions(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-100 p-3 rounded-xl border border-slate-800"
-                />
+              {/* Custom Footer Section */}
+              <div className="md:col-span-2 space-y-4 pt-2 border-t border-slate-800">
+                <h4 className="font-bold text-white text-xs flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-emerald-400" />
+                  <span>Custom Footer & Legal Configuration</span>
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 mb-1.5 font-semibold">Custom Footer Note / Support Line (PDF)</label>
+                    <input
+                      type="text"
+                      value={customInvoiceFooterNote}
+                      onChange={(e) => setCustomInvoiceFooterNote(e.target.value)}
+                      className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800"
+                      placeholder="Thank you for choosing Mobile World Care! Visit www.mobileworldcare.com for warranty tracking."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 mb-1.5 font-semibold">Thermal Receipt Footer Thank You Message</label>
+                    <input
+                      type="text"
+                      value={receiptFooterMessage}
+                      onChange={(e) => setReceiptFooterMessage(e.target.value)}
+                      className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800"
+                      placeholder="Thank you for shopping with us! Standard warranty terms apply."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 mb-1.5 font-semibold">Terms & Conditions (Printed at Bottom)</label>
+                    <textarea
+                      rows={3}
+                      value={termsAndConditions}
+                      onChange={(e) => setTermsAndConditions(e.target.value)}
+                      className="w-full bg-slate-950 text-slate-100 p-3 rounded-xl border border-slate-800"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 mb-1.5 font-semibold">Return & Replacement Guarantee Policy</label>
+                    <textarea
+                      rows={3}
+                      value={returnPolicyText}
+                      onChange={(e) => setReturnPolicyText(e.target.value)}
+                      className="w-full bg-slate-950 text-slate-100 p-3 rounded-xl border border-slate-800"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 mb-1.5 font-semibold">Authorized Signatory Title</label>
+                  <input
+                    type="text"
+                    value={authorizedSignatoryName}
+                    onChange={(e) => setAuthorizedSignatoryName(e.target.value)}
+                    className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800"
+                    placeholder="Mobile World Store Manager"
+                  />
+                </div>
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-slate-300 mb-1.5 font-semibold">Return & Exchange Guarantee Policy</label>
-                <textarea
-                  rows={2}
-                  value={returnPolicyText}
-                  onChange={(e) => setReturnPolicyText(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-100 p-3 rounded-xl border border-slate-800"
-                />
+              {/* Live Preview Card */}
+              <div className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-300 text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>Live Header & Footer Print Preview</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">Sample PDF Render</span>
+                </div>
+
+                {/* Simulated Invoice Document Paper */}
+                <div className="bg-white text-slate-900 p-4 rounded-lg shadow-md border border-slate-200 text-[11px] font-sans space-y-3">
+                  {/* Header Box */}
+                  <div className="flex items-start justify-between border-b pb-3" style={{ borderColor: invoiceThemeColor }}>
+                    <div className="flex items-start gap-3">
+                      {showShopLogoOnInvoice && logoUrl && (
+                        <img src={logoUrl} alt="Logo" className="w-10 h-10 object-contain rounded border p-0.5 shrink-0" />
+                      )}
+                      <div>
+                        <div className="font-black text-sm flex items-center gap-1.5" style={{ color: invoiceThemeColor }}>
+                          <span>{shopName || 'Mobile World Store'}</span>
+                        </div>
+                        <p className="text-[10px] text-slate-600 font-medium">{tagline}</p>
+                        <p className="text-[10px] text-slate-500">{address}</p>
+                        {invoiceHeaderNote && (
+                          <p className="text-[9px] font-semibold pt-1 italic" style={{ color: invoiceThemeColor }}>{invoiceHeaderNote}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-right bg-slate-50 p-2 rounded border border-slate-200 min-w-[140px]">
+                      <span className="font-black text-[9px] block uppercase" style={{ color: invoiceThemeColor }}>
+                        {invoiceHeaderTitle}
+                      </span>
+                      <span className="font-mono font-bold text-xs">{invoicePrefix}2026-0042</span>
+                      <div className="text-[9px] text-slate-500">Date: {new Date().toISOString().split('T')[0]}</div>
+                    </div>
+                  </div>
+
+                  {/* Sample Item Table snippet */}
+                  <div className="bg-slate-50 p-2 rounded border border-slate-200 text-[10px] flex justify-between font-mono">
+                    <span>1x iPhone 15 Pro Max 256GB Titanium</span>
+                    <span className="font-bold">₹1,34,900.00</span>
+                  </div>
+
+                  {/* Footer Box */}
+                  <div className="border-t pt-2 space-y-1 text-[9px] text-slate-600 border-slate-200">
+                    {customInvoiceFooterNote && (
+                      <p className="font-semibold text-center italic" style={{ color: invoiceThemeColor }}>{customInvoiceFooterNote}</p>
+                    )}
+                    <div className="flex items-center justify-between text-[8px] text-slate-500 pt-1">
+                      <div>
+                        <p><strong>Terms:</strong> {termsAndConditions ? termsAndConditions.substring(0, 60) + '...' : 'Standard terms apply.'}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">{authorizedSignatoryName}</p>
+                        <p className="text-[7px]">Authorized Signatory</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-slate-300 mb-1.5 font-semibold">Thermal Receipt Footer Message</label>
-                <input
-                  type="text"
-                  value={receiptFooterMessage}
-                  onChange={(e) => setReceiptFooterMessage(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 mb-1.5 font-semibold">Authorized Signatory Title</label>
-                <input
-                  type="text"
-                  value={authorizedSignatoryName}
-                  onChange={(e) => setAuthorizedSignatoryName(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800"
-                />
-              </div>
             </div>
           </div>
         )}
@@ -800,81 +1057,37 @@ export const SettingsModule: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 7: STAFF & DATA TOOLS */}
+        {/* TAB 7: ACTIVE STAFF & ACCESS ROLES */}
         {activeTab === 'staff_data' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Staff Accounts */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <h3 className="font-bold text-white text-base flex items-center gap-2 border-b border-slate-800 pb-3">
-                <Users className="w-5 h-5 text-indigo-400" />
-                <span>Active Staff & Access Roles</span>
-              </h3>
+          <UsersModule />
+        )}
 
-              <div className="space-y-3 text-xs">
-                {users.map((u) => (
-                  <div key={u.id} className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img src={u.avatar} alt={u.name} className="w-9 h-9 rounded-xl object-cover" />
-                      <div>
-                        <div className="font-bold text-slate-100">{u.name}</div>
-                        <div className="text-[10px] text-slate-400">{u.email}</div>
-                      </div>
-                    </div>
+        {/* TAB 8: MYSQL DATABASE SCHEMA & EXPORT */}
+        {activeTab === 'mysql_database' && (
+          <DatabaseSchemaTab />
+        )}
 
-                    <span className={`font-bold px-2.5 py-1 rounded-lg text-[10px] ${
-                      u.role === 'Admin' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    }`}>
-                      {u.role}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* TAB 8: IMPORT DATA */}
+        {activeTab === 'import_data' && (
+          <ImportSettingsTab />
+        )}
 
-            {/* Data Tools */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <h3 className="font-bold text-white text-base flex items-center gap-2 border-b border-slate-800 pb-3">
-                <Database className="w-5 h-5 text-indigo-400" />
-                <span>Database Backup & Demo Reset</span>
-              </h3>
-
-              <div className="space-y-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleExportData}
-                  className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition cursor-pointer"
-                >
-                  <Download className="w-4 h-4 text-cyan-400" />
-                  <span>Download Full JSON Database Backup</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm('Are you sure you want to restore pristine sample smartphones, sales, and ledger data?')) {
-                      resetAllData();
-                      alert('Demo data restored successfully!');
-                    }
-                  }}
-                  className="w-full py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition cursor-pointer"
-                >
-                  <RefreshCw className="w-4 h-4 text-rose-400" />
-                  <span>Reset Demo Sample Data</span>
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* TAB 9: BACKUP & RESTORE */}
+        {activeTab === 'backup_restore' && (
+          <BackupRestoreSettingsTab />
         )}
 
         {/* Global Save Button */}
-        <button
-          type="submit"
-          id="save-settings-btn"
-          className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition cursor-pointer flex items-center justify-center gap-2"
-        >
-          <Check className="w-4 h-4" />
-          <span>Save All Settings & Configuration Changes</span>
-        </button>
+        {activeTab !== 'import_data' && activeTab !== 'backup_restore' && activeTab !== 'mysql_database' && activeTab !== 'staff_data' && (
+          <button
+            type="submit"
+            id="save-settings-btn"
+            className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Check className="w-4 h-4" />
+            <span>Save All Settings & Configuration Changes</span>
+          </button>
+        )}
 
       </form>
 

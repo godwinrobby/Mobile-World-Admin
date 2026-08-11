@@ -146,7 +146,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     variants: [
       { id: 'v-1a', color: 'Natural Titanium', ramStorage: '8GB / 256GB', price: 134900, costPrice: 122000, stock: 5, sku: 'IP15PM-256-NT' },
       { id: 'v-1b', color: 'Blue Titanium', ramStorage: '8GB / 512GB', price: 154900, costPrice: 140000, stock: 3, sku: 'IP15PM-512-BT' }
-    ]
+    ],
+    sku: 'IP15PM-BASE',
+    barcode: '8901234567801'
   },
   {
     id: 'p-2',
@@ -158,6 +160,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     onlinePrice: 132999,
     costPrice: 115000,
     stock: 12,
+    sku: 'S24U-512-GRY',
+    barcode: '8901234567802',
     image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&q=80&w=600',
     hasImeiTracking: true,
     imeiList: [
@@ -212,6 +216,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     onlinePrice: 24900,
     costPrice: 19500,
     stock: 24,
+    sku: 'APP-AIRPODS-P2',
+    barcode: '8901234567804',
     image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&q=80&w=600',
     hasImeiTracking: false,
     status: 'Active',
@@ -1154,11 +1160,16 @@ export const DEFAULT_SETTINGS: ShopSettings = {
   emailFromAddress: 'billing@mobileworldcare.com',
   autoEmailInvoiceReceipts: true,
 
-  // Invoice Headers Defaults
+  // Invoice Headers & Legal
   invoicePrefix: 'INV-MWC-',
   repairJobCardPrefix: 'JC-MWC-',
+  invoiceHeaderTitle: 'RETAIL TAX INVOICE & DIGITAL RECEIPT',
   invoiceHeaderNote: 'Authorized Sales, Multi-Brand Mobile Repairs & Digital Electronics Outlet',
+  customInvoiceFooterNote: 'Thank you for choosing Mobile World Care! For express support & warranty tracking visit www.mobileworldcare.com',
   termsAndConditions: '1. Goods once sold are subject to manufacturer warranty terms.\n2. Screen replacement warranty is 90 days against touch failure.\n3. Physical or water damage voids all warranties.',
   returnPolicyText: '7-Day replacement guarantee on un-opened accessories with original VAT/GST tax bill.',
-  authorizedSignatoryName: 'Mobile World Store Manager'
+  authorizedSignatoryName: 'Mobile World Store Manager',
+  showShopLogoOnInvoice: true,
+  showQrCodeOnInvoice: true,
+  invoiceThemeColor: '#4f46e5'
 };

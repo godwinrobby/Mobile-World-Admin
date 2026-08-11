@@ -3,6 +3,7 @@ import { useApp, ActiveTab } from '../../context/AppContext';
 import { PurchasesModule } from '../purchases/PurchasesModule';
 import { RepairsModule } from '../repairs/RepairsModule';
 import { PaymentsModule } from '../payments/PaymentsModule';
+import { CustomerModule } from '../customer/CustomerModule';
 import {
   Package,
   ShoppingBag,
@@ -167,41 +168,7 @@ export const GenericModuleView: React.FC<Props> = ({ tab }) => {
         );
 
       case 'customer':
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-indigo-400" />
-                  <span>Customer Directory & CRM</span>
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Customer contact directory, credit limits, purchase histories, and WhatsApp reminders.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h3 className="font-bold text-white text-sm">Registered Customer Accounts ({customers.length})</h3>
-              <div className="space-y-2">
-                {customers.map(c => (
-                  <div key={c.id} className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 flex items-center justify-between text-xs">
-                    <div>
-                      <div className="font-bold text-slate-100">{c.name}</div>
-                      <div className="text-[10px] text-slate-400">{c.phone}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className={`font-bold ${c.currentBalance > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                        {settings.currencySymbol}{c.currentBalance.toLocaleString()}
-                      </div>
-                      <div className="text-[10px] text-slate-400">{c.currentBalance > 0 ? 'Udhar Balance' : 'Clean Account'}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
+        return <CustomerModule />;
 
       case 'cms':
         return (

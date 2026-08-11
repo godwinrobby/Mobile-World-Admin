@@ -21,6 +21,7 @@ import { StorefrontPreviewModal } from './components/ecommerce/StorefrontPreview
 import { RepairsModule } from './components/repairs/RepairsModule';
 import { ReportsModule } from './components/reports/ReportsModule';
 import { UsersModule } from './components/users/UsersModule';
+import { CustomerModule } from './components/customer/CustomerModule';
 
 // Protected Application Layout & Router Guard
 function ProtectedLayout() {
@@ -98,7 +99,7 @@ export default function App() {
             <Route path="/logistics" element={<GenericModuleView tab="logistics" />} />
             <Route path="/stores" element={<GenericModuleView tab="stores" />} />
             <Route path="/payments" element={<GenericModuleView tab="payments" />} />
-            <Route path="/customer" element={<GenericModuleView tab="customer" />} />
+            <Route path="/customer" element={<CustomerModule />} />
             <Route path="/cms" element={<GenericModuleView tab="cms" />} />
             <Route path="/reports" element={<ReportsModule />} />
             <Route path="/users" element={<UsersModule />} />
