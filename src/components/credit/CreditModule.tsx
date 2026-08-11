@@ -1073,7 +1073,7 @@ export const CreditModule: React.FC = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 space-y-6">
+            <div className="printable-area p-6 space-y-6">
               
               {/* Account Balance Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1386,7 +1386,7 @@ export const CreditModule: React.FC = () => {
             </div>
 
             {/* Printable Voucher Body */}
-            <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <div className="printable-area bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3 text-xs">
                 <div>
                   <div className="font-bold text-white text-sm">{settings.shopName || 'Mobile Shop Store'}</div>

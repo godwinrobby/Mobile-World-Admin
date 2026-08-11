@@ -759,6 +759,7 @@ export const ReportsModule: React.FC = () => {
       </div>
 
       {/* SUMMARY STAT CARDS */}
+      <div className="printable-area space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-slate-400">
@@ -1753,6 +1754,7 @@ export const ReportsModule: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

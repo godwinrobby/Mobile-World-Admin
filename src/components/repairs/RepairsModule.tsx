@@ -920,7 +920,7 @@ export const RepairsModule: React.FC = () => {
       {/* MODAL: PRINTABLE PHYSICAL REPAIR JOB CARD RECEIPT */}
       {selectedJobCardForPrint && (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white text-slate-900 rounded-2xl w-full max-w-xl p-8 shadow-2xl space-y-6 relative border border-slate-200">
+          <div className="printable-area bg-white text-slate-900 rounded-2xl w-full max-w-xl p-8 shadow-2xl space-y-6 relative border border-slate-200">
             {/* Close / Print / PDF buttons top right */}
             <div className="no-print absolute right-4 top-4 flex items-center gap-2">
               <button

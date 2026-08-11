@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { SaleTransaction, RepairJobCard, ShopSettings } from '../../types';
+import { SaleTransaction, RepairJobCard, PurchaseOrder, ShopSettings } from '../../types';
 import {
   Printer,
   Download,
@@ -20,12 +20,13 @@ import {
   Phone,
   Calendar,
   CreditCard,
-  Sparkles
+  Sparkles,
+  ShoppingBag
 } from 'lucide-react';
 
 export interface PdfInvoiceModalProps {
-  type: 'sale' | 'repair';
-  data: SaleTransaction | RepairJobCard;
+  type: 'sale' | 'repair' | 'purchase';
+  data: SaleTransaction | RepairJobCard | PurchaseOrder;
   settings: ShopSettings;
   onClose: () => void;
 }
@@ -42,48 +43,140 @@ export const PdfInvoiceModal: React.FC<PdfInvoiceModalProps> = ({
   const [customNotes, setCustomNotes] = useState(
     type === 'sale'
       ? (data as SaleTransaction).notes || ''
-      : (data as RepairJobCard).notes || ''
+      : type === 'repair'
+      ? (data as RepairJobCard).notes || ''
+      : (data as PurchaseOrder).notes || ''
   );
 
   const printAreaRef = useRef<HTMLDivElement>(null);
 
   const currency = settings.currencySymbol || '₹';
   const isSale = type === 'sale';
+  const isRepair = type === 'repair';
+  const isPurchase = type === 'purchase';
+
   const saleData = isSale ? (data as SaleTransaction) : null;
-  const repairData = !isSale ? (data as RepairJobCard) : null;
+  const repairData = isRepair ? (data as RepairJobCard) : null;
+  const purchaseData = isPurchase ? (data as PurchaseOrder) : null;
 
   const invoiceNumber = isSale
     ? saleData!.invoiceNumber
-    : repairData!.jobCardNumber;
+    : isRepair
+    ? repairData!.jobCardNumber
+    : purchaseData!.poNumber;
 
   const documentTitle = isSale
     ? 'RETAIL TAX INVOICE'
-    : 'REPAIR SERVICE INVOICE & JOB CARD';
+    : isRepair
+    ? 'REPAIR SERVICE INVOICE & JOB CARD'
+    : 'PURCHASE ORDER VOUCHER & INWARD INVOICE';
 
-  const customerName = isSale ? saleData!.customerName : repairData!.customerName;
-  const customerPhone = isSale ? saleData!.customerPhone : repairData!.customerPhone;
-  const customerEmail = !isSale && repairData?.customerEmail ? repairData.customerEmail : '';
+  const customerName = isSale
+    ? saleData!.customerName
+    : isRepair
+    ? repairData!.customerName
+    : purchaseData!.partyName;
+
+  const customerPhone = isSale
+    ? saleData!.customerPhone
+    : isRepair
+    ? repairData!.customerPhone
+    : purchaseData!.partyPhone;
+
+  const customerEmail = isRepair && repairData?.customerEmail
+    ? repairData.customerEmail
+    : isPurchase && purchaseData?.partyEmail
+    ? purchaseData.partyEmail
+    : '';
   
   const issueDate = isSale
     ? saleData!.timestamp
-    : repairData!.createdDate;
+    : isRepair
+    ? repairData!.createdDate
+    : purchaseData!.orderDate;
 
   // Total calculations
   const totalAmount = isSale
     ? saleData!.totalAmount
-    : (repairData!.finalCost || repairData!.estimatedCost);
+    : isRepair
+    ? (repairData!.finalCost || repairData!.estimatedCost)
+    : purchaseData!.totalAmount;
 
   const paidAmount = isSale
     ? saleData!.paidAmount
-    : repairData!.advancePaid;
+    : isRepair
+    ? repairData!.advancePaid
+    : purchaseData!.paidAmount;
 
   const balanceAmount = isSale
     ? saleData!.balanceAmount
-    : repairData!.balanceDue;
+    : isRepair
+    ? repairData!.balanceDue
+    : purchaseData!.balanceAmount;
 
   const paymentMethod = isSale
     ? saleData!.paymentMethod
-    : repairData!.paymentStatus;
+    : isRepair
+    ? repairData!.paymentStatus
+    : purchaseData!.paymentStatus;
+
+  // Helper to replace unsupported oklch color functions for html2canvas
+  const oklchToRgbStr = (oklchStr: string): string => {
+    if (!oklchStr || typeof oklchStr !== 'string') return oklchStr;
+
+    return oklchStr.replace(/oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.]+)(?:\s*\/\s*([\d.%]+))?\s*\)/gi, (fullMatch, lRaw, cRaw, hRaw, aRaw) => {
+      try {
+        let l = parseFloat(lRaw);
+        if (lRaw.endsWith('%')) l = l / 100;
+
+        let c = parseFloat(cRaw);
+        if (cRaw.endsWith('%')) c = c / 100;
+
+        let h = parseFloat(hRaw);
+
+        let alpha = 1;
+        if (aRaw) {
+          alpha = parseFloat(aRaw);
+          if (aRaw.endsWith('%')) alpha = alpha / 100;
+        }
+
+        // OKLCH -> OKLAB
+        const hRad = (h * Math.PI) / 180;
+        const aComp = c * Math.cos(hRad);
+        const bComp = c * Math.sin(hRad);
+
+        // OKLAB -> LMS
+        const l_ = l + 0.3963377774 * aComp + 0.2158037573 * bComp;
+        const m_ = l - 0.1055613458 * aComp - 0.0638541728 * bComp;
+        const s_ = l - 0.0894841775 * aComp - 1.2914855480 * bComp;
+
+        const l3 = l_ * l_ * l_;
+        const m3 = m_ * m_ * m_;
+        const s3 = s_ * s_ * s_;
+
+        // LMS -> Linear sRGB
+        const rLin = +4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3;
+        const gLin = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3;
+        const bLin = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3;
+
+        const gamma = (val: number) => {
+          val = Math.max(0, Math.min(1, val));
+          return val <= 0.0031308 ? 12.92 * val : 1.055 * Math.pow(val, 1 / 2.4) - 0.055;
+        };
+
+        const r = Math.round(gamma(rLin) * 255);
+        const g = Math.round(gamma(gLin) * 255);
+        const bVal = Math.round(gamma(bLin) * 255);
+
+        if (alpha < 1) {
+          return `rgba(${r}, ${g}, ${bVal}, ${alpha})`;
+        }
+        return `rgb(${r}, ${g}, ${bVal})`;
+      } catch {
+        return '#ffffff';
+      }
+    });
+  };
 
   // Handles client-side PDF download using jsPDF and html2canvas
   const handleDownloadPdf = async () => {
@@ -96,7 +189,37 @@ export const PdfInvoiceModal: React.FC<PdfInvoiceModalProps> = ({
         scale: 2, // High resolution for crisp text
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          // 1. Process and sanitize all <style> elements in cloned document
+          const styleTags = clonedDoc.querySelectorAll('style');
+          styleTags.forEach((styleTag) => {
+            if (styleTag.textContent && styleTag.textContent.includes('oklch')) {
+              styleTag.textContent = oklchToRgbStr(styleTag.textContent);
+            }
+          });
+
+          // 2. Process all element inline styles & custom properties
+          const allElements = clonedDoc.querySelectorAll('*');
+          allElements.forEach((node) => {
+            const el = node as HTMLElement;
+            if (!el.style) return;
+
+            if (el.style.cssText && el.style.cssText.includes('oklch')) {
+              el.style.cssText = oklchToRgbStr(el.style.cssText);
+            }
+
+            for (let i = 0; i < el.style.length; i++) {
+              const propName = el.style[i];
+              if (propName.startsWith('--')) {
+                const propVal = el.style.getPropertyValue(propName);
+                if (propVal && propVal.includes('oklch')) {
+                  el.style.setProperty(propName, oklchToRgbStr(propVal));
+                }
+              }
+            }
+          });
+        }
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -257,71 +380,71 @@ Thank you for shopping with us!`;
             style={{ color: '#0f172a', backgroundColor: '#ffffff' }}
           >
             {/* Header: Shop Branding & Invoice Title */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b-2 border-slate-900 gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b-2 border-slate-900 gap-4" style={{ borderBottomColor: '#0f172a' }}>
               <div className="space-y-1">
-                <div className="flex items-center gap-2 font-black text-xl text-slate-900 tracking-tight">
-                  <Smartphone className="w-6 h-6 text-indigo-600 shrink-0" />
+                <div className="flex items-center gap-2 font-black text-xl tracking-tight" style={{ color: '#0f172a' }}>
+                  <Smartphone className="w-6 h-6 shrink-0" style={{ color: '#4f46e5' }} />
                   <span>{settings.shopName}</span>
                 </div>
-                <p className="text-xs text-slate-600 font-medium">{settings.tagline}</p>
-                <p className="text-[11px] text-slate-500 leading-tight max-w-xs">{settings.address}</p>
-                <div className="flex flex-wrap items-center gap-x-3 text-[11px] text-slate-600 pt-1 font-medium">
+                <p className="text-xs font-medium" style={{ color: '#475569' }}>{settings.tagline}</p>
+                <p className="text-[11px] leading-tight max-w-xs" style={{ color: '#64748b' }}>{settings.address}</p>
+                <div className="flex flex-wrap items-center gap-x-3 text-[11px] pt-1 font-medium" style={{ color: '#475569' }}>
                   <span>Ph: {settings.phone}</span>
                   {settings.email && <span>• {settings.email}</span>}
                   {settings.gstNumber && (
-                    <span className="font-bold text-slate-800">GSTIN: {settings.gstNumber}</span>
+                    <span className="font-bold" style={{ color: '#1e293b' }}>GSTIN: {settings.gstNumber}</span>
                   )}
                 </div>
               </div>
 
-              <div className="text-left sm:text-right space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200 min-w-[200px]">
-                <span className="text-[10px] font-black tracking-wider text-indigo-700 uppercase block">
+              <div className="text-left sm:text-right space-y-1 p-3 rounded-xl border min-w-[200px]" style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#0f172a' }}>
+                <span className="text-[10px] font-black tracking-wider uppercase block" style={{ color: '#4338ca' }}>
                   {documentTitle}
                 </span>
-                <div className="font-mono font-black text-base text-slate-900">{invoiceNumber}</div>
-                <div className="text-[11px] text-slate-600 font-medium">Date: <strong>{issueDate}</strong></div>
+                <div className="font-mono font-black text-base" style={{ color: '#0f172a' }}>{invoiceNumber}</div>
+                <div className="text-[11px] font-medium" style={{ color: '#475569' }}>Date: <strong>{issueDate}</strong></div>
                 {repairData?.promisedDate && (
-                  <div className="text-[11px] text-slate-600 font-medium">Delivery: <strong>{repairData.promisedDate}</strong></div>
+                  <div className="text-[11px] font-medium" style={{ color: '#475569' }}>Delivery: <strong>{repairData.promisedDate}</strong></div>
                 )}
-                <div className="text-[10px] text-slate-500 mt-1 font-semibold">
+                <div className="text-[10px] mt-1 font-semibold" style={{ color: '#64748b' }}>
                   Billed By: {isSale ? saleData!.salesByStaff || 'POS Desk' : repairData!.assignedTechnician}
                 </div>
               </div>
             </div>
 
             {/* Customer Details Box */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-xl border" style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#0f172a' }}>
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                <span className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: '#64748b' }}>
                   Customer Billing Information
                 </span>
-                <div className="font-bold text-sm text-slate-900">{customerName}</div>
-                <div className="text-slate-700 font-medium flex items-center gap-1.5">
-                  <Phone className="w-3 h-3 text-slate-400" />
+                <div className="font-bold text-sm" style={{ color: '#0f172a' }}>{customerName}</div>
+                <div className="font-medium flex items-center gap-1.5" style={{ color: '#334155' }}>
+                  <Phone className="w-3 h-3" style={{ color: '#94a3b8' }} />
                   <span>{customerPhone}</span>
                 </div>
                 {customerEmail && (
-                  <div className="text-slate-600 flex items-center gap-1.5">
-                    <Mail className="w-3 h-3 text-slate-400" />
+                  <div className="flex items-center gap-1.5" style={{ color: '#475569' }}>
+                    <Mail className="w-3 h-3" style={{ color: '#94a3b8' }} />
                     <span>{customerEmail}</span>
                   </div>
                 )}
               </div>
 
               <div className="space-y-1 text-left sm:text-right">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                <span className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: '#64748b' }}>
                   Payment Status & Details
                 </span>
                 <div className="flex items-center sm:justify-end gap-1.5">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
-                    balanceAmount <= 0
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                      : 'bg-rose-100 text-rose-800 border-rose-300'
-                  }`}>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border" style={{
+                    backgroundColor: balanceAmount <= 0 ? '#d1fae5' : '#ffe4e6',
+                    color: balanceAmount <= 0 ? '#065f46' : '#9f1239',
+                    borderColor: balanceAmount <= 0 ? '#a7f3d0' : '#fecdd3'
+                  }}>
                     {balanceAmount <= 0 ? 'PAID IN FULL' : `BALANCE DUE: ${currency}${balanceAmount.toLocaleString()}`}
                   </span>
                 </div>
-                <div className="text-slate-600 text-[11px] font-medium pt-1">
+                <div className="text-[11px] font-medium pt-1" style={{ color: '#475569' }}>
                   Method: <strong>{paymentMethod}</strong>
                 </div>
               </div>
@@ -332,7 +455,7 @@ Thank you for shopping with us!`;
               /* SALES ITEMS TABLE */
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-700 uppercase text-[10px] font-bold border-y-2 border-slate-300">
+                  <tr className="uppercase text-[10px] font-bold border-y-2" style={{ backgroundColor: '#f1f5f9', color: '#334155', borderColor: '#cbd5e1' }}>
                     <th className="py-2 px-2">#</th>
                     <th className="py-2 px-2">Item Description</th>
                     <th className="py-2 px-2 text-center">Qty</th>
@@ -343,24 +466,57 @@ Thank you for shopping with us!`;
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {saleData!.items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/50">
-                      <td className="py-2.5 px-2 font-mono text-slate-500 text-[11px]">{idx + 1}</td>
+                    <tr key={idx} style={{ borderBottomColor: '#e2e8f0' }}>
+                      <td className="py-2.5 px-2 font-mono text-[11px]" style={{ color: '#64748b' }}>{idx + 1}</td>
                       <td className="py-2.5 px-2">
-                        <div className="font-bold text-slate-900">{item.brand} {item.productName}</div>
+                        <div className="font-bold" style={{ color: '#0f172a' }}>{item.brand} {item.productName}</div>
                         {item.ramStorage || item.color ? (
-                          <div className="text-[11px] text-slate-500">{item.color} • {item.ramStorage}</div>
+                          <div className="text-[11px]" style={{ color: '#64748b' }}>{item.color} • {item.ramStorage}</div>
                         ) : null}
                         {item.imei && (
-                          <div className="text-[10px] font-mono text-indigo-700 font-bold bg-indigo-50 inline-block px-1.5 py-0.5 rounded border border-indigo-200 mt-0.5">
+                          <div className="text-[10px] font-mono font-bold inline-block px-1.5 py-0.5 rounded border mt-0.5" style={{ backgroundColor: '#e0e7ff', color: '#3730a3', borderColor: '#c7d2fe' }}>
                             IMEI / Serial #: {item.imei}
                           </div>
                         )}
                       </td>
-                      <td className="py-2.5 px-2 text-center font-bold text-slate-800">{item.quantity}</td>
-                      <td className="py-2.5 px-2 text-right text-slate-700">{currency}{item.unitPrice.toLocaleString()}</td>
-                      <td className="py-2.5 px-2 text-right text-emerald-600">{currency}{item.discount.toLocaleString()}</td>
-                      <td className="py-2.5 px-2 text-right font-extrabold text-slate-900">
+                      <td className="py-2.5 px-2 text-center font-bold" style={{ color: '#1e293b' }}>{item.quantity}</td>
+                      <td className="py-2.5 px-2 text-right" style={{ color: '#334155' }}>{currency}{item.unitPrice.toLocaleString()}</td>
+                      <td className="py-2.5 px-2 text-right font-medium" style={{ color: '#059669' }}>{currency}{item.discount.toLocaleString()}</td>
+                      <td className="py-2.5 px-2 text-right font-extrabold" style={{ color: '#0f172a' }}>
                         {currency}{((item.unitPrice * item.quantity) - item.discount).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : isPurchase ? (
+              /* PURCHASE ORDER ITEMS TABLE */
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="uppercase text-[10px] font-bold border-y-2" style={{ backgroundColor: '#f1f5f9', color: '#334155', borderColor: '#cbd5e1' }}>
+                    <th className="py-2 px-2">#</th>
+                    <th className="py-2 px-2">Product Particulars / IMEIs</th>
+                    <th className="py-2 px-2 text-center">Qty</th>
+                    <th className="py-2 px-2 text-right">Unit Cost</th>
+                    <th className="py-2 px-2 text-right">Total Cost</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {purchaseData!.items.map((item, idx) => (
+                    <tr key={idx} style={{ borderBottomColor: '#e2e8f0' }}>
+                      <td className="py-2.5 px-2 font-mono text-[11px]" style={{ color: '#64748b' }}>{idx + 1}</td>
+                      <td className="py-2.5 px-2">
+                        <div className="font-bold" style={{ color: '#0f172a' }}>{item.productName}</div>
+                        {item.imeiNumbers && item.imeiNumbers.length > 0 && (
+                          <div className="text-[10px] font-mono font-bold inline-block px-1.5 py-0.5 rounded border mt-0.5" style={{ backgroundColor: '#e0e7ff', color: '#3730a3', borderColor: '#c7d2fe' }}>
+                            IMEIs: {item.imeiNumbers.join(', ')}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-2 text-center font-bold" style={{ color: '#1e293b' }}>{item.quantity}</td>
+                      <td className="py-2.5 px-2 text-right" style={{ color: '#334155' }}>{currency}{item.unitCostPrice.toLocaleString()}</td>
+                      <td className="py-2.5 px-2 text-right font-extrabold" style={{ color: '#0f172a' }}>
+                        {currency}{item.totalCost.toLocaleString()}
                       </td>
                     </tr>
                   ))}
@@ -369,51 +525,51 @@ Thank you for shopping with us!`;
             ) : (
               /* REPAIR SERVICE BREAKDOWN TABLE */
               <div className="space-y-3">
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                  <div className="flex items-center justify-between text-xs border-b border-slate-200 pb-2">
-                    <span className="font-bold text-slate-700">Device Under Repair:</span>
-                    <span className="font-extrabold text-indigo-900 text-sm">{repairData!.deviceBrand} {repairData!.deviceModel}</span>
+                <div className="p-3 rounded-xl border space-y-2" style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#0f172a' }}>
+                  <div className="flex items-center justify-between text-xs border-b pb-2" style={{ borderBottomColor: '#cbd5e1' }}>
+                    <span className="font-bold" style={{ color: '#334155' }}>Device Under Repair:</span>
+                    <span className="font-extrabold text-sm" style={{ color: '#312e81' }}>{repairData!.deviceBrand} {repairData!.deviceModel}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    <div><span className="text-slate-500">IMEI / Serial #:</span> <strong className="font-mono">{repairData!.imeiOrSerial}</strong></div>
-                    <div><span className="text-slate-500">Passcode / Pattern:</span> <strong className="font-mono">{repairData!.passcode || 'N/A'}</strong></div>
+                    <div><span style={{ color: '#64748b' }}>IMEI / Serial #:</span> <strong className="font-mono" style={{ color: '#0f172a' }}>{repairData!.imeiOrSerial}</strong></div>
+                    <div><span style={{ color: '#64748b' }}>Passcode / Pattern:</span> <strong className="font-mono" style={{ color: '#0f172a' }}>{repairData!.passcode || 'N/A'}</strong></div>
                   </div>
                   <div className="text-[11px] pt-1">
-                    <span className="text-slate-500 block">Reported Fault:</span>
-                    <span className="font-medium text-slate-800">{repairData!.reportedFault}</span>
+                    <span className="block" style={{ color: '#64748b' }}>Reported Fault:</span>
+                    <span className="font-medium" style={{ color: '#1e293b' }}>{repairData!.reportedFault}</span>
                   </div>
                   {repairData!.diagnosis && (
                     <div className="text-[11px]">
-                      <span className="text-slate-500 block">Technician Diagnosis:</span>
-                      <span className="font-medium text-slate-800">{repairData!.diagnosis}</span>
+                      <span className="block" style={{ color: '#64748b' }}>Technician Diagnosis:</span>
+                      <span className="font-medium" style={{ color: '#1e293b' }}>{repairData!.diagnosis}</span>
                     </div>
                   )}
                 </div>
 
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-100 text-slate-700 uppercase text-[10px] font-bold border-y-2 border-slate-300">
+                    <tr className="uppercase text-[10px] font-bold border-y-2" style={{ backgroundColor: '#f1f5f9', color: '#334155', borderColor: '#cbd5e1' }}>
                       <th className="py-2 px-2">Service Line / Spare Part Particulars</th>
                       <th className="py-2 px-2 text-right">Cost</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    <tr>
+                    <tr style={{ borderBottomColor: '#e2e8f0' }}>
                       <td className="py-2.5 px-2">
-                        <div className="font-bold text-slate-900">Hardware Inspection & Repair Service Charge</div>
-                        <div className="text-[11px] text-slate-500">Includes technician diagnostic fee, disassembly & labor</div>
+                        <div className="font-bold" style={{ color: '#0f172a' }}>Hardware Inspection & Repair Service Charge</div>
+                        <div className="text-[11px]" style={{ color: '#64748b' }}>Includes technician diagnostic fee, disassembly & labor</div>
                       </td>
-                      <td className="py-2.5 px-2 text-right font-bold text-slate-900">
+                      <td className="py-2.5 px-2 text-right font-bold" style={{ color: '#0f172a' }}>
                         {currency}{(repairData!.finalCost || repairData!.estimatedCost).toLocaleString()}
                       </td>
                     </tr>
                     {repairData!.sparePartsUsed && repairData!.sparePartsUsed.length > 0 && (
                       repairData!.sparePartsUsed.map((part, pIdx) => (
-                        <tr key={pIdx}>
-                          <td className="py-2 px-2 text-slate-700">
+                        <tr key={pIdx} style={{ borderBottomColor: '#e2e8f0' }}>
+                          <td className="py-2 px-2" style={{ color: '#334155' }}>
                             <span>Spare Part: {part.partName}</span>
                           </td>
-                          <td className="py-2 px-2 text-right font-medium text-slate-700">
+                          <td className="py-2 px-2 text-right font-medium" style={{ color: '#334155' }}>
                             {currency}{part.sellingPrice.toLocaleString()}
                           </td>
                         </tr>
@@ -425,67 +581,67 @@ Thank you for shopping with us!`;
             )}
 
             {/* Summary & Totals Calculation */}
-            <div className="pt-3 border-t-2 border-slate-300 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="pt-3 border-t-2 grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ borderTopColor: '#cbd5e1' }}>
               
               {/* Payment Notes & Terms */}
-              <div className="space-y-2 text-[11px] text-slate-600">
-                <div className="flex items-center gap-1.5 text-slate-800 font-bold">
-                  <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              <div className="space-y-2 text-[11px]" style={{ color: '#475569' }}>
+                <div className="flex items-center gap-1.5 font-bold" style={{ color: '#1e293b' }}>
+                  <ShieldCheck className="w-4 h-4" style={{ color: '#4338ca' }} />
                   <span>
                     Warranty: {isSale ? `${saleData!.warrantyPeriodMonths || settings.defaultWarrantyMonths || 6} Months Official Warranty` : `${repairData!.warrantyDays || 30} Days Service Warranty`}
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-500 leading-tight">
+                <p className="text-[10px] leading-tight" style={{ color: '#64748b' }}>
                   {settings.receiptFooterMessage || 'Goods once sold are covered under shop warranty. Please retain this original tax invoice for warranty claims.'}
                 </p>
 
                 {customNotes && (
-                  <div className="bg-amber-50 p-2 rounded border border-amber-200 text-amber-900 text-[10px]">
+                  <div className="p-2 rounded border text-[10px]" style={{ backgroundColor: '#fffbeb', color: '#78350f', borderColor: '#fde68a' }}>
                     <strong>Note:</strong> {customNotes}
                   </div>
                 )}
               </div>
 
               {/* Math Totals */}
-              <div className="space-y-1.5 text-xs text-right bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <div className="flex justify-between text-slate-600">
+              <div className="space-y-1.5 text-xs text-right p-3 rounded-xl border" style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0', color: '#0f172a' }}>
+                <div className="flex justify-between" style={{ color: '#475569' }}>
                   <span>Subtotal Amount:</span>
                   <span className="font-semibold">{currency}{(isSale ? saleData!.subtotal : (repairData!.finalCost || repairData!.estimatedCost)).toLocaleString()}</span>
                 </div>
 
                 {isSale && saleData!.discountAmount > 0 && (
-                  <div className="flex justify-between text-emerald-600 font-medium">
+                  <div className="flex justify-between font-medium" style={{ color: '#059669' }}>
                     <span>Discount Applied:</span>
                     <span>- {currency}{saleData!.discountAmount.toLocaleString()}</span>
                   </div>
                 )}
 
                 {isSale && saleData!.tradeInCreditApplied > 0 && (
-                  <div className="flex justify-between text-cyan-600 font-medium">
+                  <div className="flex justify-between font-medium" style={{ color: '#0891b2' }}>
                     <span>Trade-in Exchange Credit:</span>
                     <span>- {currency}{saleData!.tradeInCreditApplied.toLocaleString()}</span>
                   </div>
                 )}
 
                 {isSale && saleData!.taxAmount > 0 && (
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between" style={{ color: '#475569' }}>
                     <span>GST ({settings.taxRatePercent}% Tax):</span>
                     <span className="font-semibold">{currency}{saleData!.taxAmount.toLocaleString()}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-300">
+                <div className="flex justify-between text-base font-black pt-2 border-t" style={{ color: '#0f172a', borderTopColor: '#cbd5e1' }}>
                   <span>Grand Total:</span>
                   <span>{currency}{totalAmount.toLocaleString()}</span>
                 </div>
 
-                <div className="flex justify-between text-slate-700 font-bold pt-1">
+                <div className="flex justify-between font-bold pt-1" style={{ color: '#334155' }}>
                   <span>Amount Paid:</span>
-                  <span className="text-emerald-700">{currency}{paidAmount.toLocaleString()}</span>
+                  <span style={{ color: '#047857' }}>{currency}{paidAmount.toLocaleString()}</span>
                 </div>
 
                 {balanceAmount > 0 && (
-                  <div className="flex justify-between text-rose-700 font-black bg-rose-50 p-1.5 rounded border border-rose-200">
+                  <div className="flex justify-between font-black p-1.5 rounded border" style={{ backgroundColor: '#fff1f2', color: '#be123c', borderColor: '#fecdd3' }}>
                     <span>Balance Owed:</span>
                     <span>{currency}{balanceAmount.toLocaleString()}</span>
                   </div>
@@ -494,25 +650,25 @@ Thank you for shopping with us!`;
             </div>
 
             {/* Footer Signature & Verification Barcode */}
-            <div className="pt-6 border-t border-slate-200 flex items-center justify-between gap-4 text-[11px] text-slate-600">
+            <div className="pt-6 border-t flex items-center justify-between gap-4 text-[11px]" style={{ borderTopColor: '#e2e8f0', color: '#475569' }}>
               <div className="space-y-1">
-                <div className="w-32 border-b border-slate-400"></div>
-                <div className="text-[10px] text-slate-500 font-medium">Customer Signature</div>
+                <div className="w-32 border-b" style={{ borderBottomColor: '#94a3b8' }}></div>
+                <div className="text-[10px] font-medium" style={{ color: '#64748b' }}>Customer Signature</div>
               </div>
 
               <div className="text-center">
-                <div className="w-12 h-12 mx-auto bg-slate-100 p-1 rounded border border-slate-300 flex items-center justify-center">
-                  <QrCode className="w-full h-full text-slate-800" />
+                <div className="w-12 h-12 mx-auto p-1 rounded border flex items-center justify-center" style={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }}>
+                  <QrCode className="w-full h-full" style={{ color: '#0f172a' }} />
                 </div>
-                <span className="text-[9px] text-slate-400 block mt-0.5">Scan to Verify Invoice</span>
+                <span className="text-[9px] block mt-0.5" style={{ color: '#94a3b8' }}>Scan to Verify Invoice</span>
               </div>
 
               <div className="text-right space-y-1">
-                <div className="w-36 border-b border-slate-400 ml-auto"></div>
-                <div className="text-[10px] font-bold text-slate-800">
+                <div className="w-36 border-b ml-auto" style={{ borderBottomColor: '#94a3b8' }}></div>
+                <div className="text-[10px] font-bold" style={{ color: '#0f172a' }}>
                   For {settings.shopName}
                 </div>
-                <div className="text-[9px] text-slate-400">
+                <div className="text-[9px]" style={{ color: '#94a3b8' }}>
                   {settings.authorizedSignatoryName || 'Authorized Signatory'}
                 </div>
               </div>

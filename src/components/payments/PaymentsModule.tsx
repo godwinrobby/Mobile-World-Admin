@@ -24,7 +24,8 @@ import {
   X,
   Eye,
   RefreshCw,
-  ChevronDown
+  ChevronDown,
+  Download
 } from 'lucide-react';
 
 export interface UnifiedPaymentItem {
@@ -296,6 +297,40 @@ export const PaymentsModule: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Export Payments CSV
+  const handleExportCSV = (exportType: 'filtered' | 'all' | 'summary' = 'filtered') => {
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    let csvContent = '';
+    let filename = '';
+
+    if (exportType === 'summary') {
+      filename = `MobileWorld_Payments_KPI_Summary_${dateStamp}.csv`;
+      csvContent += `=== PAYMENTS LEDGER KPI SUMMARY ===\n`;
+      csvContent += `Report Date,Total Received (${settings.currencySymbol}),Cash In-Hand (${settings.currencySymbol}),UPI Transfers (${settings.currencySymbol}),Card Settlements (${settings.currencySymbol}),Supplier Outflow (${settings.currencySymbol}),Net Cash Flow (${settings.currencySymbol}),Total Records Count\n`;
+      csvContent += `"${dateStamp}",${metrics.totalInflow},${metrics.cashInflow},${metrics.upiInflow},${metrics.cardInflow},${metrics.totalOutflow},${metrics.netBalance},${metrics.count}\n`;
+    } else {
+      const recordsToExport = exportType === 'all' ? allPayments : filteredPayments;
+      filename = `MobileWorld_Payments_Ledger_${exportType === 'all' ? 'All' : 'Filtered'}_${dateStamp}.csv`;
+
+      csvContent += `Transaction Ref,Date & Time,Category,Party Name,Phone,Payment Method,Direction,Amount (${settings.currencySymbol}),Status,Notes\n`;
+
+      recordsToExport.forEach(pay => {
+        const cleanNotes = (pay.notes || '').replace(/"/g, '""');
+        const cleanParty = (pay.partyName || '').replace(/"/g, '""');
+        csvContent += `"${pay.transactionRef}","${pay.rawTimestamp}","${pay.category}","${cleanParty}","${pay.partyPhone || ''}","${pay.paymentMethod}","${pay.direction}",${pay.amount},"${pay.status}","${cleanNotes}"\n`;
+      });
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 pb-12">
       {/* Module Header */}
@@ -317,10 +352,31 @@ export const PaymentsModule: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Export Filtered CSV */}
+          <button
+            onClick={() => handleExportCSV('filtered')}
+            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Export currently filtered payment transactions to CSV"
+          >
+            <Download className="w-4 h-4" />
+            <span>Export CSV</span>
+          </button>
+
+          {/* Export All CSV */}
+          <button
+            onClick={() => handleExportCSV('all')}
+            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Export all database payment transactions to CSV"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <span className="hidden sm:inline">Export All</span>
+          </button>
+
+          {/* Print */}
           <button
             onClick={() => window.print()}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-colors"
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4 text-indigo-400" /> Print Report
           </button>
@@ -517,14 +573,33 @@ export const PaymentsModule: React.FC = () => {
       </div>
 
       {/* PAYMENTS DATATABLE */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+      <div className="printable-area bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <h3 className="font-bold text-white text-sm flex items-center gap-2">
             <span>Payments Ledger Records</span>
             <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-normal">
               Showing {filteredPayments.length} of {allPayments.length} transactions
             </span>
           </h3>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleExportCSV('summary')}
+              className="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-indigo-300 border border-slate-800 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Export KPI Summary breakdown to CSV"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-400" />
+              <span>KPI Summary CSV</span>
+            </button>
+            <button
+              onClick={() => handleExportCSV('filtered')}
+              className="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-emerald-400 border border-slate-800 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Export current table view to CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export CSV</span>
+            </button>
+          </div>
         </div>
 
         {filteredPayments.length === 0 ? (
@@ -727,10 +802,28 @@ export const PaymentsModule: React.FC = () => {
               </div>
             )}
 
-            <div className="pt-2 flex justify-end gap-2">
+            <div className="pt-2 flex items-center justify-between">
+              <button
+                onClick={() => {
+                  const pay = selectedPayment;
+                  const dateStamp = new Date().toISOString().slice(0, 10);
+                  const csv = `Transaction Ref,Date & Time,Category,Party Name,Phone,Payment Method,Direction,Amount (${settings.currencySymbol}),Status,Notes\n"${pay.transactionRef}","${pay.rawTimestamp}","${pay.category}","${(pay.partyName || '').replace(/"/g, '""')}","${pay.partyPhone || ''}","${pay.paymentMethod}","${pay.direction}",${pay.amount},"${pay.status}","${(pay.notes || '').replace(/"/g, '""')}"`;
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', `Payment_Receipt_${pay.transactionRef}_${dateStamp}.csv`);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Download className="w-4 h-4" /> Export Payment Receipt CSV
+              </button>
               <button
                 onClick={() => setSelectedPayment(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Close
               </button>

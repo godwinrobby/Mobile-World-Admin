@@ -70,7 +70,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, settings, onCl
         </div>
 
         {/* Printable Receipt Paper Container */}
-        <div id="printable-receipt-container" className="mt-6 bg-white text-slate-900 p-6 rounded-xl shadow-lg border border-slate-200 text-sm font-sans space-y-4">
+        <div id="printable-receipt-container" className="printable-area mt-6 bg-white text-slate-900 p-6 rounded-xl shadow-lg border border-slate-200 text-sm font-sans space-y-4">
           
           {/* Shop Branding Header */}
           <div className="text-center space-y-1 pb-4 border-b border-slate-200">

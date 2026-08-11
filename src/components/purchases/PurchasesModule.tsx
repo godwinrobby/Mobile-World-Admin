@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PurchaseOrder, PurchaseOrderItem, CustomerCreditAccount, SupplierDebitAccount } from '../../types';
+import { PdfInvoiceModal } from '../common/PdfInvoiceModal';
 import {
   ShoppingBag,
   Plus,
@@ -23,7 +24,8 @@ import {
   ChevronDown,
   Sparkles,
   ArrowRight,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 
 export const PurchasesModule: React.FC = () => {
@@ -49,6 +51,7 @@ export const PurchasesModule: React.FC = () => {
   // Modals & Drawers
   const [isPoDrawerOpen, setIsPoDrawerOpen] = useState<boolean>(false);
   const [selectedPoForReceipt, setSelectedPoForReceipt] = useState<PurchaseOrder | null>(null);
+  const [selectedPoForPdf, setSelectedPoForPdf] = useState<PurchaseOrder | null>(null);
   const [isAddPartyModalOpen, setIsAddPartyModalOpen] = useState<boolean>(false);
   const [addPartyType, setAddPartyType] = useState<'Customer' | 'Supplier'>('Supplier');
 
@@ -1441,6 +1444,16 @@ export const PurchasesModule: React.FC = () => {
               
               <div className="flex items-center gap-2">
                 <button
+                  onClick={() => {
+                    setSelectedPoForPdf(selectedPoForReceipt);
+                    setSelectedPoForReceipt(null);
+                  }}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>PDF Invoice</span>
+                </button>
+                <button
                   onClick={() => window.print()}
                   className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                 >
@@ -1457,7 +1470,7 @@ export const PurchasesModule: React.FC = () => {
             </div>
 
             {/* Printable Voucher Paper */}
-            <div className="p-6 overflow-y-auto no-scrollbar space-y-6 text-slate-900 bg-white m-4 rounded-xl shadow-inner font-sans text-xs">
+            <div className="printable-area p-6 overflow-y-auto no-scrollbar space-y-6 text-slate-900 bg-white m-4 rounded-xl shadow-inner font-sans text-xs">
               
               {/* Header */}
               <div className="flex items-start justify-between border-b border-slate-300 pb-4">
@@ -1586,6 +1599,16 @@ export const PurchasesModule: React.FC = () => {
 
           </div>
         </div>
+      )}
+
+      {/* PDF INVOICE MODAL FOR PURCHASE ORDERS */}
+      {selectedPoForPdf && (
+        <PdfInvoiceModal
+          type="purchase"
+          data={selectedPoForPdf}
+          settings={settings}
+          onClose={() => setSelectedPoForPdf(null)}
+        />
       )}
 
     </div>
