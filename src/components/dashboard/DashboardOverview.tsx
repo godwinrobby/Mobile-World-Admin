@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   TrendingUp,
@@ -16,14 +16,9 @@ import {
   Tag,
   Wrench,
   Package,
-  Activity,
-  Calendar,
-  Filter,
-  RotateCcw
+  Activity
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-
-type DatePreset = 'today' | 'yesterday' | '7days' | '30days' | 'thisMonth' | 'all' | 'custom';
 
 export const DashboardOverview: React.FC = () => {
   const {
@@ -40,78 +35,12 @@ export const DashboardOverview: React.FC = () => {
     purchaseOrders
   } = useApp();
 
-  // Date helper references
-  const todayObj = new Date();
-  const formatDateStr = (d: Date) => d.toISOString().split('T')[0];
-  const todayStr = formatDateStr(todayObj);
-
-  const yesterdayObj = new Date(todayObj);
-  yesterdayObj.setDate(yesterdayObj.getDate() - 1);
-  const yesterdayStr = formatDateStr(yesterdayObj);
-
-  const sevenDaysAgoObj = new Date(todayObj);
-  sevenDaysAgoObj.setDate(sevenDaysAgoObj.getDate() - 6);
-  const sevenDaysAgoStr = formatDateStr(sevenDaysAgoObj);
-
-  const thirtyDaysAgoObj = new Date(todayObj);
-  thirtyDaysAgoObj.setDate(thirtyDaysAgoObj.getDate() - 29);
-  const thirtyDaysAgoStr = formatDateStr(thirtyDaysAgoObj);
-
-  const firstOfMonthObj = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
-  const firstOfMonthStr = formatDateStr(firstOfMonthObj);
-
-  // Date Range Filter State
-  const [preset, setPreset] = useState<DatePreset>('all');
-  const [startDate, setStartDate] = useState<string>('2026-08-01');
-  const [endDate, setEndDate] = useState<string>(todayStr);
-
-  const handlePresetChange = (newPreset: DatePreset) => {
-    setPreset(newPreset);
-    if (newPreset === 'today') {
-      setStartDate(todayStr);
-      setEndDate(todayStr);
-    } else if (newPreset === 'yesterday') {
-      setStartDate(yesterdayStr);
-      setEndDate(yesterdayStr);
-    } else if (newPreset === '7days') {
-      setStartDate(sevenDaysAgoStr);
-      setEndDate(todayStr);
-    } else if (newPreset === '30days') {
-      setStartDate(thirtyDaysAgoStr);
-      setEndDate(todayStr);
-    } else if (newPreset === 'thisMonth') {
-      setStartDate(firstOfMonthStr);
-      setEndDate(todayStr);
-    } else if (newPreset === 'all') {
-      setStartDate('');
-      setEndDate('');
-    }
-  };
-
-  // Date Range Checker Helper
-  const isInDateRange = (rawDateStr?: string) => {
-    if (!rawDateStr) return true;
-    if (preset === 'all' && !startDate && !endDate) return true;
-
-    let datePart = rawDateStr.trim();
-    if (datePart.includes('T')) {
-      datePart = datePart.split('T')[0];
-    } else if (datePart.includes(' ')) {
-      datePart = datePart.split(' ')[0];
-    }
-
-    if (startDate && datePart < startDate) return false;
-    if (endDate && datePart > endDate) return false;
-    return true;
-  };
-
-  // Filtered collections based on Date Range
-  const filteredSales = useMemo(() => sales.filter(s => isInDateRange(s.timestamp)), [sales, startDate, endDate, preset]);
-  const filteredExchanges = useMemo(() => exchanges.filter(e => isInDateRange(e.timestamp)), [exchanges, startDate, endDate, preset]);
-  const filteredJobCards = useMemo(() => jobCards ? jobCards.filter(j => isInDateRange(j.createdDate)) : [], [jobCards, startDate, endDate, preset]);
-  const filteredExpenses = useMemo(() => expenses ? expenses.filter(e => isInDateRange(e.date)) : [], [expenses, startDate, endDate, preset]);
-  const filteredOrders = useMemo(() => orders ? orders.filter(o => isInDateRange(o.date)) : [], [orders, startDate, endDate, preset]);
-  const filteredPurchaseOrders = useMemo(() => purchaseOrders ? purchaseOrders.filter(p => isInDateRange(p.orderDate)) : [], [purchaseOrders, startDate, endDate, preset]);
+  const filteredSales = sales;
+  const filteredExchanges = exchanges;
+  const filteredJobCards = jobCards || [];
+  const filteredExpenses = expenses || [];
+  const filteredOrders = orders || [];
+  const filteredPurchaseOrders = purchaseOrders || [];
 
   // Aggregated Financial & Operational Values
   const totalSalesVal = filteredSales.reduce((a, b) => a + b.totalAmount, 0);
@@ -219,8 +148,7 @@ export const DashboardOverview: React.FC = () => {
 
     if (sortedDates.length === 0) {
       return [
-        { day: startDate || 'Start', sales: 0, tradeIns: 0 },
-        { day: endDate || 'End', sales: 0, tradeIns: 0 }
+        { day: 'No Data', sales: 0, tradeIns: 0 }
       ];
     }
 
@@ -229,7 +157,7 @@ export const DashboardOverview: React.FC = () => {
       sales: dateMap[d].sales,
       tradeIns: dateMap[d].tradeIns
     }));
-  }, [filteredSales, filteredExchanges, startDate, endDate]);
+  }, [filteredSales, filteredExchanges]);
 
   return (
     <div id="dashboard-overview-container" className="space-y-6">
@@ -237,7 +165,7 @@ export const DashboardOverview: React.FC = () => {
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
         <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">
+          <h2 className="text-xl font-bold text-slate-100 tracking-tight">
             Mobile Shop Business Dashboard
           </h2>
           <p className="text-xs text-slate-400">
@@ -263,109 +191,6 @@ export const DashboardOverview: React.FC = () => {
         </div>
       </div>
 
-      {/* Date Range Filter Bar */}
-      <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          
-          {/* Left Label & Active Filter Badge */}
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl shrink-0">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white tracking-tight">Date Range Filter</span>
-                {preset !== 'all' && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider">
-                    {preset}
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-slate-400">
-                {preset === 'all' && !startDate && !endDate ? (
-                  <span>Showing all-time recorded transactions ({filteredSales.length} sales)</span>
-                ) : (
-                  <span>
-                    Period: <strong className="text-slate-200">{startDate || 'Beginning'}</strong> to <strong className="text-slate-200">{endDate || 'Today'}</strong> &bull; <span className="text-emerald-400 font-semibold">{filteredSales.length} Sales found</span>
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
-
-          {/* Preset Action Buttons */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {[
-              { id: 'today', label: 'Today' },
-              { id: 'yesterday', label: 'Yesterday' },
-              { id: '7days', label: 'Last 7 Days' },
-              { id: '30days', label: 'Last 30 Days' },
-              { id: 'thisMonth', label: 'This Month' },
-              { id: 'all', label: 'All Time' }
-            ].map((btn) => (
-              <button
-                key={btn.id}
-                onClick={() => handlePresetChange(btn.id as DatePreset)}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-xl transition cursor-pointer ${
-                  preset === btn.id
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Custom Date Picker Inputs & Reset Button */}
-        <div className="pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
-              <label className="text-[11px] font-medium text-slate-400">From Date:</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  setPreset('custom');
-                }}
-                className="bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs px-2.5 py-1.5 rounded-xl focus:outline-none focus:border-indigo-500 transition"
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label className="text-[11px] font-medium text-slate-400">To Date:</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value);
-                  setPreset('custom');
-                }}
-                className="bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs px-2.5 py-1.5 rounded-xl focus:outline-none focus:border-indigo-500 transition"
-              />
-            </div>
-
-            {(startDate || endDate || preset !== 'all') && (
-              <button
-                onClick={() => handlePresetChange('all')}
-                className="flex items-center gap-1 text-[11px] font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-xl transition border border-rose-500/20 cursor-pointer"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>Reset Filter</span>
-              </button>
-            )}
-          </div>
-
-          <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-indigo-400" />
-            <span>KPIs, cards & revenue trend charts update automatically</span>
-          </div>
-        </div>
-      </div>
-
       {/* Primary KPI Summary Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
@@ -377,7 +202,7 @@ export const DashboardOverview: React.FC = () => {
               <TrendingUp className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-extrabold text-white">
+          <div className="text-2xl font-extrabold text-slate-100">
             {settings.currencySymbol}{totalSalesVal.toLocaleString()}
           </div>
           <div className="text-[11px] text-emerald-400 flex items-center gap-1">
@@ -393,7 +218,7 @@ export const DashboardOverview: React.FC = () => {
               <Smartphone className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-extrabold text-white">
+          <div className="text-2xl font-extrabold text-slate-100">
             {totalPhonesSold} Units
           </div>
           <div className="text-[11px] text-slate-400">
@@ -409,7 +234,7 @@ export const DashboardOverview: React.FC = () => {
               <RefreshCw className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-extrabold text-white">
+          <div className="text-2xl font-extrabold text-slate-100">
             {settings.currencySymbol}{totalTradeInVal.toLocaleString()}
           </div>
           <div className="text-[11px] text-cyan-400">
@@ -460,7 +285,7 @@ export const DashboardOverview: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
-                  <div className="text-xl font-extrabold text-white tracking-tight">
+                  <div className="text-xl font-extrabold text-slate-100 tracking-tight">
                     {card.value}
                   </div>
                   <div className={`p-1.5 rounded-xl border ${card.color} group-hover:scale-110 transition shrink-0`}>

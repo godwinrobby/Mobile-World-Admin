@@ -21,21 +21,10 @@ import {
   Check,
   AlertCircle
 } from 'lucide-react';
+import { BRAND_CATALOG } from './BrandLogos';
 
 // Step 1: Brands Catalog
-const BRANDS = [
-  { name: 'Apple', icon: '🍎' },
-  { name: 'Samsung', icon: '📱' },
-  { name: 'OnePlus', icon: '⚡' },
-  { name: 'Xiaomi', icon: '🟧' },
-  { name: 'Vivo', icon: '💙' },
-  { name: 'Oppo', icon: '🟢' },
-  { name: 'Realme', icon: '🟡' },
-  { name: 'Google Pixel', icon: '🔍' },
-  { name: 'Motorola', icon: 'Ⓜ️' },
-  { name: 'Nothing', icon: '⚪' },
-  { name: 'Other', icon: '✨' }
-];
+const BRANDS = BRAND_CATALOG;
 
 // Step 2: Brand -> Model Database with Default Market Benchmark Values
 const BRANDS_AND_MODELS: Record<string, { name: string; baseValue: number }[]> = {
@@ -385,31 +374,32 @@ export const ExchangeModule: React.FC = () => {
     <div id="valuation-page-container" className="space-y-6 pb-12">
       
       {/* Top Banner & Title */}
-      <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-cyan-400 font-extrabold text-xs uppercase tracking-widest mb-1">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-extrabold text-xs uppercase tracking-widest mb-1">
+            <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
             <span>Smart Buyback & Trade-In Valuation Engine</span>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Device Damage Assessment & Buyback Calculator
           </h1>
-          <p className="text-slate-400 text-xs mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">
             4-Step Assessment Workflow: Brand → Model → Damage Selection → Auto-Calculated Valuation
           </p>
         </div>
 
         {/* Live Final Assessment Badge Example */}
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 flex items-center gap-3 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-extrabold text-lg">
+        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center gap-3 shrink-0 shadow-sm relative z-10">
+          <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-400 flex items-center justify-center font-extrabold text-lg">
             {settings.currencySymbol}
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Live Assessment Result</div>
-            <div className="text-lg font-black text-emerald-400">
+            <div className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Live Assessment Result</div>
+            <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
               {settings.currencySymbol}{finalAgreedVal.toLocaleString()}
             </div>
-            <div className="text-[10px] text-cyan-300 font-semibold">
+            <div className="text-[10px] text-cyan-700 dark:text-cyan-300 font-semibold">
               {brand} {effectiveModelName} ({selectedDamages.length} Damage Faults)
             </div>
           </div>
@@ -417,7 +407,7 @@ export const ExchangeModule: React.FC = () => {
       </div>
 
       {/* 3-Step Interactive Navigation Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-900/80 p-2 rounded-2xl border border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 bg-white dark:bg-slate-900/80 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         {[
           { step: 1, label: 'Step 1: Select Brand', sub: brand },
           { step: 2, label: 'Step 2: Select Model', sub: effectiveModelName },
@@ -427,10 +417,10 @@ export const ExchangeModule: React.FC = () => {
             key={s.step}
             type="button"
             onClick={() => setActiveStep(s.step)}
-            className={`p-3 rounded-xl border text-left transition flex items-center justify-between ${
+            className={`p-3 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
               activeStep === s.step
                 ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-cyan-400 shadow-md'
-                : 'bg-slate-950/60 text-slate-400 border-slate-800/80 hover:bg-slate-800/60 hover:text-slate-200'
+                : 'bg-slate-50 dark:bg-slate-950/60 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <div>
@@ -443,13 +433,13 @@ export const ExchangeModule: React.FC = () => {
       </div>
 
       {/* Final Prompt Workflow Example Indicator Pill */}
-      <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-        <span className="text-slate-400 font-semibold flex items-center gap-1.5">
-          <Info className="w-4 h-4 text-cyan-400 shrink-0" />
+      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs shadow-sm">
+        <span className="text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-1.5">
+          <Info className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
           <span>Active Assessment Prompt:</span>
         </span>
-        <div className="font-mono text-cyan-300 font-bold bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl text-[11px] break-all">
-          "Brand: <span className="text-white">{brand}</span> → Model: <span className="text-white">{effectiveModelName}</span> → Damage: <span className="text-rose-300">{selectedDamages.length > 0 ? selectedDamages.map(d => d.damageType).join(', ') : 'None (Flawless)'}</span> → Net Deduction: <span className="text-rose-400">-{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}</span>"
+        <div className="font-mono text-cyan-800 dark:text-cyan-300 font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-xl text-[11px] break-all shadow-sm">
+          "Brand: <span className="text-slate-900 dark:text-white">{brand}</span> → Model: <span className="text-slate-900 dark:text-white">{effectiveModelName}</span> → Damage: <span className="text-rose-600 dark:text-rose-300">{selectedDamages.length > 0 ? selectedDamages.map(d => d.damageType).join(', ') : 'None (Flawless)'}</span> → Net Deduction: <span className="text-rose-600 dark:text-rose-400">-{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}</span>"
         </div>
       </div>
 
@@ -460,62 +450,80 @@ export const ExchangeModule: React.FC = () => {
           <form onSubmit={handleValuationSubmit} className="space-y-6">
 
             {/* STEP 1: SELECT BRAND */}
-            <div className={`bg-slate-900 border rounded-3xl p-6 transition-all space-y-4 ${
-              activeStep === 1 ? 'border-cyan-500 shadow-xl shadow-cyan-950/20' : 'border-slate-800'
+            <div className={`bg-white dark:bg-slate-900 border rounded-3xl p-6 transition-all space-y-4 ${
+              activeStep === 1 ? 'border-cyan-500 shadow-md shadow-cyan-500/10' : 'border-slate-200 dark:border-slate-800'
             }`}>
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/30">
+                  <span className="w-7 h-7 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-200 dark:border-cyan-500/30">
                     1
                   </span>
                   <div>
-                    <h2 className="text-base font-extrabold text-white">Step 1: Select Brand</h2>
-                    <p className="text-[11px] text-slate-400">Choose manufacturer to load model catalog</p>
+                    <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Step 1: Select Brand</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Choose manufacturer to load model catalog</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-200 dark:border-cyan-500/20">
                   Selected: {brand}
                 </span>
               </div>
 
               {/* Brand Grid Selector */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-                {BRANDS.map((b) => (
-                  <button
-                    key={b.name}
-                    type="button"
-                    onClick={() => {
-                      handleSelectBrand(b.name);
-                      setActiveStep(2);
-                    }}
-                    className={`p-3.5 rounded-2xl border transition-all flex items-center gap-3 text-left ${
-                      brand === b.name
-                        ? 'bg-cyan-600/20 text-white border-cyan-500 shadow-md shadow-cyan-900/30'
-                        : 'bg-slate-950/70 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
-                    }`}
-                  >
-                    <span className="text-xl">{b.icon}</span>
-                    <span className="font-bold text-xs">{b.name}</span>
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {BRANDS.map((b) => {
+                  const LogoComp = b.logo;
+                  const isSelected = brand === b.name;
+
+                  return (
+                    <button
+                      key={b.name}
+                      type="button"
+                      onClick={() => {
+                        handleSelectBrand(b.name);
+                        setActiveStep(2);
+                      }}
+                      className={`p-3 rounded-2xl border transition-all flex items-center gap-3 text-left cursor-pointer group ${
+                        isSelected
+                          ? 'bg-cyan-50 dark:bg-cyan-600/20 text-cyan-900 dark:text-white border-cyan-500 shadow-sm ring-1 ring-cyan-400 dark:ring-cyan-500/50'
+                          : 'bg-slate-50 dark:bg-slate-950/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700'
+                      }`}
+                    >
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                        isSelected
+                          ? 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/40'
+                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-xs'
+                      }`}>
+                        <LogoComp className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className={`font-bold text-xs block truncate ${isSelected ? 'text-cyan-950 dark:text-white' : 'text-slate-800 dark:text-slate-200'}`}>
+                          {b.name}
+                        </span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                          {b.tagline}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* STEP 2: SELECT MODEL */}
-            <div className={`bg-slate-900 border rounded-3xl p-6 transition-all space-y-4 ${
-              activeStep === 2 ? 'border-cyan-500 shadow-xl shadow-cyan-950/20' : 'border-slate-800'
+            <div className={`bg-white dark:bg-slate-900 border rounded-3xl p-6 transition-all space-y-4 ${
+              activeStep === 2 ? 'border-cyan-500 shadow-md shadow-cyan-500/10' : 'border-slate-200 dark:border-slate-800'
             }`}>
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-full bg-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-500/30">
+                  <span className="w-7 h-7 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-black text-xs flex items-center justify-center border border-cyan-200 dark:border-cyan-500/30">
                     2
                   </span>
                   <div>
-                    <h2 className="text-base font-extrabold text-white">Step 2: Select Model ({brand})</h2>
-                    <p className="text-[11px] text-slate-400">Pick device model or enter custom details</p>
+                    <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Step 2: Select Model ({brand})</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Pick device model or enter custom details</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-500/20">
                   Base Market Benchmark: {settings.currencySymbol}{baseMarketValue.toLocaleString()}
                 </span>
               </div>
@@ -527,10 +535,10 @@ export const ExchangeModule: React.FC = () => {
                     key={m.name}
                     type="button"
                     onClick={() => handleSelectModel(m.name, m.baseValue)}
-                    className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-start ${
+                    className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-start cursor-pointer ${
                       model === m.name && !isCustomModel
-                        ? 'bg-cyan-600/20 text-cyan-200 border-cyan-500 font-bold'
-                        : 'bg-slate-950/60 text-slate-300 border-slate-800 hover:bg-slate-800/80'
+                        ? 'bg-cyan-50 dark:bg-cyan-600/20 text-cyan-900 dark:text-cyan-200 border-cyan-500 font-bold ring-1 ring-cyan-300 dark:ring-cyan-500/40 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-950/60 text-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800/80'
                     }`}
                   >
                     <div className="text-xs font-semibold truncate">{m.name}</div>
@@ -539,9 +547,9 @@ export const ExchangeModule: React.FC = () => {
               </div>
 
               {/* Custom Model Toggle */}
-              <div className="pt-2 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <div className="sm:col-span-1">
-                  <label className="block text-slate-300 mb-1 font-semibold">Custom Model Name</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Custom Model Name</label>
                   <input
                     type="text"
                     placeholder="e.g. iPhone 13 Pro"
@@ -551,65 +559,65 @@ export const ExchangeModule: React.FC = () => {
                       setCustomModelInput(e.target.value);
                       setModel(e.target.value || 'Custom Model');
                     }}
-                    className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 mb-1 font-semibold">Variant / Storage / Color</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Variant / Storage / Color</label>
                   <input
                     type="text"
                     placeholder="e.g. 128GB Sierra Blue"
                     value={storageColor}
                     onChange={(e) => setStorageColor(e.target.value)}
-                    className="w-full bg-slate-800 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 mb-1 font-semibold">Total Price ({settings.currencySymbol}) *</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Total Price ({settings.currencySymbol}) *</label>
                   <input
                     type="number"
                     placeholder={`e.g. 45000`}
                     value={baseMarketValue || ''}
                     onChange={(e) => setBaseMarketValue(Math.max(0, parseFloat(e.target.value) || 0))}
-                    className="w-full bg-slate-800 text-emerald-300 font-extrabold px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-300 font-extrabold px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
                     required
                   />
                 </div>
               </div>
 
               {/* Accessories Bonus Selection */}
-              <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                  <Tag className="w-4 h-4 text-cyan-400" />
+              <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Tag className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                   <span>Accessories Bonus:</span>
                 </span>
                 <div className="flex items-center gap-4 flex-wrap">
-                  <label className="flex items-center gap-1.5 text-slate-200 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200 cursor-pointer font-medium">
                     <input
                       type="checkbox"
                       checked={boxAvailable}
                       onChange={(e) => setBoxAvailable(e.target.checked)}
-                      className="accent-cyan-500 w-4 h-4 rounded"
+                      className="accent-cyan-600 w-4 h-4 rounded"
                     />
                     <span>Original Box (+{settings.currencySymbol}500)</span>
                   </label>
-                  <label className="flex items-center gap-1.5 text-slate-200 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200 cursor-pointer font-medium">
                     <input
                       type="checkbox"
                       checked={chargerAvailable}
                       onChange={(e) => setChargerAvailable(e.target.checked)}
-                      className="accent-cyan-500 w-4 h-4 rounded"
+                      className="accent-cyan-600 w-4 h-4 rounded"
                     />
                     <span>Original Charger (+{settings.currencySymbol}500)</span>
                   </label>
-                  <label className="flex items-center gap-1.5 text-slate-200 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200 cursor-pointer font-medium">
                     <input
                       type="checkbox"
                       checked={billAvailable}
                       onChange={(e) => setBillAvailable(e.target.checked)}
-                      className="accent-cyan-500 w-4 h-4 rounded"
+                      className="accent-cyan-600 w-4 h-4 rounded"
                     />
                     <span>Tax Invoice (+{settings.currencySymbol}1,000)</span>
                   </label>
@@ -618,20 +626,20 @@ export const ExchangeModule: React.FC = () => {
             </div>
 
             {/* STEP 3: SELECT DAMAGE TYPE(S) */}
-            <div className={`bg-slate-900 border rounded-3xl p-6 transition-all space-y-5 ${
-              activeStep === 3 ? 'border-rose-500 shadow-xl shadow-rose-950/20' : 'border-slate-800'
+            <div className={`bg-white dark:bg-slate-900 border rounded-3xl p-6 transition-all space-y-5 ${
+              activeStep === 3 ? 'border-rose-500 shadow-md shadow-rose-500/10' : 'border-slate-200 dark:border-slate-800'
             }`}>
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-full bg-rose-500/20 text-rose-400 font-black text-xs flex items-center justify-center border border-rose-500/30">
+                  <span className="w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 font-black text-xs flex items-center justify-center border border-rose-200 dark:border-rose-500/30">
                     3
                   </span>
                   <div>
-                    <h2 className="text-base font-extrabold text-white">Step 3: Select Damage Type(s)</h2>
-                    <p className="text-[11px] text-slate-400">Click any damage type card to select or deselect defect faults.</p>
+                    <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Step 3: Select Damage Type(s)</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Click any damage type card to select or deselect defect faults.</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+                <span className="text-xs font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-500/20">
                   {selectedDamages.length} Damage Fault(s) Selected
                 </span>
               </div>
@@ -648,31 +656,31 @@ export const ExchangeModule: React.FC = () => {
                       onClick={() => handleToggleDamage(dmg)}
                       className={`p-4 rounded-2xl border transition-all text-left flex items-center justify-between gap-3 cursor-pointer ${
                         isSelected
-                          ? 'bg-rose-500/15 border-rose-500 text-white shadow-md shadow-rose-950/30 ring-1 ring-rose-500/40'
-                          : 'bg-slate-950/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/80 hover:border-slate-700'
+                          ? 'bg-rose-50 dark:bg-rose-500/15 border-rose-400 dark:border-rose-500 text-rose-950 dark:text-white shadow-sm ring-1 ring-rose-300 dark:ring-rose-500/40'
+                          : 'bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700'
                       }`}
                     >
                       <div className="space-y-1.5 flex-1">
                         <div className="flex items-center gap-2">
                           <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
-                            isSelected ? 'bg-rose-500 text-white' : 'bg-slate-800 text-slate-400'
+                            isSelected ? 'bg-rose-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400'
                           }`}>
                             {dmg.category}
                           </span>
                           {isSelected && (
-                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                            <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-500/20">
                               Selected
                             </span>
                           )}
                         </div>
-                        <div className="text-xs font-bold text-slate-100">{dmg.type}</div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-slate-100">{dmg.type}</div>
                       </div>
 
                       {/* Toggle Checkbox Icon */}
                       <div className={`w-7 h-7 rounded-xl border flex items-center justify-center transition shrink-0 ${
                         isSelected
-                          ? 'bg-rose-500 border-rose-400 text-white'
-                          : 'border-slate-700 bg-slate-900 text-slate-500'
+                          ? 'bg-rose-600 border-rose-500 text-white'
+                          : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500'
                       }`}>
                         <Check className="w-4 h-4 stroke-[3]" />
                       </div>
@@ -682,25 +690,25 @@ export const ExchangeModule: React.FC = () => {
               </div>
 
               {/* Selected Damage List Table inside Step 3 */}
-              <div className="space-y-2 pt-2 border-t border-slate-800">
+              <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-300 flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-rose-400" />
+                  <span className="font-bold text-slate-800 dark:text-slate-300 flex items-center gap-1.5">
+                    <Sliders className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                     <span>Selected Damage Faults ({selectedDamages.length})</span>
                   </span>
-                  <span className="text-[10px] text-rose-400 font-bold">
+                  <span className="text-[10px] text-rose-600 dark:text-rose-400 font-bold">
                     Total Deduction: -{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}
                   </span>
                 </div>
 
                 {selectedDamages.length === 0 ? (
-                  <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 text-center text-slate-400 text-xs">
+                  <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 text-center text-slate-500 dark:text-slate-400 text-xs">
                     No damage faults selected yet. Click any card above or add custom defect below.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950">
-                    <table className="w-full text-left text-xs text-slate-300">
-                      <thead className="bg-slate-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm">
+                    <table className="w-full text-left text-xs text-slate-800 dark:text-slate-300">
+                      <thead className="bg-slate-50 dark:bg-slate-900/90 text-slate-700 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
                         <tr>
                           <th className="p-3">Category</th>
                           <th className="p-3">Damage Fault</th>
@@ -708,23 +716,23 @@ export const ExchangeModule: React.FC = () => {
                           <th className="p-3 text-center">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800/80">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                         {selectedDamages.map((dmg) => (
-                          <tr key={dmg.id} className="hover:bg-slate-900/50 transition">
+                          <tr key={dmg.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition">
                             <td className="p-3">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
                                 {dmg.category}
                               </span>
                             </td>
-                            <td className="p-3 font-semibold text-slate-100">{dmg.damageType}</td>
+                            <td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{dmg.damageType}</td>
                             <td className="p-3 text-right">
                               <div className="inline-flex items-center gap-1">
-                                <span className="text-rose-400 font-extrabold">- {settings.currencySymbol}</span>
+                                <span className="text-rose-600 dark:text-rose-400 font-extrabold">- {settings.currencySymbol}</span>
                                 <input
                                   type="number"
                                   value={dmg.deductionValue}
                                   onChange={(e) => handleUpdateDeduction(dmg.id, parseFloat(e.target.value) || 0)}
-                                  className="w-24 bg-slate-900 text-rose-400 font-black text-right px-2 py-1 rounded-xl border border-slate-700 focus:outline-none focus:border-rose-500"
+                                  className="w-24 bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 font-black text-right px-2 py-1 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-rose-500 shadow-xs"
                                 />
                               </div>
                             </td>
@@ -732,7 +740,7 @@ export const ExchangeModule: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveDamage(dmg.id)}
-                                className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition"
+                                className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition cursor-pointer"
                                 title="Remove damage fault"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -747,9 +755,9 @@ export const ExchangeModule: React.FC = () => {
               </div>
 
               {/* Add Custom Damage Option */}
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <Plus className="w-4 h-4 text-purple-400" />
+              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-300 flex items-center gap-1.5">
+                  <Plus className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <span>Add Additional / Custom Defect & Price</span>
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
@@ -757,7 +765,7 @@ export const ExchangeModule: React.FC = () => {
                     <select
                       value={customDamageCategory}
                       onChange={(e) => setCustomDamageCategory(e.target.value as any)}
-                      className="w-full bg-slate-900 text-slate-100 px-3 py-2 rounded-xl border border-slate-700"
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs"
                     >
                       <option value="Display & Screen">Display & Screen</option>
                       <option value="Body & Frame">Body & Frame</option>
@@ -773,16 +781,16 @@ export const ExchangeModule: React.FC = () => {
                       placeholder="e.g. Broken Volume Key, SIM Tray Missing..."
                       value={customDamageName}
                       onChange={(e) => setCustomDamageName(e.target.value)}
-                      className="w-full bg-slate-900 text-slate-100 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-purple-500"
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-purple-500 shadow-xs"
                     />
                   </div>
                   <div className="sm:col-span-2">
                     <input
                       type="number"
-                      placeholder={`Custom Amount (${settings.currencySymbol})`}
+                      placeholder={`Amount (${settings.currencySymbol})`}
                       value={customDamageValue}
                       onChange={(e) => setCustomDamageValue(e.target.value)}
-                      className="w-full bg-slate-900 text-rose-300 font-bold px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-purple-500"
+                      className="w-full bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-300 font-bold px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-purple-500 shadow-xs"
                     />
                   </div>
                   <div className="sm:col-span-2">
@@ -790,7 +798,7 @@ export const ExchangeModule: React.FC = () => {
                       type="button"
                       onClick={handleAddCustomDamage}
                       disabled={!customDamageName.trim()}
-                      className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white font-bold py-2 rounded-xl transition"
+                      className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white font-bold py-2 rounded-xl transition cursor-pointer shadow-xs"
                     >
                       + Add Fault
                     </button>
@@ -800,14 +808,83 @@ export const ExchangeModule: React.FC = () => {
 
             </div>
 
+            {/* Customer Details Form Card */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
+              <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                <span className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-black text-xs flex items-center justify-center border border-emerald-200 dark:border-emerald-500/30">
+                  4
+                </span>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Customer & Identification Details</h2>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Record customer proof and serial / IMEI</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Customer Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. John Doe"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Customer Phone</label>
+                  <input
+                    type="tel"
+                    placeholder="e.g. +91 98765 43210"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Govt ID / Aadhaar / DL</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. XXXX-XXXX-4920"
+                    value={govtId}
+                    onChange={(e) => setGovtId(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">IMEI / Serial Number</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 358921048291048"
+                    value={imei}
+                    onChange={(e) => setImei(e.target.value)}
+                    className="w-full font-mono bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Inspection Notes</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Slight discoloration on bottom speaker mesh"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Confirm Valuation Button */}
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-base rounded-2xl shadow-xl shadow-emerald-950/40 transition active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer"
+                className="w-full py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-base rounded-2xl shadow-md transition active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer"
               >
-                <CheckCircle2 className="w-5 h-5 text-emerald-200" />
-                <span>Confirm Valuation</span>
+                <CheckCircle2 className="w-5 h-5 text-emerald-100" />
+                <span>Confirm Valuation & Issue Certificate</span>
               </button>
             </div>
 
@@ -817,24 +894,24 @@ export const ExchangeModule: React.FC = () => {
         {/* Right Column: Live Assessment Card, Math Breakdown & Payout Method */}
         <div className="lg:col-span-4 space-y-6">
           
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-5 shadow-2xl sticky top-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-5 shadow-sm sticky top-6">
             
-            <div className="text-center space-y-2 pb-4 border-b border-slate-800">
-              <span className="text-[10px] uppercase font-black text-cyan-400 tracking-widest flex items-center justify-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <div className="text-center space-y-2 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] uppercase font-black text-cyan-700 dark:text-cyan-400 tracking-widest flex items-center justify-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                 Auto-Calculated Assessment
               </span>
               
-              <div className="text-4xl font-black text-white tracking-tight">
+              <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 {settings.currencySymbol}{finalAgreedVal.toLocaleString()}
               </div>
 
               <div className="flex items-center justify-center gap-2 pt-1">
                 <span className={`text-xs font-black px-3.5 py-1 rounded-full border ${
-                  grade.startsWith('Grade A') ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' :
-                  grade.startsWith('Grade B') ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' :
-                  grade.startsWith('Grade C') ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' :
-                  'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                  grade.startsWith('Grade A') ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/40' :
+                  grade.startsWith('Grade B') ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/40' :
+                  grade.startsWith('Grade C') ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40' :
+                  'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/40'
                 }`}>
                   {grade}
                 </span>
@@ -842,49 +919,49 @@ export const ExchangeModule: React.FC = () => {
             </div>
 
             {/* Itemized Deduction Math Breakdown */}
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
-              <div className="font-bold text-slate-300 text-[11px] uppercase tracking-wider pb-1.5 border-b border-slate-800 flex justify-between">
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5 text-xs">
+              <div className="font-bold text-slate-700 dark:text-slate-300 text-[11px] uppercase tracking-wider pb-1.5 border-b border-slate-200 dark:border-slate-800 flex justify-between">
                 <span>Deduction Itemized Math</span>
-                <span className="text-cyan-400">{brand}</span>
+                <span className="text-cyan-700 dark:text-cyan-400 font-extrabold">{brand}</span>
               </div>
               
-              <div className="flex items-center justify-between text-slate-300">
+              <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span>Base Market Benchmark:</span>
-                <span className="font-extrabold text-emerald-400">+{settings.currencySymbol}{baseMarketValue.toLocaleString()}</span>
+                <span className="font-extrabold text-emerald-600 dark:text-emerald-400">+{settings.currencySymbol}{baseMarketValue.toLocaleString()}</span>
               </div>
 
-              <div className="flex items-center justify-between text-slate-300">
+              <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span>Accessories Bonus:</span>
-                <span className="font-extrabold text-cyan-400">+{settings.currencySymbol}{accessoriesBonus.toLocaleString()}</span>
+                <span className="font-extrabold text-cyan-600 dark:text-cyan-400">+{settings.currencySymbol}{accessoriesBonus.toLocaleString()}</span>
               </div>
 
-              <div className="flex items-center justify-between text-slate-300">
+              <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span>Damage Deductions ({selectedDamages.length}):</span>
-                <span className="font-extrabold text-rose-400">-{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}</span>
+                <span className="font-extrabold text-rose-600 dark:text-rose-400">-{settings.currencySymbol}{totalDamageDeductions.toLocaleString()}</span>
               </div>
 
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between font-black text-white text-sm">
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between font-black text-slate-900 dark:text-white text-sm">
                 <span>Auto-Calculated Payout:</span>
-                <span className="text-cyan-300">{settings.currencySymbol}{calculatedVal.toLocaleString()}</span>
+                <span className="text-cyan-700 dark:text-cyan-300">{settings.currencySymbol}{calculatedVal.toLocaleString()}</span>
               </div>
             </div>
 
             {/* Custom Override Option */}
             <div className="text-xs space-y-1.5">
-              <label className="text-slate-300 block font-semibold">Custom Valuation Override ({settings.currencySymbol})</label>
+              <label className="text-slate-700 dark:text-slate-300 block font-semibold">Custom Valuation Override ({settings.currencySymbol})</label>
               <input
                 type="number"
                 placeholder={`Calculated: ${calculatedVal}`}
                 value={customValueOverride}
                 onChange={(e) => setCustomValueOverride(e.target.value)}
-                className="w-full bg-slate-800 text-cyan-300 font-black text-sm px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-cyan-500"
+                className="w-full bg-white dark:bg-slate-800 text-cyan-800 dark:text-cyan-300 font-black text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-cyan-500 shadow-xs"
               />
-              <p className="text-[10px] text-slate-400">Leave empty to use auto-calculated amount</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Leave empty to use auto-calculated amount</p>
             </div>
 
             {/* Payout Method */}
-            <div className="text-xs space-y-2 pt-2 border-t border-slate-800">
-              <label className="text-slate-300 block font-semibold">Trade-In Payout Method</label>
+            <div className="text-xs space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <label className="text-slate-700 dark:text-slate-300 block font-semibold">Trade-In Payout Method</label>
               
               <div className="space-y-2">
                 {[
@@ -896,14 +973,14 @@ export const ExchangeModule: React.FC = () => {
                     key={opt.id}
                     type="button"
                     onClick={() => setActionChoice(opt.id as any)}
-                    className={`w-full p-2.5 rounded-xl border text-left transition ${
+                    className={`w-full p-2.5 rounded-xl border text-left transition cursor-pointer ${
                       actionChoice === opt.id
-                        ? 'bg-cyan-600/20 text-cyan-200 border-cyan-500'
-                        : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'
+                        ? 'bg-cyan-50 dark:bg-cyan-600/20 text-cyan-900 dark:text-cyan-200 border-cyan-500 font-bold ring-1 ring-cyan-300 dark:ring-cyan-500/40 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800'
                     }`}
                   >
                     <div className="font-bold text-xs">{opt.label}</div>
-                    <div className="text-[10px] text-slate-400">{opt.desc}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">{opt.desc}</div>
                   </button>
                 ))}
               </div>
@@ -916,20 +993,20 @@ export const ExchangeModule: React.FC = () => {
       </div>
 
       {/* History Log of Saved Buyback Assessments */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-extrabold text-white text-base flex items-center gap-2">
-              <FileCheck className="w-5 h-5 text-cyan-400" />
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-base flex items-center gap-2">
+              <FileCheck className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
               <span>Valuation & Buyback History Log</span>
             </h3>
-            <p className="text-xs text-slate-400">All issued trade-in vouchers, damage reports & refurbish stock records</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">All issued trade-in vouchers, damage reports & refurbish stock records</p>
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-slate-800">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm">
+          <table className="w-full text-left text-xs text-slate-800 dark:text-slate-300">
+            <thead className="bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="p-3">Exchange Code / Date</th>
                 <th className="p-3">Customer</th>
@@ -940,40 +1017,40 @@ export const ExchangeModule: React.FC = () => {
                 <th className="p-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80 bg-slate-950/30">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-slate-950/30">
               {exchanges.map((ex) => (
-                <tr key={ex.id} className="hover:bg-slate-800/50 transition">
+                <tr key={ex.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                   <td className="p-3">
-                    <div className="font-mono font-bold text-cyan-300">{ex.exchangeCode}</div>
-                    <div className="text-[10px] text-slate-400">{ex.timestamp}</div>
+                    <div className="font-mono font-bold text-cyan-700 dark:text-cyan-300">{ex.exchangeCode}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">{ex.timestamp}</div>
                   </td>
                   <td className="p-3">
-                    <div className="font-semibold text-slate-200">{ex.customerName}</div>
-                    <div className="text-[10px] text-slate-400">{ex.customerPhone}</div>
+                    <div className="font-semibold text-slate-900 dark:text-slate-200">{ex.customerName}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">{ex.customerPhone}</div>
                   </td>
                   <td className="p-3">
-                    <div className="font-bold text-slate-200">{ex.deviceBrand} {ex.deviceModel}</div>
-                    <div className="text-[10px] text-cyan-400 font-mono">IMEI: {ex.imeiNumber}</div>
+                    <div className="font-bold text-slate-900 dark:text-slate-200">{ex.deviceBrand} {ex.deviceModel}</div>
+                    <div className="text-[10px] text-cyan-700 dark:text-cyan-400 font-mono">IMEI: {ex.imeiNumber}</div>
                   </td>
                   <td className="p-3">
-                    <span className="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-semibold">
+                    <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded text-[10px] font-semibold text-slate-700 dark:text-slate-300">
                       {ex.grade}
                     </span>
                   </td>
-                  <td className="p-3 font-bold text-emerald-400">
+                  <td className="p-3 font-bold text-emerald-600 dark:text-emerald-400">
                     {settings.currencySymbol}{ex.agreedValue.toLocaleString()}
                   </td>
                   <td className="p-3">
-                    <div className="font-medium text-slate-200">{ex.actionTaken}</div>
+                    <div className="font-medium text-slate-800 dark:text-slate-200">{ex.actionTaken}</div>
                     {ex.voucherCode && (
-                      <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/80 px-1.5 py-0.5 rounded border border-indigo-800/60 inline-block mt-0.5">
+                      <span className="text-[10px] font-mono font-bold text-purple-700 dark:text-indigo-300 bg-purple-50 dark:bg-indigo-950/80 px-1.5 py-0.5 rounded border border-purple-200 dark:border-indigo-800/60 inline-block mt-0.5">
                         {ex.voucherCode}
                       </span>
                     )}
                   </td>
                   <td className="p-3">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      ex.status === 'Completed' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-300'
+                      ex.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-cyan-500/20 dark:text-cyan-300'
                     }`}>
                       {ex.status}
                     </span>

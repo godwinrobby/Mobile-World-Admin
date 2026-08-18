@@ -204,19 +204,19 @@ export const BuyModule: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Page Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-50 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-md shadow-indigo-500/20">
+            <div className="flex items-center gap-2.5">
+              <span className="p-2.5 bg-indigo-600 rounded-2xl text-white shadow-sm">
                 <ShoppingBag className="w-5 h-5" />
               </span>
-              <h1 className="text-xl font-black text-white tracking-tight">
+              <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
                 Customer Mobile Buyback & Trade-In Directory
               </h1>
             </div>
-            <p className="text-xs text-slate-400 pl-1">
+            <p className="text-xs text-slate-500 font-medium pl-1">
               Manage all customer devices planned to sell, exchange records, refurbish inventory pipeline & voucher certificates.
             </p>
           </div>
@@ -225,7 +225,7 @@ export const BuyModule: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveTab('valuation')}
-              className="px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-cyan-900/30 transition flex items-center gap-2 active:scale-95 cursor-pointer"
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl shadow-sm hover:shadow transition flex items-center gap-2 active:scale-98 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>New Valuation & Buyback</span>
@@ -237,64 +237,64 @@ export const BuyModule: React.FC = () => {
       {/* KPI Dashboard Analytics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Buybacks */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-2 relative overflow-hidden group hover:border-slate-700 transition">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 relative overflow-hidden group hover:border-slate-300 hover:shadow-xs transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Buybacks</span>
-            <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Buybacks</span>
+            <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-white">{exchanges.length} Deals</div>
-            <div className="text-xs font-extrabold text-indigo-400 mt-0.5">
+            <div className="text-2xl font-black text-slate-900">{exchanges.length} Deals</div>
+            <div className="text-xs font-extrabold text-indigo-600 mt-0.5">
               {settings.currencySymbol}{totalValuationSum.toLocaleString()} Total Value
             </div>
           </div>
         </div>
 
         {/* Completed & Vouchers */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-2 relative overflow-hidden group hover:border-slate-700 transition">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 relative overflow-hidden group hover:border-slate-300 hover:shadow-xs transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Completed Deals</span>
-            <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Deals</span>
+            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-white">{totalCompletedCount} Verified</div>
-            <div className="text-xs font-extrabold text-emerald-400 mt-0.5">
+            <div className="text-2xl font-black text-slate-900">{totalCompletedCount} Verified</div>
+            <div className="text-xs font-extrabold text-emerald-600 mt-0.5">
               Store Credits & Sales Settled
             </div>
           </div>
         </div>
 
         {/* In Refurbish Stock Pipeline */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-2 relative overflow-hidden group hover:border-slate-700 transition">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 relative overflow-hidden group hover:border-slate-300 hover:shadow-xs transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Refurbish Pipeline</span>
-            <div className="p-2 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Refurbish Pipeline</span>
+            <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl border border-amber-100">
               <RefreshCw className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-white">{inRefurbishCount} Mobiles</div>
-            <div className="text-xs font-extrabold text-amber-400 mt-0.5">
+            <div className="text-2xl font-black text-slate-900">{inRefurbishCount} Mobiles</div>
+            <div className="text-xs font-extrabold text-amber-700 mt-0.5">
               Stock Inward for Resale
             </div>
           </div>
         </div>
 
         {/* Average Buyback Payout */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-2 relative overflow-hidden group hover:border-slate-700 transition">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2 relative overflow-hidden group hover:border-slate-300 hover:shadow-xs transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Avg Buyback Payout</span>
-            <div className="p-2 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Avg Buyback Payout</span>
+            <div className="p-2.5 bg-cyan-50 text-cyan-600 rounded-xl border border-cyan-100">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-white">{settings.currencySymbol}{avgValuation.toLocaleString()}</div>
-            <div className="text-xs font-extrabold text-cyan-400 mt-0.5">
+            <div className="text-2xl font-black text-slate-900">{settings.currencySymbol}{avgValuation.toLocaleString()}</div>
+            <div className="text-xs font-extrabold text-cyan-700 mt-0.5">
               Average Valuation Per Mobile
             </div>
           </div>
@@ -302,9 +302,9 @@ export const BuyModule: React.FC = () => {
       </div>
 
       {/* Main Listing Section with Search & Pagination */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-5">
         {/* Filters and Controls Toolbar */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -313,13 +313,13 @@ export const BuyModule: React.FC = () => {
               placeholder="Search by customer name, phone, device model, IMEI, or voucher code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-950 text-slate-100 rounded-2xl border border-slate-800 focus:outline-none focus:border-indigo-500 text-xs placeholder:text-slate-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 text-slate-900 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 focus:bg-white text-xs placeholder:text-slate-400 transition"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-semibold"
               >
                 Clear
               </button>
@@ -329,63 +329,63 @@ export const BuyModule: React.FC = () => {
           {/* Filter Dropdowns */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {/* Status Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
               <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-slate-400 text-[11px] font-semibold">Status:</span>
+              <span className="text-slate-500 text-[11px] font-semibold">Status:</span>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer"
+                className="bg-transparent text-slate-800 font-bold focus:outline-none cursor-pointer"
               >
-                <option value="ALL" className="bg-slate-900">All Statuses</option>
-                <option value="Completed" className="bg-slate-900">Completed</option>
-                <option value="In Refurbish" className="bg-slate-900">In Refurbish</option>
-                <option value="Pending" className="bg-slate-900">Pending</option>
-                <option value="Cancelled" className="bg-slate-900">Cancelled</option>
+                <option value="ALL">All Statuses</option>
+                <option value="Completed">Completed</option>
+                <option value="In Refurbish">In Refurbish</option>
+                <option value="Pending">Pending</option>
+                <option value="Cancelled">Cancelled</option>
               </select>
             </div>
 
             {/* Brand Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
               <Smartphone className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-slate-400 text-[11px] font-semibold">Brand:</span>
+              <span className="text-slate-500 text-[11px] font-semibold">Brand:</span>
               <select
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
-                className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer"
+                className="bg-transparent text-slate-800 font-bold focus:outline-none cursor-pointer"
               >
-                <option value="ALL" className="bg-slate-900">All Brands</option>
-                <option value="Apple" className="bg-slate-900">Apple</option>
-                <option value="Samsung" className="bg-slate-900">Samsung</option>
-                <option value="OnePlus" className="bg-slate-900">OnePlus</option>
-                <option value="Xiaomi" className="bg-slate-900">Xiaomi</option>
-                <option value="Google Pixel" className="bg-slate-900">Google Pixel</option>
-                <option value="Vivo" className="bg-slate-900">Vivo</option>
-                <option value="Oppo" className="bg-slate-900">Oppo</option>
+                <option value="ALL">All Brands</option>
+                <option value="Apple">Apple</option>
+                <option value="Samsung">Samsung</option>
+                <option value="OnePlus">OnePlus</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="Google Pixel">Google Pixel</option>
+                <option value="Vivo">Vivo</option>
+                <option value="Oppo">Oppo</option>
               </select>
             </div>
 
             {/* Items Per Page */}
-            <div className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-              <span className="text-slate-400 text-[11px] font-semibold">Show:</span>
+            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+              <span className="text-slate-500 text-[11px] font-semibold">Show:</span>
               <select
                 value={itemsPerPage}
                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                className="bg-transparent text-indigo-400 font-bold focus:outline-none cursor-pointer"
+                className="bg-transparent text-indigo-600 font-bold focus:outline-none cursor-pointer"
               >
-                <option value={5} className="bg-slate-900">5 per page</option>
-                <option value={10} className="bg-slate-900">10 per page</option>
-                <option value={20} className="bg-slate-900">20 per page</option>
-                <option value={50} className="bg-slate-900">50 per page</option>
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={20}>20 per page</option>
+                <option value={50}>50 per page</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Customer Trade-In Mobile Listing Data Table */}
-        <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/50">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-xs">
+          <table className="w-full text-left text-xs text-slate-800">
+            <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
               <tr>
                 <th className="p-3.5">Code & Timestamp</th>
                 <th className="p-3.5">Customer & ID</th>
@@ -397,52 +397,54 @@ export const BuyModule: React.FC = () => {
                 <th className="p-3.5 text-center">Certificate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-500 space-y-2">
-                    <AlertCircle className="w-8 h-8 text-slate-600 mx-auto" />
-                    <p className="text-sm font-semibold">No customer trade-in records match your filters.</p>
-                    <p className="text-xs text-slate-600">Try clearing your search query or changing status filters.</p>
+                  <td colSpan={8} className="p-8 text-center text-slate-500 space-y-2 bg-white">
+                    <AlertCircle className="w-8 h-8 text-slate-400 mx-auto" />
+                    <p className="text-sm font-semibold text-slate-700">No customer trade-in records match your filters.</p>
+                    <p className="text-xs text-slate-500">Try clearing your search query or changing status filters.</p>
                   </td>
                 </tr>
               ) : (
                 currentItems.map((ex) => (
-                  <tr key={ex.id} className="hover:bg-slate-900/60 transition group">
+                  <tr key={ex.id} className="bg-white hover:bg-slate-50/80 transition group">
                     {/* Code & Timestamp */}
                     <td className="p-3.5">
-                      <div className="font-mono font-bold text-slate-100">{ex.exchangeCode}</div>
-                      <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                        <Clock className="w-3 h-3 text-slate-500" />
+                      <div className="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200 inline-block text-xs">
+                        {ex.exchangeCode}
+                      </div>
+                      <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-1 font-medium">
+                        <Clock className="w-3 h-3 text-slate-400" />
                         <span>{ex.timestamp}</span>
                       </div>
                     </td>
 
                     {/* Customer Info */}
                     <td className="p-3.5">
-                      <div className="font-bold text-slate-100 flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      <div className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
+                        <User className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                         <span>{ex.customerName}</span>
                       </div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                        <Phone className="w-3 h-3 text-slate-500" />
+                      <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                        <Phone className="w-3 h-3 text-slate-400" />
                         <span>{ex.customerPhone}</span>
                       </div>
                     </td>
 
                     {/* Device & Grade */}
                     <td className="p-3.5">
-                      <div className="font-extrabold text-white">{ex.deviceBrand} {ex.deviceModel}</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-semibold text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                      <div className="font-extrabold text-slate-900 text-xs">{ex.deviceBrand} {ex.deviceModel}</div>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                           {ex.storageColor}
                         </span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                           ex.grade.includes('Grade A')
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : ex.grade.includes('Grade B')
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                            : 'bg-rose-50 text-rose-700 border-rose-200'
                         }`}>
                           {ex.grade}
                         </span>
@@ -451,34 +453,34 @@ export const BuyModule: React.FC = () => {
 
                     {/* IMEI */}
                     <td className="p-3.5">
-                      <span className="font-mono font-bold text-cyan-300 bg-slate-900 px-2 py-1 rounded-lg border border-slate-800 text-[11px]">
+                      <span className="font-mono font-bold text-cyan-800 bg-cyan-50 px-2.5 py-1 rounded-lg border border-cyan-200 text-[11px] inline-block">
                         {ex.imeiNumber}
                       </span>
                     </td>
 
                     {/* Agreed Valuation */}
-                    <td className="p-3.5 text-right font-black text-emerald-400 text-sm">
+                    <td className="p-3.5 text-right font-black text-emerald-600 text-sm">
                       {settings.currencySymbol}{ex.agreedValue.toLocaleString()}
                     </td>
 
                     {/* Action Taken & Voucher */}
                     <td className="p-3.5">
-                      <div className="text-xs font-semibold text-slate-300">{ex.actionTaken}</div>
+                      <div className="text-xs font-semibold text-slate-800">{ex.actionTaken}</div>
                       {ex.voucherCode && (
                         <div className="flex items-center gap-1.5 mt-1">
-                          <span className="text-[10px] font-mono font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                          <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
                             {ex.voucherCode}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleCopyVoucher(ex.voucherCode!)}
-                            className="text-slate-500 hover:text-purple-300 transition"
+                            className="text-slate-400 hover:text-purple-600 transition cursor-pointer"
                             title="Copy Voucher Code"
                           >
                             <Copy className="w-3.5 h-3.5" />
                           </button>
                           {copiedVoucher === ex.voucherCode && (
-                            <span className="text-[9px] text-emerald-400 font-bold">Copied!</span>
+                            <span className="text-[9px] text-emerald-600 font-bold">Copied!</span>
                           )}
                         </div>
                       )}
@@ -489,20 +491,20 @@ export const BuyModule: React.FC = () => {
                       <select
                         value={ex.status}
                         onChange={(e) => updateExchangeStatus(ex.id, e.target.value as any)}
-                        className={`text-[11px] font-extrabold px-2.5 py-1 rounded-xl border focus:outline-none cursor-pointer transition ${
+                        className={`text-[11px] font-extrabold px-3 py-1 rounded-xl border focus:outline-none cursor-pointer transition ${
                           ex.status === 'Completed'
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : ex.status === 'In Refurbish'
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
                             : ex.status === 'Pending'
-                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-                            : 'bg-slate-800 text-slate-400 border-slate-700'
+                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            : 'bg-slate-100 text-slate-700 border-slate-200'
                         }`}
                       >
-                        <option value="Completed" className="bg-slate-900 text-emerald-400">Completed</option>
-                        <option value="In Refurbish" className="bg-slate-900 text-amber-400">In Refurbish</option>
-                        <option value="Pending" className="bg-slate-900 text-blue-400">Pending</option>
-                        <option value="Cancelled" className="bg-slate-900 text-rose-400">Cancelled</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Refurbish">In Refurbish</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Cancelled">Cancelled</option>
                       </select>
                     </td>
 
@@ -511,9 +513,9 @@ export const BuyModule: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedExchange(ex)}
-                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white rounded-xl border border-slate-800 transition text-xs font-bold flex items-center gap-1.5 mx-auto"
+                        className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl border border-slate-200 hover:border-slate-300 transition text-xs font-bold flex items-center gap-1.5 mx-auto shadow-xs cursor-pointer"
                       >
-                        <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                        <Eye className="w-3.5 h-3.5 text-cyan-600" />
                         <span>View</span>
                       </button>
                     </td>
@@ -526,12 +528,12 @@ export const BuyModule: React.FC = () => {
 
         {/* Proper Pagination Controls Footer */}
         {totalItems > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs text-slate-400 border-t border-slate-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs text-slate-500 border-t border-slate-100">
             {/* Range Text */}
             <div>
-              Showing <strong className="text-slate-200">{startIndex + 1}</strong> to{' '}
-              <strong className="text-slate-200">{endIndex}</strong> of{' '}
-              <strong className="text-slate-200">{totalItems}</strong> customer trade-in records
+              Showing <strong className="text-slate-800">{startIndex + 1}</strong> to{' '}
+              <strong className="text-slate-800">{endIndex}</strong> of{' '}
+              <strong className="text-slate-800">{totalItems}</strong> customer trade-in records
             </div>
 
             {/* Pagination Button Group */}
@@ -541,7 +543,7 @@ export const BuyModule: React.FC = () => {
                 type="button"
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
-                className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-300"
+                className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-600 cursor-pointer shadow-xs"
                 title="First Page"
               >
                 <ChevronsLeft className="w-4 h-4" />
@@ -552,7 +554,7 @@ export const BuyModule: React.FC = () => {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-300"
+                className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-600 cursor-pointer shadow-xs"
                 title="Previous Page"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -564,10 +566,10 @@ export const BuyModule: React.FC = () => {
                   key={pageNum}
                   type="button"
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`w-8 h-8 rounded-xl font-bold transition flex items-center justify-center ${
+                  className={`w-8 h-8 rounded-xl font-bold transition flex items-center justify-center cursor-pointer ${
                     currentPage === pageNum
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'bg-slate-950 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200 shadow-xs'
                   }`}
                 >
                   {pageNum}
@@ -579,7 +581,7 @@ export const BuyModule: React.FC = () => {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-300"
+                className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-600 cursor-pointer shadow-xs"
                 title="Next Page"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -590,7 +592,7 @@ export const BuyModule: React.FC = () => {
                 type="button"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-300"
+                className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-slate-600 cursor-pointer shadow-xs"
                 title="Last Page"
               >
                 <ChevronsRight className="w-4 h-4" />
@@ -602,23 +604,23 @@ export const BuyModule: React.FC = () => {
 
       {/* Customer Trade-In Detail & Certificate Modal */}
       {selectedExchange && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl p-6 space-y-5 my-8">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-xl p-6 space-y-5 my-8 text-slate-900">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-2xl border border-indigo-500/20">
+                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
                   <FileText className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-white">Customer Buyback Certificate</h3>
-                  <p className="text-xs text-slate-400">Trade-In Code: <span className="font-mono text-indigo-300 font-bold">{selectedExchange.exchangeCode}</span></p>
+                  <h3 className="text-base font-extrabold text-slate-900">Customer Buyback Certificate</h3>
+                  <p className="text-xs text-slate-500">Trade-In Code: <span className="font-mono text-indigo-600 font-bold">{selectedExchange.exchangeCode}</span></p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedExchange(null)}
-                className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition"
+                className="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition cursor-pointer"
               >
                 ✕
               </button>
@@ -627,55 +629,55 @@ export const BuyModule: React.FC = () => {
             {/* Modal Content Sections */}
             <div className="space-y-4 text-xs">
               {/* Customer Info Box */}
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Customer & Inspector Info</div>
-                <div className="grid grid-cols-2 gap-2 text-slate-200">
-                  <div>Customer Name: <strong className="text-white">{selectedExchange.customerName}</strong></div>
-                  <div>Phone: <strong className="text-white">{selectedExchange.customerPhone}</strong></div>
-                  <div>Govt ID Proof: <strong className="text-white">{selectedExchange.customerGovtId || 'N/A'}</strong></div>
-                  <div>Inspector Staff: <strong className="text-white">{selectedExchange.inspectorStaff}</strong></div>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Customer & Inspector Info</div>
+                <div className="grid grid-cols-2 gap-2 text-slate-700">
+                  <div>Customer Name: <strong className="text-slate-900">{selectedExchange.customerName}</strong></div>
+                  <div>Phone: <strong className="text-slate-900">{selectedExchange.customerPhone}</strong></div>
+                  <div>Govt ID Proof: <strong className="text-slate-900">{selectedExchange.customerGovtId || 'N/A'}</strong></div>
+                  <div>Inspector Staff: <strong className="text-slate-900">{selectedExchange.inspectorStaff}</strong></div>
                 </div>
               </div>
 
               {/* Device & Valuation Summary Box */}
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Device & Valuation Details</div>
-                <div className="grid grid-cols-2 gap-2 text-slate-200">
-                  <div>Brand & Model: <strong className="text-white">{selectedExchange.deviceBrand} {selectedExchange.deviceModel}</strong></div>
-                  <div>Variant/Color: <strong className="text-white">{selectedExchange.storageColor}</strong></div>
-                  <div>IMEI Number: <strong className="font-mono text-cyan-300">{selectedExchange.imeiNumber}</strong></div>
-                  <div>Quality Grade: <strong className="text-emerald-400">{selectedExchange.grade}</strong></div>
-                  <div>Market Benchmark: <strong className="text-slate-300">{settings.currencySymbol}{selectedExchange.calculatedValue.toLocaleString()}</strong></div>
-                  <div>Agreed Buyback Price: <strong className="text-emerald-400 font-black text-sm">{settings.currencySymbol}{selectedExchange.agreedValue.toLocaleString()}</strong></div>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Device & Valuation Details</div>
+                <div className="grid grid-cols-2 gap-2 text-slate-700">
+                  <div>Brand & Model: <strong className="text-slate-900">{selectedExchange.deviceBrand} {selectedExchange.deviceModel}</strong></div>
+                  <div>Variant/Color: <strong className="text-slate-900">{selectedExchange.storageColor}</strong></div>
+                  <div>IMEI Number: <strong className="font-mono text-cyan-700">{selectedExchange.imeiNumber}</strong></div>
+                  <div>Quality Grade: <strong className="text-emerald-600 font-bold">{selectedExchange.grade}</strong></div>
+                  <div>Market Benchmark: <strong className="text-slate-700">{settings.currencySymbol}{selectedExchange.calculatedValue.toLocaleString()}</strong></div>
+                  <div>Agreed Buyback Price: <strong className="text-emerald-600 font-black text-sm">{settings.currencySymbol}{selectedExchange.agreedValue.toLocaleString()}</strong></div>
                 </div>
               </div>
 
               {/* Condition Checklist */}
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Physical Condition Inspection</div>
-                <div className="grid grid-cols-2 gap-2 text-slate-300">
-                  <div>Screen Condition: <strong>{selectedExchange.condition.screenCondition}</strong></div>
-                  <div>Body Condition: <strong>{selectedExchange.condition.bodyCondition}</strong></div>
-                  <div>Battery Health: <strong>{selectedExchange.condition.batteryHealth}%</strong></div>
-                  <div>Box / Bill: <strong>{selectedExchange.condition.boxAvailable ? 'Box ✅' : 'No Box'} | {selectedExchange.condition.billAvailable ? 'Bill ✅' : 'No Bill'}</strong></div>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Physical Condition Inspection</div>
+                <div className="grid grid-cols-2 gap-2 text-slate-700">
+                  <div>Screen Condition: <strong className="text-slate-900">{selectedExchange.condition.screenCondition}</strong></div>
+                  <div>Body Condition: <strong className="text-slate-900">{selectedExchange.condition.bodyCondition}</strong></div>
+                  <div>Battery Health: <strong className="text-slate-900">{selectedExchange.condition.batteryHealth}%</strong></div>
+                  <div>Box / Bill: <strong className="text-slate-900">{selectedExchange.condition.boxAvailable ? 'Box ✅' : 'No Box'} | {selectedExchange.condition.billAvailable ? 'Bill ✅' : 'No Bill'}</strong></div>
                 </div>
               </div>
 
               {/* Notes */}
               {selectedExchange.notes && (
-                <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-slate-300">
-                  <span className="font-bold text-slate-400">Notes: </span>
+                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-slate-700">
+                  <span className="font-bold text-slate-500">Notes: </span>
                   <span>{selectedExchange.notes}</span>
                 </div>
               )}
             </div>
 
             {/* Modal Actions Footer */}
-            <div className="flex items-center justify-between border-t border-slate-800 pt-4">
+            <div className="flex items-center justify-between border-t border-slate-100 pt-4">
               <button
                 type="button"
                 onClick={() => setSelectedExchange(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition cursor-pointer"
               >
                 Close
               </button>
@@ -683,7 +685,7 @@ export const BuyModule: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handlePrintCertificate(selectedExchange)}
-                className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-indigo-900/30 transition flex items-center gap-2 cursor-pointer"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Buyback Certificate</span>

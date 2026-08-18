@@ -360,8 +360,8 @@ OnePlus 12 5G (16GB RAM / 512GB Silky Black),OnePlus,Smartphones,69999,60000,6,H
                 />
               </div>
 
-              <div className="text-[11px] text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800 flex items-start gap-2">
-                <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-[11px] text-slate-700 dark:text-slate-400 bg-amber-500/10 dark:bg-slate-950/60 p-3 rounded-xl border border-amber-500/30 dark:border-slate-800 flex items-start gap-2 font-medium">
+                <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <span>
                   Brands already existing in Mobile World Store will be automatically detected and safely skipped during import.
                 </span>

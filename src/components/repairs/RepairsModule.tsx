@@ -228,7 +228,7 @@ export const RepairsModule: React.FC = () => {
               <Wrench className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
                 <span>Device Repair Center & Job Cards</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-normal">
                   Live Management
@@ -256,7 +256,7 @@ export const RepairsModule: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
           <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Total Repairs</span>
-          <div className="text-2xl font-extrabold text-white flex items-center justify-between">
+          <div className="text-2xl font-extrabold text-slate-100 flex items-center justify-between">
             <span>{totalJobs}</span>
             <Cpu className="w-5 h-5 text-indigo-400 opacity-60" />
           </div>

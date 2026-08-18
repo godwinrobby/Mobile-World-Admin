@@ -134,6 +134,10 @@ interface AppContextType {
 
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean | ((prev: boolean) => boolean)) => void;
+
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -226,6 +230,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeReceipt, setActiveReceipt] = useState<SaleTransaction | null>(null);
   const [showStorefrontPreview, setShowStorefrontPreview] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  useEffect(() => {
+    localStorage.setItem('mshop_theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.add('light-theme');
+      document.body.classList.add('light-theme');
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+      document.body.classList.remove('light-theme');
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    }
+  }, [theme]);
 
   // Save changes to localStorage
   useEffect(() => {
@@ -984,7 +1009,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       searchQuery,
       setSearchQuery,
       isMobileMenuOpen,
-      setIsMobileMenuOpen
+      setIsMobileMenuOpen,
+      theme,
+      setTheme,
+      toggleTheme
     }}>
       {children}
     </AppContext.Provider>

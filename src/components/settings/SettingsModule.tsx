@@ -4,7 +4,6 @@ import { ShopSettings } from '../../types';
 import { ImportSettingsTab } from './ImportSettingsTab';
 import { BackupRestoreSettingsTab } from './BackupRestoreSettingsTab';
 import { DatabaseSchemaTab } from './DatabaseSchemaTab';
-import { UsersModule } from '../users/UsersModule';
 import {
   Settings,
   Store,
@@ -14,7 +13,6 @@ import {
   Mail,
   FileText,
   Code,
-  Users,
   Database,
   CheckCircle2,
   Download,
@@ -28,13 +26,15 @@ import {
   Smartphone,
   Check,
   Upload,
-  HardDrive
+  HardDrive,
+  Sun,
+  Moon
 } from 'lucide-react';
 
-type SettingsTab = 'site_info' | 'mysql_database' | 'import_data' | 'backup_restore' | 'payment_gateway' | 'whatsapp_api' | 'email_api' | 'invoice_headers' | 'api_dev' | 'staff_data';
+type SettingsTab = 'site_info' | 'mysql_database' | 'import_data' | 'backup_restore' | 'payment_gateway' | 'whatsapp_api' | 'email_api' | 'invoice_headers' | 'api_dev';
 
 export const SettingsModule: React.FC = () => {
-  const { settings, updateSettings, resetAllData, users, products, sales, exchanges, customers } = useApp();
+  const { settings, updateSettings, resetAllData, users, products, sales, exchanges, customers, theme, setTheme } = useApp();
 
   const [activeTab, setActiveTab] = useState<SettingsTab>('site_info');
   const [saveToast, setSaveToast] = useState(false);
@@ -221,7 +221,6 @@ export const SettingsModule: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         {[
           { id: 'site_info', label: 'Site Information', icon: Store },
-          { id: 'mysql_database', label: 'MySQL Database (.SQL)', icon: Database },
           { id: 'import_data', label: 'Import Data', icon: Upload },
           { id: 'backup_restore', label: 'Backup & Restore', icon: HardDrive },
           { id: 'payment_gateway', label: 'Payment Gateway', icon: CreditCard },
@@ -229,7 +228,7 @@ export const SettingsModule: React.FC = () => {
           { id: 'email_api', label: 'Email API', icon: Mail },
           { id: 'invoice_headers', label: 'Invoice Headers', icon: FileText },
           { id: 'api_dev', label: 'API & Dev Keys', icon: Code },
-          { id: 'staff_data', label: 'Active Staff & Access Roles', icon: Users }
+          { id: 'mysql_database', label: 'MySQL Database (.SQL)', icon: Database }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -295,6 +294,47 @@ export const SettingsModule: React.FC = () => {
                   className="w-full bg-slate-950 text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 font-mono"
                   placeholder="https://mobileworldcare.com"
                 />
+              </div>
+
+              {/* Theme Preference Option */}
+              <div className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <div className="font-bold text-slate-100 text-xs flex items-center gap-2">
+                    {theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+                    <span>UI Theme Preference (Light / Dark Mode)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Applies light theme or dark theme across all modules, tables, cards, popups, and dialogs.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setTheme('light')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      theme === 'light'
+                        ? 'bg-amber-500 text-slate-950 shadow-md'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <Sun className="w-3.5 h-3.5" />
+                    <span>Light Mode</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTheme('dark')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      theme === 'dark'
+                        ? 'bg-indigo-600 text-white shadow-md'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <Moon className="w-3.5 h-3.5" />
+                    <span>Dark Mode</span>
+                  </button>
+                </div>
               </div>
 
               <div className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
@@ -1057,11 +1097,6 @@ export const SettingsModule: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 7: ACTIVE STAFF & ACCESS ROLES */}
-        {activeTab === 'staff_data' && (
-          <UsersModule />
-        )}
-
         {/* TAB 8: MYSQL DATABASE SCHEMA & EXPORT */}
         {activeTab === 'mysql_database' && (
           <DatabaseSchemaTab />
@@ -1078,7 +1113,7 @@ export const SettingsModule: React.FC = () => {
         )}
 
         {/* Global Save Button */}
-        {activeTab !== 'import_data' && activeTab !== 'backup_restore' && activeTab !== 'mysql_database' && activeTab !== 'staff_data' && (
+        {activeTab !== 'import_data' && activeTab !== 'backup_restore' && activeTab !== 'mysql_database' && (
           <button
             type="submit"
             id="save-settings-btn"

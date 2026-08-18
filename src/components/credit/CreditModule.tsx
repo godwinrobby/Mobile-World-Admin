@@ -569,11 +569,11 @@ export const CreditModule: React.FC = () => {
             </div>
           </div>
 
-          {/* INNER LISTING TABLE FOR CUSTOMERS */}
+          {/* LISTING TABLE FOR CUSTOMERS */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xs">
             {filteredCustomers.length === 0 ? (
               <div className="p-12 text-center text-slate-500 space-y-3">
-                <Users className="w-10 h-10 mx-auto text-slate-600 opacity-50" />
+                <Users className="w-10 h-10 mx-auto text-slate-500 opacity-50" />
                 <div className="text-sm font-semibold">No customer credit accounts match your search</div>
                 <button
                   onClick={handleOpenAddCustomer}
@@ -584,10 +584,10 @@ export const CreditModule: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3 p-3">
-                <div className="overflow-x-auto rounded-xl border border-slate-800">
+              <div>
+                <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs text-slate-300">
-                    <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                    <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-semibold">
                       <tr>
                         <th className="p-3.5">Customer Profile</th>
                         <th className="p-3.5">Credit Usage & Limit</th>
@@ -606,7 +606,7 @@ export const CreditModule: React.FC = () => {
                             {/* Customer Profile */}
                             <td className="p-3.5">
                               <div className="flex items-center space-x-3">
-                                <div className="w-9 h-9 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-center shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-center shrink-0 text-xs">
                                   {c.name.substring(0, 2).toUpperCase()}
                                 </div>
                                 <div>
@@ -642,7 +642,7 @@ export const CreditModule: React.FC = () => {
                               <div className="text-slate-200 font-mono text-[11px]">
                                 {c.lastPaymentDate || 'No payments yet'}
                               </div>
-                              <div className="text-[10px] text-slate-500">
+                              <div className="text-[10px] text-slate-400">
                                 {c.ledgerHistory.length} ledger record(s)
                               </div>
                             </td>
@@ -712,18 +712,21 @@ export const CreditModule: React.FC = () => {
                   </table>
                 </div>
 
-                <Pagination
-                  currentPage={customerPage}
-                  totalPages={Math.ceil(filteredCustomers.length / customerPageSize) || 1}
-                  totalItems={filteredCustomers.length}
-                  pageSize={customerPageSize}
-                  onPageChange={(p) => setCustomerPage(p)}
-                  onPageSizeChange={(sz) => {
-                    setCustomerPageSize(sz);
-                    setCustomerPage(1);
-                  }}
-                  pageSizeOptions={[5, 10, 20, 50]}
-                />
+                <div className="border-t border-slate-800 bg-slate-950/40 p-2.5">
+                  <Pagination
+                    currentPage={customerPage}
+                    totalPages={Math.ceil(filteredCustomers.length / customerPageSize) || 1}
+                    totalItems={filteredCustomers.length}
+                    pageSize={customerPageSize}
+                    onPageChange={(p) => setCustomerPage(p)}
+                    onPageSizeChange={(sz) => {
+                      setCustomerPageSize(sz);
+                      setCustomerPage(1);
+                    }}
+                    pageSizeOptions={[5, 10, 20, 50]}
+                    className="border-0 bg-transparent p-0"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -847,11 +850,11 @@ export const CreditModule: React.FC = () => {
             </div>
           </div>
 
-          {/* INNER LISTING TABLE FOR EXPENSES */}
+          {/* LISTING TABLE FOR EXPENSES */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xs">
             {filteredExpenses.length === 0 ? (
               <div className="p-12 text-center text-slate-500 space-y-3">
-                <Receipt className="w-10 h-10 mx-auto text-slate-600 opacity-50" />
+                <Receipt className="w-10 h-10 mx-auto text-slate-500 opacity-50" />
                 <div className="text-sm font-semibold">No store expenses match the filter criteria</div>
                 <button
                   onClick={handleOpenAddExpense}
@@ -862,10 +865,10 @@ export const CreditModule: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3 p-3">
-                <div className="overflow-x-auto rounded-xl border border-slate-800">
+              <div>
+                <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs text-slate-300">
-                    <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                    <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-semibold">
                       <tr>
                         <th className="p-3.5">Date & Ref #</th>
                         <th className="p-3.5">Type of Expense</th>
@@ -876,9 +879,9 @@ export const CreditModule: React.FC = () => {
                         <th className="p-3.5 text-center">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800">
+                    <tbody className="divide-y divide-slate-800/80">
                       {paginatedExpenses.map(e => (
-                        <tr key={e.id} className="hover:bg-slate-800/50 transition">
+                        <tr key={e.id} className="hover:bg-slate-800/40 transition">
                           <td className="p-3.5">
                             <div className="font-mono text-slate-200 font-bold">{e.expenseNumber}</div>
                             <div className="text-[10px] text-slate-400">{e.date}</div>
@@ -945,18 +948,21 @@ export const CreditModule: React.FC = () => {
                   </table>
                 </div>
 
-                <Pagination
-                  currentPage={expensePage}
-                  totalPages={Math.ceil(filteredExpenses.length / expensePageSize) || 1}
-                  totalItems={filteredExpenses.length}
-                  pageSize={expensePageSize}
-                  onPageChange={(p) => setExpensePage(p)}
-                  onPageSizeChange={(sz) => {
-                    setExpensePageSize(sz);
-                    setExpensePage(1);
-                  }}
-                  pageSizeOptions={[5, 10, 20, 50]}
-                />
+                <div className="border-t border-slate-800 bg-slate-950/40 p-2.5">
+                  <Pagination
+                    currentPage={expensePage}
+                    totalPages={Math.ceil(filteredExpenses.length / expensePageSize) || 1}
+                    totalItems={filteredExpenses.length}
+                    pageSize={expensePageSize}
+                    onPageChange={(p) => setExpensePage(p)}
+                    onPageSizeChange={(sz) => {
+                      setExpensePageSize(sz);
+                      setExpensePage(1);
+                    }}
+                    pageSizeOptions={[5, 10, 20, 50]}
+                    className="border-0 bg-transparent p-0"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -1148,14 +1154,14 @@ export const CreditModule: React.FC = () => {
                 </h4>
 
                 {selectedViewCustomer.ledgerHistory.length === 0 ? (
-                  <div className="p-8 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
-                    <FileText className="w-8 h-8 mx-auto text-slate-600 opacity-50 mb-2" />
+                  <div className="p-8 text-center text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800">
+                    <FileText className="w-8 h-8 mx-auto text-slate-500 opacity-50 mb-2" />
                     <p className="text-xs font-medium">No ledger entries recorded yet for this customer.</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto rounded-xl border border-slate-800">
+                  <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/40">
                     <table className="w-full text-left text-xs text-slate-300">
-                      <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                      <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-semibold">
                         <tr>
                           <th className="p-3">Date / Time</th>
                           <th className="p-3">Type</th>

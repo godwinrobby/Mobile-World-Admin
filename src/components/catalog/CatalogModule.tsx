@@ -460,21 +460,21 @@ export const CatalogModule: React.FC = () => {
 
       {/* Low-Stock High-Priority Alert Banner */}
       {lowStockCount > 0 && (
-        <div className="bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/15 border border-amber-500/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg shadow-amber-500/5 animate-in fade-in duration-200">
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm animate-in fade-in duration-200">
           <div className="flex items-start gap-3">
-            <div className="p-2.5 bg-amber-500/20 rounded-xl border border-amber-500/40 text-amber-300 shrink-0 mt-0.5">
+            <div className="p-2.5 bg-amber-500/20 rounded-xl border border-amber-500/40 text-amber-600 dark:text-amber-300 shrink-0 mt-0.5">
               <AlertTriangle className="w-5 h-5 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-amber-300 text-sm">
+                <h3 className="font-extrabold text-amber-950 dark:text-amber-300 text-sm">
                   Low Stock Alert ({lowStockCount} {lowStockCount === 1 ? 'Product' : 'Products'} Below Threshold)
                 </h3>
-                <span className="bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-500/30">
+                <span className="bg-amber-500/20 text-amber-950 dark:text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-500/40">
                   ≤ {settings.lowStockThreshold} Items
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
+              <p className="text-xs text-amber-950 dark:text-amber-200 mt-1 font-medium">
                 Certain inventory models are running low on stock. Re-order from suppliers or create Purchase Orders to prevent lost sales.
               </p>
             </div>
@@ -486,7 +486,7 @@ export const CatalogModule: React.FC = () => {
               className={`text-xs font-bold px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
                 stockFilter === 'LOW_STOCK'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                  : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40'
+                  : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 dark:text-amber-200 border border-amber-500/40'
               }`}
             >
               <Filter className="w-3.5 h-3.5" />

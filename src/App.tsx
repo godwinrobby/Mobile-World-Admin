@@ -47,7 +47,7 @@ function ProtectedLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased">
       
       {/* Top Navbar */}
       <Navbar />
@@ -59,7 +59,7 @@ function ProtectedLayout() {
         <Sidebar />
 
         {/* Dynamic Page Route Content */}
-        <main ref={mainContentRef} className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 overflow-y-auto">
+        <main ref={mainContentRef} className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 overflow-y-auto bg-slate-100 dark:bg-slate-950">
           <Outlet />
         </main>
 

@@ -624,10 +624,10 @@ export const CustomerModule: React.FC = () => {
             return (
               <div
                 key={c.id}
-                className={`bg-slate-900 border rounded-2xl p-5 space-y-4 shadow-md relative group transition hover:border-indigo-500/50 flex flex-col justify-between ${
+                className={`border rounded-2xl p-5 space-y-4 shadow-md relative group transition hover:border-indigo-500/50 flex flex-col justify-between ${
                   c.currentBalance > 0
-                    ? 'border-amber-500/40 bg-gradient-to-b from-amber-500/5 via-slate-900 to-slate-900'
-                    : 'border-slate-800'
+                    ? 'border-amber-400/80 dark:border-amber-500/40 bg-amber-500/5 dark:bg-gradient-to-b dark:from-amber-500/5 dark:via-slate-900 dark:to-slate-900'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
                 }`}
               >
                 {/* Top Customer Info */}
@@ -648,25 +648,25 @@ export const CustomerModule: React.FC = () => {
 
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3 className="font-extrabold text-slate-100 text-sm group-hover:text-indigo-300 transition">
+                          <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition">
                             {c.name}
                           </h3>
                           
                           {/* Type Badge */}
                           <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-tight ${
                             c.customerType === 'VIP' || isVip
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                              ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40'
                               : c.customerType === 'Wholesale'
-                              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                              ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/40'
                               : c.customerType === 'Corporate'
-                              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                              : 'bg-slate-800 text-slate-300 border border-slate-700'
+                              ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/40'
+                              : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700'
                           }`}>
                             {c.customerType || 'Retail'}
                           </span>
                         </div>
 
-                        <div className="text-xs font-mono text-slate-400 mt-0.5 flex items-center gap-1">
+                        <div className="text-xs font-mono text-slate-600 dark:text-slate-400 mt-0.5 flex items-center gap-1">
                           <Phone className="w-3 h-3 text-slate-500" />
                           <span>{c.phone}</span>
                         </div>
@@ -677,14 +677,14 @@ export const CustomerModule: React.FC = () => {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => handleOpenEditModal(c)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700"
+                        className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition border border-slate-200 dark:border-slate-700"
                         title="Edit Customer"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteCustomer(c)}
-                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition border border-rose-500/20"
+                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition border border-rose-500/20"
                         title="Delete Customer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -694,7 +694,7 @@ export const CustomerModule: React.FC = () => {
                   </div>
 
                   {/* Secondary Details: Email, Address, GSTIN */}
-                  <div className="text-[11px] text-slate-400 space-y-1 pt-1 border-t border-slate-800/80">
+                  <div className="text-[11px] text-slate-600 dark:text-slate-400 space-y-1 pt-1 border-t border-slate-200 dark:border-slate-800/80">
                     {c.email && (
                       <div className="flex items-center gap-1.5 truncate">
                         <Mail className="w-3 h-3 text-slate-500 shrink-0" />
@@ -708,8 +708,8 @@ export const CustomerModule: React.FC = () => {
                       </div>
                     )}
                     {c.gstin && (
-                      <div className="flex items-center gap-1.5 text-indigo-300 font-mono text-[10px]">
-                        <Building2 className="w-3 h-3 text-indigo-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-300 font-mono text-[10px]">
+                        <Building2 className="w-3 h-3 text-indigo-500 dark:text-indigo-400 shrink-0" />
                         <span>GSTIN: {c.gstin}</span>
                       </div>
                     )}
@@ -717,35 +717,35 @@ export const CustomerModule: React.FC = () => {
                 </div>
 
                 {/* Spending Metrics & Udhar Balance Box */}
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-2">
+                <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-2">
                   
                   <div className="flex items-center justify-between text-xs">
                     <div>
                       <span className="text-[10px] text-slate-500 block uppercase font-bold">Lifetime Spend</span>
-                      <span className="font-extrabold text-emerald-400 text-sm">
+                      <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
                         {settings.currencySymbol}{item.totalSpent.toLocaleString()}
                       </span>
                     </div>
 
                     <div className="text-right">
                       <span className="text-[10px] text-slate-500 block uppercase font-bold">Orders / Repairs</span>
-                      <span className="font-extrabold text-indigo-300 text-sm">
+                      <span className="font-extrabold text-indigo-600 dark:text-indigo-300 text-sm">
                         {item.totalOrdersCount} Txns
                       </span>
                     </div>
                   </div>
 
                   {/* Udhar Balance Indicator */}
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Udhar Balance</span>
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Udhar Balance</span>
                     {c.currentBalance > 0 ? (
-                      <span className="font-extrabold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1 text-[11px]">
-                        <AlertTriangle className="w-3 h-3 text-amber-400 animate-pulse" />
+                      <span className="font-extrabold text-amber-700 dark:text-amber-400 bg-amber-500/15 dark:bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1 text-[11px]">
+                        <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400 animate-pulse" />
                         {settings.currencySymbol}{c.currentBalance.toLocaleString()} Debt
                       </span>
                     ) : (
-                      <span className="font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 text-[10px] flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Clean
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 text-[10px] flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Clean
                       </span>
                     )}
                   </div>
@@ -758,11 +758,11 @@ export const CustomerModule: React.FC = () => {
                     setSelectedCustomerId(c.id);
                     setActiveProfileTab('SALES');
                   }}
-                  className="w-full bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-200 text-xs font-bold py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 border border-slate-700/80 group-hover:border-indigo-500/50 shadow-sm"
+                  className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 group-hover:border-indigo-500/50 shadow-sm"
                 >
-                  <Eye className="w-4 h-4 text-indigo-400 group-hover:text-white" />
+                  <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:text-white" />
                   <span>View Orders & Profile Details</span>
-                  <ChevronRight className="w-3.5 h-3.5 ml-auto text-slate-500 group-hover:text-white" />
+                  <ChevronRight className="w-3.5 h-3.5 ml-auto text-slate-400 group-hover:text-white" />
                 </button>
 
               </div>

@@ -102,3 +102,530 @@ html, body, div, form, section, aside, nav, article {
     border-color: #cbd5e1 !important;
   }
 }
+
+/* ================================================================================
+   LIGHT THEME OVERRIDES - FULL APPLICATION, POPUPS, MODALS, DRAWERS, TABLES & CARDS
+   ================================================================================ */
+
+.light-theme {
+  color-scheme: light !important;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.light-theme body,
+.light-theme #root,
+.light-theme main,
+.light-theme .min-h-screen {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Headings and Base Text in Light Theme */
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme h4,
+.light-theme h5,
+.light-theme h6,
+.light-theme label,
+.light-theme strong,
+.light-theme b {
+  color: #0f172a !important;
+}
+
+/* Text Color Hierarchy Overrides for Light Theme */
+.light-theme .text-white {
+  color: #0f172a !important;
+}
+
+.light-theme .text-slate-100,
+.light-theme .text-slate-200,
+.light-theme .text-gray-100,
+.light-theme .text-gray-200 {
+  color: #0f172a !important;
+}
+
+.light-theme .text-slate-300,
+.light-theme .text-gray-300 {
+  color: #1e293b !important;
+}
+
+.light-theme .text-slate-400,
+.light-theme .text-gray-400 {
+  color: #334155 !important;
+}
+
+.light-theme .text-slate-500,
+.light-theme .text-gray-500 {
+  color: #475569 !important;
+}
+
+/* High-Contrast Legible Accent Text Colors for Light Mode */
+.light-theme .text-indigo-400,
+.light-theme .text-indigo-300 {
+  color: #4338ca !important;
+}
+
+.light-theme .text-cyan-400,
+.light-theme .text-cyan-300 {
+  color: #0e7490 !important;
+}
+
+.light-theme .text-emerald-400,
+.light-theme .text-emerald-300 {
+  color: #047857 !important;
+}
+
+.light-theme .text-rose-400,
+.light-theme .text-rose-300 {
+  color: #be123c !important;
+}
+
+.light-theme .text-amber-400,
+.light-theme .text-amber-300 {
+  color: #b45309 !important;
+}
+
+.light-theme .text-purple-400,
+.light-theme .text-purple-300 {
+  color: #6b21a8 !important;
+}
+
+.light-theme .text-blue-400,
+.light-theme .text-blue-300 {
+  color: #1d4ed8 !important;
+}
+
+/* Backgrounds - Cards, Containers, Header, Modals with Reduced Shadows */
+.light-theme [class*="via-slate-9"],
+.light-theme [class*="to-slate-9"],
+.light-theme [class*="via-slate-8"],
+.light-theme [class*="to-slate-8"] {
+  --tw-gradient-via: #ffffff !important;
+  --tw-gradient-to: #ffffff !important;
+}
+
+.light-theme .bg-slate-950,
+.light-theme .bg-slate-900,
+.light-theme .bg-black,
+.light-theme .bg-black\/95,
+.light-theme .bg-black\/90,
+.light-theme .bg-black\/80,
+.light-theme .bg-black\/70,
+.light-theme .bg-black\/60,
+.light-theme .bg-black\/50,
+.light-theme .bg-slate-950\/90,
+.light-theme .bg-slate-950\/80,
+.light-theme .bg-slate-950\/70,
+.light-theme .bg-slate-950\/60,
+.light-theme .bg-slate-950\/50,
+.light-theme .bg-slate-900\/90,
+.light-theme .bg-slate-900\/95,
+.light-theme .bg-slate-900\/80,
+.light-theme .bg-slate-900\/70,
+.light-theme .bg-slate-900\/60,
+.light-theme .bg-slate-900\/50 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+.light-theme .bg-slate-800,
+.light-theme .bg-slate-800\/80,
+.light-theme .bg-slate-800\/60,
+.light-theme .bg-slate-800\/50,
+.light-theme .bg-slate-800\/40,
+.light-theme .bg-slate-800\/30,
+.light-theme .bg-slate-800\/20,
+.light-theme .bg-slate-950\/40,
+.light-theme .bg-slate-950\/30,
+.light-theme .bg-slate-950\/20,
+.light-theme .bg-slate-950\/10,
+.light-theme .bg-slate-900\/40,
+.light-theme .bg-slate-900\/30,
+.light-theme .bg-slate-900\/20,
+.light-theme .bg-slate-900\/10 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.light-theme .bg-slate-700,
+.light-theme .bg-slate-700\/50,
+.light-theme .bg-slate-700\/60,
+.light-theme .bg-slate-700\/80 {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Hover States in Light Theme */
+.light-theme .hover\:bg-slate-800:hover,
+.light-theme .hover\:bg-slate-800\/50:hover,
+.light-theme .hover\:bg-slate-800\/80:hover,
+.light-theme .hover\:bg-slate-700:hover,
+.light-theme .hover\:bg-slate-900:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Comprehensive Light Theme Light Border Overrides for All Pages */
+.light-theme .border,
+.light-theme [class*="border-"] {
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme .border-slate-800,
+.light-theme .border-slate-800\/80,
+.light-theme .border-slate-800\/60,
+.light-theme .border-slate-800\/50,
+.light-theme .border-slate-800\/40,
+.light-theme .border-slate-800\/30,
+.light-theme .border-slate-800\/20,
+.light-theme .border-slate-900,
+.light-theme .border-slate-950,
+.light-theme .border-slate-700,
+.light-theme .border-slate-700\/80,
+.light-theme .border-slate-700\/60,
+.light-theme .border-slate-700\/50,
+.light-theme .border-slate-700\/40,
+.light-theme .border-slate-700\/30,
+.light-theme .border-slate-600 {
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme input:not([type="checkbox"]):not([type="radio"]),
+.light-theme select,
+.light-theme textarea {
+  border-color: #cbd5e1 !important;
+}
+
+.light-theme .hover\:border-slate-700:hover,
+.light-theme .hover\:border-slate-600:hover,
+.light-theme .hover\:border-indigo-500:hover {
+  border-color: #6366f1 !important;
+}
+
+.light-theme .divide-slate-800 > :not([hidden]) ~ :not([hidden]),
+.light-theme .divide-slate-700 > :not([hidden]) ~ :not([hidden]),
+.light-theme .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-color: #f1f5f9 !important;
+}
+
+/* Tinted Accent Borders in Light Theme */
+.light-theme .border-indigo-500\/20,
+.light-theme .border-indigo-500\/30,
+.light-theme .border-indigo-500\/40 {
+  border-color: #a5b4fc !important;
+}
+
+.light-theme .border-emerald-500\/20,
+.light-theme .border-emerald-500\/30,
+.light-theme .border-emerald-500\/40 {
+  border-color: #6ee7b7 !important;
+}
+
+.light-theme .border-rose-500\/20,
+.light-theme .border-rose-500\/30,
+.light-theme .border-rose-500\/40 {
+  border-color: #fca5a5 !important;
+}
+
+.light-theme .border-amber-500\/20,
+.light-theme .border-amber-500\/30,
+.light-theme .border-amber-500\/40 {
+  border-color: #fcd34d !important;
+}
+
+.light-theme .border-cyan-500\/20,
+.light-theme .border-cyan-500\/30,
+.light-theme .border-cyan-500\/40 {
+  border-color: #67e8f9 !important;
+}
+
+/* Ensure text on filled solid & gradient buttons stays crisp white */
+.light-theme .bg-indigo-600,
+.light-theme .bg-indigo-700,
+.light-theme .bg-indigo-500,
+.light-theme .bg-violet-600,
+.light-theme .bg-violet-700,
+.light-theme .bg-emerald-600,
+.light-theme .bg-emerald-700,
+.light-theme .bg-emerald-500,
+.light-theme .bg-rose-600,
+.light-theme .bg-rose-700,
+.light-theme .bg-rose-500,
+.light-theme .bg-cyan-600,
+.light-theme .bg-cyan-700,
+.light-theme .bg-cyan-500,
+.light-theme .bg-blue-600,
+.light-theme .bg-blue-700,
+.light-theme .bg-purple-600,
+.light-theme .bg-purple-700,
+.light-theme button.bg-indigo-600,
+.light-theme button.bg-indigo-700,
+.light-theme button.bg-indigo-500,
+.light-theme button.bg-emerald-600,
+.light-theme button.bg-emerald-700,
+.light-theme button.bg-emerald-500,
+.light-theme button.bg-rose-600,
+.light-theme button.bg-rose-700,
+.light-theme button.bg-rose-500,
+.light-theme button.bg-cyan-600,
+.light-theme button.bg-cyan-700,
+.light-theme button.bg-cyan-500,
+.light-theme button.bg-blue-600,
+.light-theme button.bg-blue-700,
+.light-theme button.bg-purple-600,
+.light-theme button.bg-purple-700,
+.light-theme button[class*="bg-gradient-to-"],
+.light-theme .btn-primary,
+.light-theme button.text-white {
+  color: #ffffff !important;
+}
+
+.light-theme .bg-indigo-600 *,
+.light-theme .bg-indigo-700 *,
+.light-theme .bg-indigo-500 *,
+.light-theme .bg-violet-600 *,
+.light-theme .bg-violet-700 *,
+.light-theme .bg-emerald-600 *,
+.light-theme .bg-emerald-700 *,
+.light-theme .bg-emerald-500 *,
+.light-theme .bg-rose-600 *,
+.light-theme .bg-rose-700 *,
+.light-theme .bg-rose-500 *,
+.light-theme .bg-cyan-600 *,
+.light-theme .bg-cyan-700 *,
+.light-theme .bg-cyan-500 *,
+.light-theme .bg-blue-600 *,
+.light-theme .bg-blue-700 *,
+.light-theme .bg-purple-600 *,
+.light-theme .bg-purple-700 *,
+.light-theme button[class*="bg-gradient-to-"] *,
+.light-theme button.text-white * {
+  color: #ffffff !important;
+}
+
+.light-theme button.bg-amber-600,
+.light-theme button.bg-amber-500 {
+  color: #0f172a !important;
+}
+
+/* High-contrast text & badge colors for Low Stock Alert Banners & Amber Tints in Light Mode */
+.light-theme .text-amber-950,
+.light-theme .text-amber-900,
+.light-theme .text-amber-800,
+.light-theme .text-amber-700 {
+  color: #451a03 !important; /* Deep dark amber brown for maximum contrast on light yellow backgrounds */
+}
+
+.light-theme .text-amber-300,
+.light-theme .text-amber-200,
+.light-theme .text-amber-100 {
+  color: #78350f !important; /* Dark amber brown for sharp contrast on light yellow backgrounds */
+}
+
+.light-theme .text-amber-400,
+.light-theme .text-amber-500 {
+  color: #b45309 !important;
+}
+
+.light-theme .bg-amber-500\/20,
+.light-theme .bg-amber-500\/15 {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
+}
+
+/* Soft Badges & Tints in Light Theme */
+.light-theme .bg-indigo-500\/10 { background-color: #e0e7ff !important; color: #4338ca !important; border-color: #c7d2fe !important; }
+.light-theme .bg-emerald-500\/10 { background-color: #d1fae5 !important; color: #047857 !important; border-color: #a7f3d0 !important; }
+.light-theme .bg-amber-500\/10 { background-color: #fef3c7 !important; color: #b45309 !important; border-color: #fde68a !important; }
+.light-theme .bg-rose-500\/10 { background-color: #ffe4e6 !important; color: #be123c !important; border-color: #fecdd3 !important; }
+.light-theme .bg-cyan-500\/10 { background-color: #cffaff !important; color: #0e7490 !important; border-color: #a5f3fc !important; }
+.light-theme .bg-purple-500\/10 { background-color: #f3e8ff !important; color: #6b21a8 !important; border-color: #e9d5ff !important; }
+
+/* Modals, Overlays, Drawers, Popups & Minimal Shadow */
+.light-theme .fixed.inset-0.bg-slate-950\/80,
+.light-theme .fixed.inset-0.bg-black\/60,
+.light-theme .fixed.inset-0.bg-black\/70,
+.light-theme .fixed.inset-0.bg-slate-900\/70,
+.light-theme .fixed.inset-0.bg-slate-950\/70,
+.light-theme .fixed.inset-0.bg-slate-900\/80 {
+  background-color: rgba(15, 23, 42, 0.35) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+.light-theme .fixed .bg-slate-900,
+.light-theme .fixed .bg-slate-950,
+.light-theme .absolute.z-50,
+.light-theme [role="dialog"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05) !important; /* Reduced minimal shadow */
+}
+
+/* General Shadow Reduction in Light Mode */
+.light-theme .shadow-2xl,
+.light-theme .shadow-xl,
+.light-theme .shadow-lg,
+.light-theme .shadow-md,
+.light-theme .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Form Controls, Inputs, Selects & Textareas */
+.light-theme input:not([type="checkbox"]):not([type="radio"]),
+.light-theme select,
+.light-theme textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+.light-theme input:focus,
+.light-theme select:focus,
+.light-theme textarea:focus {
+  border-color: #6366f1 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+}
+
+.light-theme input::placeholder,
+.light-theme textarea::placeholder {
+  color: #64748b !important;
+}
+
+.light-theme select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Table FX & Borders */
+.light-theme table {
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme table th {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.light-theme table td {
+  color: #0f172a !important;
+  border-bottom-color: #f1f5f9 !important;
+}
+
+.light-theme table tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+/* Header & Sidebar - Minimal Border & No Heavy Shadows */
+.light-theme header#admin-navbar {
+  background-color: #ffffff !important;
+  border-bottom-color: #e2e8f0 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  color: #0f172a !important;
+}
+
+.light-theme #global-admin-search {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light-theme #view-storefront-btn {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+.light-theme #view-storefront-btn:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light-theme #theme-toggle-btn {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+.light-theme #theme-toggle-btn:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light-theme #theme-toggle-btn span {
+  color: #1e293b !important;
+}
+
+.light-theme #user-profile-menu {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light-theme #user-profile-menu:hover {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light-theme #user-profile-menu .font-extrabold {
+  color: #0f172a !important;
+}
+
+.light-theme #demo-logout-btn {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+.light-theme #demo-logout-btn:hover {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #e11d48 !important;
+}
+
+.light-theme aside#admin-sidebar {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+  box-shadow: none !important;
+  color: #0f172a !important;
+}
+
+/* Sidebar Specific Light Theme Text & Contrast */
+.light-theme #admin-sidebar button[id^="nav-item-"]:not([class*="from-indigo-600"]) {
+  color: #1e293b !important;
+}
+
+.light-theme #admin-sidebar button[id^="nav-item-"]:not([class*="from-indigo-600"]):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.light-theme #admin-sidebar button[id^="nav-item-"][class*="from-indigo-600"] {
+  color: #ffffff !important;
+  background: linear-gradient(to right, #4f46e5, #2563eb) !important;
+}
+
+.light-theme #admin-sidebar button[id^="nav-item-"][class*="from-indigo-600"] * {
+  color: #ffffff !important;
+}
+
+.light-theme #sidebar-shop-quick-info {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Code blocks / SQL blocks */
+.light-theme .font-mono.bg-slate-900,
+.light-theme .font-mono.bg-slate-950 {
+  background-color: #f1f5f9 !important;
+  color: #0284c7 !important;
+  border-color: #cbd5e1 !important;
+}
